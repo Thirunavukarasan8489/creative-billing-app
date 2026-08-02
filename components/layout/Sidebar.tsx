@@ -13,6 +13,7 @@ import {
   Menu,
   Settings,
   CheckCircle2,
+  FileSpreadsheet,
 } from "lucide-react";
 
 export function Sidebar() {
@@ -23,6 +24,7 @@ export function Sidebar() {
   const navLinks = [
     { href: "/", label: "Overview", icon: LayoutDashboard },
     { href: "/invoices", label: "Invoices & Ledger", icon: FileText },
+    { href: "/quotations", label: "Rate Quotations", icon: FileSpreadsheet },
     { href: "/companies", label: "Client Ledgers & Statements", icon: Building2 },
     { href: "/reports", label: "GST & Tax Reports", icon: PieChart },
     { href: "/settings", label: "Press Settings", icon: Settings },

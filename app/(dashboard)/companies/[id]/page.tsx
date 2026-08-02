@@ -28,7 +28,8 @@ export default function CompanyDetailPage({
 
   // Financial Year default: 1st April of current/previous FY to 31st March
   const now = new Date();
-  const fyStart = now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
+  const fyStart =
+    now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
   const [startDate, setStartDate] = useState(`${fyStart}-04-01`);
   const [endDate, setEndDate] = useState(`${fyStart + 1}-03-31`);
 
@@ -36,10 +37,11 @@ export default function CompanyDetailPage({
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/companies/${id}/statement?startDate=${startDate}&endDate=${endDate}`
+        `/api/companies/${id}/statement?startDate=${startDate}&endDate=${endDate}`,
       );
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to load account statement");
+      if (!res.ok)
+        throw new Error(data.error || "Failed to load account statement");
       setStatementData(data);
     } catch (err: any) {
       setError(err.message);
@@ -55,12 +57,16 @@ export default function CompanyDetailPage({
   const handlePrintStatement = () => {
     window.open(
       `/companies/${id}/statement/print?startDate=${startDate}&endDate=${endDate}`,
-      "_blank"
+      "_blank",
     );
   };
 
   if (loading && !statementData) {
-    return <div className="p-12 text-center text-xs text-slate-500">Loading company statement...</div>;
+    return (
+      <div className="p-12 text-center text-xs text-slate-500">
+        Loading company statement...
+      </div>
+    );
   }
 
   if (error || !statementData) {
@@ -123,7 +129,9 @@ export default function CompanyDetailPage({
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
             Company Billing Details
           </span>
-          <p className="text-xs text-slate-700 whitespace-pre-line">{company.address}</p>
+          <p className="text-xs text-slate-700 whitespace-pre-line">
+            {company.address}
+          </p>
           {company.gstin ? (
             <span className="inline-block bg-[#0F172A] text-white text-[10px] uppercase font-mono px-2 py-0.5 rounded font-semibold mt-2">
               GSTIN: {company.gstin}
@@ -140,10 +148,16 @@ export default function CompanyDetailPage({
             Period Total Billed (₹)
           </span>
           <p className="font-mono text-2xl font-bold text-[#0F172A]">
-            ₹{summary.totalBilled.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+            ₹
+            {summary.totalBilled.toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+            })}
           </p>
           <p className="text-[11px] text-slate-500">
-            Total Payments Received: ₹{summary.totalReceived.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+            Total Payments Received: ₹
+            {summary.totalReceived.toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+            })}
           </p>
         </div>
 
@@ -152,10 +166,14 @@ export default function CompanyDetailPage({
             Net Outstanding Balance (₹)
           </span>
           <p className="font-mono text-2xl font-bold text-[#E11D48]">
-            ₹{summary.balance.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+            ₹
+            {summary.balance.toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+            })}
           </p>
           <p className="text-[11px] text-slate-500">
-            Statement Period: {new Date(startDate).toLocaleDateString("en-IN")} to {new Date(endDate).toLocaleDateString("en-IN")}
+            Statement Period: {new Date(startDate).toLocaleDateString("en-IN")}{" "}
+            to {new Date(endDate).toLocaleDateString("en-IN")}
           </p>
         </div>
       </div>
@@ -226,7 +244,8 @@ export default function CompanyDetailPage({
             {press.address}
           </p>
           <p className="text-xs text-slate-600 font-mono">
-            Cell : {press.phone} | GSTIN : <span className="font-bold text-[#E11D48]">{press.gstin}</span>
+            Cell : {press.phone} | GSTIN :{" "}
+            <span className="font-bold text-[#E11D48]">{press.gstin}</span>
           </p>
         </div>
 
@@ -234,7 +253,9 @@ export default function CompanyDetailPage({
         <div className="flex flex-col sm:flex-row justify-between items-center bg-slate-100 p-3 rounded-lg border border-slate-300 font-mono text-xs font-bold text-[#0F172A] gap-2">
           <span className="uppercase text-blue-700">{company.name}</span>
           <span>
-            ACCOUNT STATEMENT - {new Date(startDate).toLocaleDateString("en-IN")} TO {new Date(endDate).toLocaleDateString("en-IN")}
+            ACCOUNT STATEMENT -{" "}
+            {new Date(startDate).toLocaleDateString("en-IN")} TO{" "}
+            {new Date(endDate).toLocaleDateString("en-IN")}
           </span>
           <span>GSTIN: {company.gstin || "N/A"}</span>
         </div>
@@ -244,23 +265,45 @@ export default function CompanyDetailPage({
           <table className="w-full text-xs text-left border-collapse">
             <thead className="bg-[#0F172A] text-white uppercase text-[10px] font-bold tracking-wider">
               <tr>
-                <th className="p-2.5 border border-slate-800 text-center w-24">Date</th>
-                <th className="p-2.5 border border-slate-800 text-center w-24">Bill No.</th>
+                <th className="p-2.5 border border-slate-800 text-center w-24">
+                  Date
+                </th>
+                <th className="p-2.5 border border-slate-800 text-center w-24">
+                  Bill No.
+                </th>
                 <th className="p-2.5 border border-slate-800">Particulars</th>
-                <th className="p-2.5 border border-slate-800 text-right w-24">Total (₹)</th>
-                <th className="p-2.5 border border-slate-800 text-center w-10">%</th>
-                <th className="p-2.5 border border-slate-800 text-right w-20">CGST (₹)</th>
-                <th className="p-2.5 border border-slate-800 text-center w-10">%</th>
-                <th className="p-2.5 border border-slate-800 text-right w-20">SGST (₹)</th>
-                <th className="p-2.5 border border-slate-800 text-right w-28">Total Amount (₹)</th>
-                <th className="p-2.5 border border-slate-800 text-right w-36">Payment Received Details (₹)</th>
+                <th className="p-2.5 border border-slate-800 text-right w-24">
+                  Total (₹)
+                </th>
+                <th className="p-2.5 border border-slate-800 text-center w-10">
+                  %
+                </th>
+                <th className="p-2.5 border border-slate-800 text-right w-20">
+                  CGST (₹)
+                </th>
+                <th className="p-2.5 border border-slate-800 text-center w-10">
+                  %
+                </th>
+                <th className="p-2.5 border border-slate-800 text-right w-20">
+                  SGST (₹)
+                </th>
+                <th className="p-2.5 border border-slate-800 text-right w-28">
+                  Total Amount (₹)
+                </th>
+                <th className="p-2.5 border border-slate-800 text-right w-36">
+                  Payment Received Details (₹)
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 font-mono">
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={10} className="p-8 text-center text-slate-400 italic font-sans">
-                    No bills or payment transactions recorded for this company during the selected date range.
+                  <td
+                    colSpan={10}
+                    className="p-8 text-center text-slate-400 italic font-sans"
+                  >
+                    No bills or payment transactions recorded for this company
+                    during the selected date range.
                   </td>
                 </tr>
               ) : (
@@ -271,7 +314,10 @@ export default function CompanyDetailPage({
                     </td>
                     <td className="p-2 border border-slate-200 text-center font-bold text-[#0F172A]">
                       {r.billNo ? (
-                        <Link href={`/invoices/new?search=${r.billNo}`} className="hover:underline">
+                        <Link
+                          href={`/invoices/new?search=${r.billNo}`}
+                          className="hover:underline"
+                        >
                           {r.billNo}
                         </Link>
                       ) : (
@@ -300,7 +346,9 @@ export default function CompanyDetailPage({
                       {r.totalAmount > 0 ? r.totalAmount.toFixed(2) : ""}
                     </td>
                     <td className="p-2 border border-slate-200 text-right font-bold text-emerald-700 bg-emerald-50/50">
-                      {r.paymentReceived > 0 ? r.paymentReceived.toFixed(2) : ""}
+                      {r.paymentReceived > 0
+                        ? r.paymentReceived.toFixed(2)
+                        : ""}
                     </td>
                   </tr>
                 ))
@@ -308,26 +356,44 @@ export default function CompanyDetailPage({
 
               {/* Totals Summary Row */}
               <tr className="bg-slate-100 font-bold font-serif text-xs border-t-2 border-slate-900">
-                <td colSpan={3} className="p-3 text-right uppercase text-[#E11D48]">
+                <td
+                  colSpan={3}
+                  className="p-3 text-right uppercase text-[#E11D48]"
+                >
                   TOTAL
                 </td>
                 <td colSpan={5} className="p-3 border border-slate-300"></td>
                 <td className="p-3 border border-slate-300 text-right font-mono text-sm text-[#0F172A]">
-                  ₹{summary.totalBilled.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  ₹
+                  {summary.totalBilled.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                  })}
                 </td>
                 <td className="p-3 border border-slate-300 text-right font-mono text-sm text-emerald-700">
-                  ₹{summary.totalReceived.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  ₹
+                  {summary.totalReceived.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                  })}
                 </td>
               </tr>
 
               {/* Net Balance Row */}
               <tr className="bg-white font-bold font-serif text-sm border-t border-slate-300">
-                <td colSpan={3} className="p-3 text-right uppercase text-[#E11D48]">
-                  NET BALANCE DUE
+                <td
+                  colSpan={3}
+                  className="p-3 text-right uppercase text-[#E11D48]"
+                >
+                  DUE BALANCE
                 </td>
                 <td colSpan={5} className="p-3 border border-slate-300"></td>
-                <td colSpan={2} className="p-3 border border-slate-300 text-right font-mono text-base text-[#E11D48]">
-                  ₹{summary.balance.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                <td
+                  colSpan={2}
+                  className="p-3 border border-slate-300 text-right font-mono text-base text-[#E11D48]"
+                >
+                  ₹
+                  {summary.balance.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                  })}
                 </td>
               </tr>
             </tbody>
@@ -336,13 +402,19 @@ export default function CompanyDetailPage({
 
         {/* Bank Account Details Footer Box */}
         <div className="p-4 bg-slate-50 border border-slate-300 rounded-lg max-w-xl mx-auto space-y-1.5 text-xs text-center font-mono">
-          <h4 className="font-serif font-bold text-base text-[#0F172A]">{press.name}</h4>
+          <h4 className="font-serif font-bold text-base text-[#0F172A]">
+            {press.name}
+          </h4>
           <p className="font-bold text-slate-800">
-            NAME OF BANK : <span className="text-blue-700">{press.bankName}</span>
+            NAME OF BANK :{" "}
+            <span className="text-blue-700">{press.bankName}</span>
           </p>
-          <p className="font-bold text-slate-800">NATURE OF ACCOUNT : CURRENT ACCOUNT</p>
           <p className="font-bold text-slate-800">
-            ACCOUNT NO. : <span className="text-[#0F172A]">{press.accountNo}</span>
+            NATURE OF ACCOUNT : CURRENT ACCOUNT
+          </p>
+          <p className="font-bold text-slate-800">
+            ACCOUNT NO. :{" "}
+            <span className="text-[#0F172A]">{press.accountNo}</span>
           </p>
           <p className="font-bold text-slate-800">
             IFSC : <span className="text-[#0F172A]">{press.ifscCode}</span>

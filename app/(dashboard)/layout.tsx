@@ -16,8 +16,9 @@ export default function DashboardLayout({
           {children}
         </main>
         <footer className="border-t border-slate-200 bg-white text-slate-500 text-xs py-4 px-6 text-center">
-          <p className="font-medium">
-            CREATIVE LINE GRAPHICS — Printing Press Billing Management System • Tiruppur, Tamil Nadu
+          <p className="font-medium ">
+            <span className="park-avenue text-brand-rose text-lg">Creative Line Graphics</span> —
+            Printing Press Billing Management System • Tiruppur, Tamil Nadu
           </p>
         </footer>
       </div>
