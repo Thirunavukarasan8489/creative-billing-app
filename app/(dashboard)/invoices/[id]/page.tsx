@@ -3,16 +3,16 @@
 import { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import {
   FileText,
   Printer,
-  ArrowLeft,
   CreditCard,
-  CheckCircle2,
-  AlertCircle,
-  Download,
-  Trash2,
+  ArrowLeft,
   Pencil,
+  Trash2,
+  AlertCircle,
+  Ban,
 } from "lucide-react";
 import { InvoicePreview } from "@/components/invoices/InvoicePreview";
 import { PaymentModal } from "@/components/invoices/PaymentModal";
@@ -29,6 +29,7 @@ export default function InvoiceDetailPage({
   const [payments, setPayments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const fetchInvoiceData = async () => {
@@ -50,16 +51,47 @@ export default function InvoiceDetailPage({
     fetchInvoiceData();
   }, [id]);
 
+  const handleCancel = async () => {
+    if (
+      !confirm(
+        `Are you sure you want to CANCEL Bill #${invoice.number}? This will remove its amount from company account statements.`
+      )
+    )
+      return;
+
+    try {
+      const res = await fetch(`/api/invoices/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelled" }),
+      });
+      if (res.ok) {
+        toast.success(`Bill #${invoice.number} cancelled`);
+        fetchInvoiceData();
+      } else {
+        toast.error("Failed to cancel bill");
+      }
+    } catch (err) {
+      toast.error("Error cancelling bill");
+    }
+  };
+
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this invoice?")) return;
+    if (!confirm(`Permanently DELETE Bill #${invoice.number}? This action cannot be undone.`))
+      return;
+
     try {
       const res = await fetch(`/api/invoices/${id}`, { method: "DELETE" });
       if (res.ok) {
+        toast.success("Invoice deleted");
         router.push("/invoices");
         router.refresh();
+      } else {
+        toast.error("Failed to delete invoice");
       }
     } catch (err) {
       console.error(err);
+      toast.error("Error deleting invoice");
     }
   };
 
@@ -84,6 +116,7 @@ export default function InvoiceDetailPage({
   }
 
   const isPaid = invoice.status === "paid" || invoice.balanceAmount === 0;
+  const isCancelled = invoice.status === "cancelled";
 
   return (
     <div className="space-y-6">
@@ -110,6 +143,11 @@ export default function InvoiceDetailPage({
                   Labour Bill
                 </span>
               )}
+              {isCancelled && (
+                <span className="bg-rose-100 text-rose-800 border border-rose-300 text-[10px] uppercase font-bold px-2 py-0.5 rounded">
+                  Cancelled
+                </span>
+              )}
             </div>
             <p className="text-xs text-slate-600 font-mono">
               Issued To: <strong>{invoice.companySnapshot.name}</strong> | Date:{" "}
@@ -119,16 +157,17 @@ export default function InvoiceDetailPage({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {/* Edit Bill Button */}
-          <Link
-            href={`/invoices/${id}/edit`}
-            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5 transition-colors"
-          >
-            <Pencil className="w-4 h-4" />
-            <span>Edit Bill</span>
-          </Link>
+          {!isCancelled && (
+            <Link
+              href={`/invoices/${id}/edit`}
+              className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5 transition-colors"
+            >
+              <Pencil className="w-4 h-4" />
+              <span>Edit Bill</span>
+            </Link>
+          )}
 
-          {!isPaid && (
+          {!isPaid && !isCancelled && (
             <button
               onClick={() => setShowPaymentModal(true)}
               className="px-4 py-2 bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5"
@@ -146,47 +185,59 @@ export default function InvoiceDetailPage({
             <span>Print / Export PDF</span>
           </button>
 
-          <button
-            onClick={handleDelete}
-            className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200"
-            title="Delete Invoice"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+          {!isCancelled ? (
+            <button
+              onClick={handleCancel}
+              className="px-3 py-2 text-rose-700 hover:bg-rose-50 rounded-lg border border-rose-300 text-xs font-bold flex items-center gap-1 transition-colors"
+              title="Cancel Bill"
+            >
+              <Ban className="w-4 h-4 text-rose-600" />
+              <span>Cancel Bill</span>
+            </button>
+          ) : (
+            <button
+              onClick={handleDelete}
+              className="px-3 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-bold text-xs flex items-center gap-1.5 shadow"
+              title="Permanently Delete Cancelled Invoice"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Delete Cancelled Bill</span>
+            </button>
+          )}
         </div>
       </div>
 
       {/* Payment & Balance Status Banner */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase text-slate-500 block">
-            Grand Total
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+          <span className="text-[10px] font-bold uppercase text-slate-600 block">
+            Grand Total Amount
           </span>
-          <p className="font-mono text-xl font-bold text-[#0F172A]">
-            ₹{invoice.grandTotal.toLocaleString("en-IN")}
+          <p className="font-mono text-xl font-bold text-[#0F172A] mt-0.5">
+            ₹{invoice.grandTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase text-slate-500 block">
-            Amount Paid
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+          <span className="text-[10px] font-bold uppercase text-slate-600 block">
+            Total Payments Received
           </span>
-          <p className="font-mono text-xl font-bold text-emerald-700">
-            ₹{(invoice.paidAmount || 0).toLocaleString("en-IN")}
+          <p className="font-mono text-xl font-bold text-emerald-800 mt-0.5">
+            ₹{(invoice.paidAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase text-slate-500 block">
-            Outstanding Balance
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
+          <span className="text-[10px] font-bold uppercase text-slate-600 block">
+            Balance Outstanding
           </span>
-          <p className="font-mono text-xl font-bold text-[#E11D48]">
-            ₹{(invoice.balanceAmount || 0).toLocaleString("en-IN")}
+          <p className="font-mono text-xl font-bold text-[#E11D48] mt-0.5">
+            ₹{(invoice.balanceAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
           </p>
         </div>
       </div>
 
-      {/* Live Paper Bill Display */}
+      {/* Live Paper Bill Preview */}
       <InvoicePreview
         type={invoice.type}
         number={invoice.number}
@@ -204,33 +255,35 @@ export default function InvoiceDetailPage({
         notes={invoice.notes}
       />
 
-      {/* Payment Transaction Ledger */}
+      {/* Payment Transactions Ledger */}
       {payments.length > 0 && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden p-5 space-y-3">
-          <h3 className="font-serif font-bold text-base text-[#0F172A]">
-            Recorded Payment Transactions
+        <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-2xs space-y-3">
+          <h3 className="font-serif font-bold text-base text-[#0F172A] border-b border-slate-100 pb-2">
+            Payment Transaction History ({payments.length})
           </h3>
-          <div className="divide-y divide-slate-100">
-            {payments.map((p) => (
-              <div key={p._id} className="py-2.5 flex items-center justify-between text-xs">
-                <div>
-                  <span className="font-bold text-[#0F172A]">
-                    ₹{p.amountPaid.toLocaleString("en-IN")}
-                  </span>{" "}
-                  <span className="text-slate-500 font-mono">
-                    via {p.mode.toUpperCase()} ({new Date(p.date).toLocaleDateString("en-IN")})
-                  </span>
-                  {p.referenceNo && (
-                    <p className="text-[11px] font-mono text-slate-500">
-                      Ref: {p.referenceNo}
-                    </p>
-                  )}
-                </div>
-                <span className="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded">
-                  Cleared
-                </span>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs text-left">
+              <thead className="bg-slate-100 text-[#0F172A] font-bold uppercase tracking-wider">
+                <tr>
+                  <th className="p-2">Date</th>
+                  <th className="p-2">Mode</th>
+                  <th className="p-2">Reference No.</th>
+                  <th className="p-2 text-right">Amount Paid (₹)</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-mono">
+                {payments.map((p) => (
+                  <tr key={p._id}>
+                    <td className="p-2">{new Date(p.date).toLocaleDateString("en-IN")}</td>
+                    <td className="p-2 uppercase font-bold text-blue-800">{p.mode}</td>
+                    <td className="p-2 text-slate-700">{p.referenceNo || "—"}</td>
+                    <td className="p-2 text-right font-bold text-emerald-800">
+                      ₹{p.amountPaid.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
@@ -238,11 +291,14 @@ export default function InvoiceDetailPage({
       {/* Record Payment Modal */}
       {showPaymentModal && (
         <PaymentModal
-          invoiceId={invoice._id}
+          invoiceId={id}
           invoiceNumber={invoice.number}
           outstandingBalance={invoice.balanceAmount}
-          onSuccess={fetchInvoiceData}
           onClose={() => setShowPaymentModal(false)}
+          onSuccess={() => {
+            setShowPaymentModal(false);
+            fetchInvoiceData();
+          }}
         />
       )}
     </div>

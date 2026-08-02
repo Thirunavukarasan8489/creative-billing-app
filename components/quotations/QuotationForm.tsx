@@ -29,9 +29,19 @@ interface QuotationFormProps {
 export function QuotationForm({ initialValues }: QuotationFormProps) {
   const router = useRouter();
 
+  const getCompanyIdString = (val: any): string => {
+    if (!val) return "";
+    if (typeof val === "string") return val;
+    if (typeof val === "object") {
+      const id = val._id || val.id;
+      if (id) return typeof id === "string" ? id : String(id);
+    }
+    return String(val);
+  };
+
   const [selectedCompany, setSelectedCompany] = useState<any | null>(
     initialValues?.companySnapshot
-      ? { ...initialValues.companySnapshot, _id: initialValues.companyId }
+      ? { ...initialValues.companySnapshot, _id: getCompanyIdString(initialValues.companyId) }
       : null,
   );
 
@@ -125,7 +135,7 @@ export function QuotationForm({ initialValues }: QuotationFormProps) {
       const payload = {
         number,
         date,
-        companyId: selectedCompany._id || initialValues?.companyId,
+        companyId: getCompanyIdString(selectedCompany?._id || selectedCompany?.id || initialValues?.companyId),
         recipientTitle,
         subject,
         items: items.map((i) => ({
@@ -353,11 +363,12 @@ export function QuotationForm({ initialValues }: QuotationFormProps) {
                         type="number"
                         min="0"
                         step="any"
-                        value={item.rate}
+                        placeholder="0"
+                        value={item.rate === 0 ? "" : item.rate}
                         onChange={(e) =>
                           handleItemChange(index, "rate", e.target.value)
                         }
-                        className="w-full px-2 py-1 border border-slate-300 rounded font-mono bg-white text-right"
+                        className="w-full px-2 py-1 border border-slate-300 rounded font-mono bg-white text-right focus:ring-2 focus:ring-blue-500 outline-none"
                       />
                     </div>
 

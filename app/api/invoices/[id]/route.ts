@@ -42,6 +42,15 @@ export async function PUT(
     const { id } = await params;
     const body = await req.json();
 
+    if (body.status === "cancelled" && Object.keys(body).length === 1) {
+      const updated = await Invoice.findByIdAndUpdate(
+        id,
+        { status: "cancelled", balanceAmount: 0 },
+        { new: true }
+      );
+      return NextResponse.json(updated);
+    }
+
     const validation = invoiceSchema.safeParse(body);
     if (!validation.success) {
       return NextResponse.json(

@@ -54,6 +54,7 @@ export async function GET(
     const invoices = await Invoice.find({
       companyId: id,
       date: { $gte: startDate, $lte: endDate },
+      status: { $ne: "cancelled" },
     })
       .sort({ date: 1, createdAt: 1 })
       .lean();

@@ -12,7 +12,18 @@ export const invoiceSchema = z.object({
   type: z.enum(["tax_invoice", "labour_bill"]),
   number: z.string().optional(), // If omitted, API will generate next number
   date: z.string().or(z.date()),
-  companyId: z.string().min(1, "Company selection is required"),
+  companyId: z
+    .any()
+    .transform((val) => {
+      if (!val) return "";
+      if (typeof val === "string") return val;
+      if (typeof val === "object") {
+        const id = val._id || val.id;
+        if (id) return typeof id === "string" ? id : String(id);
+      }
+      return String(val);
+    })
+    .pipe(z.string().min(1, "Company selection is required")),
   items: z.array(invoiceItemSchema).min(1, "At least one item is required"),
   subtotal: z.coerce.number().min(0),
   cgstPercent: z.coerce.number().min(0).default(0),
@@ -22,7 +33,7 @@ export const invoiceSchema = z.object({
   roundOff: z.coerce.number().default(0),
   grandTotal: z.coerce.number().min(0),
   amountInWords: z.string().min(1),
-  status: z.enum(["draft", "sent", "paid"]).default("draft"),
+  status: z.enum(["draft", "sent", "paid", "cancelled"]).default("draft"),
   notes: z.string().optional(),
 });
 

@@ -49,10 +49,10 @@ app/
           print/
             route.ts            # Printable A4 Account Statement letterhead stream
     invoices/
-      page.tsx                  # Filterable invoice ledger (/invoices)
+      page.tsx                  # Filterable invoice ledger (/invoices) with Cancel & Delete actions
       new/page.tsx              # Company-first invoice creation (/invoices/new)
       [id]/
-        page.tsx                # Invoice view, status update, record payment (/invoices/[id])
+        page.tsx                # Invoice view, status update, record payment, cancel & delete (/invoices/[id])
         edit/
           page.tsx              # Interactive invoice editor to add/modify items (/invoices/[id]/edit)
         pdf/
@@ -73,7 +73,7 @@ app/
   api/
     companies/route.ts          # GET list, POST create
     companies/[id]/route.ts     # GET detail, PUT update, DELETE
-    companies/[id]/statement/route.ts # Chronological company account statement API
+    companies/[id]/statement/route.ts # Chronological company account statement API (excludes cancelled bills)
     invoices/route.ts           # GET list, POST create
     invoices/[id]/route.ts      # GET detail, PUT update, DELETE
     invoices/[id]/payments/route.ts # POST record payment transaction
@@ -89,24 +89,24 @@ lib/
   db.ts                         # Mongoose connection singleton
   models/
     Company.ts                  # Company schema & GSTIN detection
-    Invoice.ts                  # Invoice schema with historic company snapshot
+    Invoice.ts                  # Invoice schema with historic company snapshot & cancelled status
     Payment.ts                  # Payment transaction schema
     PressProfile.ts             # Printing press profile & bank details schema
     Quotation.ts                # Rate quotation schema with unit quantities & tax note
   validation/
     company.ts                  # Zod schema for company forms
-    invoice.ts                  # Zod schema for invoice forms with z.coerce.number()
+    invoice.ts                  # Zod schema for invoice forms with safe companyId object transformer
   numberToWords.ts              # Indian Rupees amount-in-words converter
 components/
   layout/
     Sidebar.tsx                 # Persistent Left Sidebar navigation (mobile & desktop)
   invoices/
-    InvoiceForm.tsx             # Interactive billing form with live GST math
+    InvoiceForm.tsx             # Interactive billing form with live GST math & empty numeric inputs
     InvoicePreview.tsx          # Real-time paper bill letterhead replica
     BillTypeToggle.tsx          # Tax Invoice vs Labour Bill selector
     PaymentModal.tsx            # Payment recording dialog
   quotations/
-    QuotationForm.tsx           # Interactive quotation editor
+    QuotationForm.tsx           # Interactive quotation editor with empty rate inputs
     QuotationPreview.tsx        # Real-time paper quotation letterhead replica
   companies/
     CompanyForm.tsx             # Company input form
@@ -122,18 +122,18 @@ All routes verified active and functional:
 | Route Path | File Location | Purpose & Status |
 | :--- | :--- | :--- |
 | `/` | `app/(dashboard)/page.tsx` | **Verified**: Dashboard overview, metrics & recent ledger |
-| `/invoices` | `app/(dashboard)/invoices/page.tsx` | **Verified**: Searchable & filterable invoice list with Edit buttons |
-| `/invoices/new` | `app/(dashboard)/invoices/new/page.tsx` | **Verified**: New bill creation with live paper preview |
-| `/invoices/[id]` | `app/(dashboard)/invoices/[id]/page.tsx` | **Verified**: Invoice details, Edit button, & payment modal |
-| `/invoices/[id]/edit` | `app/(dashboard)/invoices/[id]/edit/page.tsx` | **Verified**: Invoice editing to add/modify items |
-| `/invoices/[id]/pdf` | `app/(dashboard)/invoices/[id]/pdf/route.ts` | **Verified**: Printable HTML/PDF stream with dynamic press info |
+| `/invoices` | `app/(dashboard)/invoices/page.tsx` | **Verified**: Searchable invoice list with Cancel & Delete actions |
+| `/invoices/new` | `app/(dashboard)/invoices/new/page.tsx` | **Verified**: New bill creation with empty numeric inputs & live paper preview |
+| `/invoices/[id]` | `app/(dashboard)/invoices/[id]/page.tsx` | **Verified**: Invoice details, Edit button, Payment modal, & Cancel/Delete actions |
+| `/invoices/[id]/edit` | `app/(dashboard)/invoices/[id]/edit/page.tsx` | **Verified**: Invoice editing with object-safe companyId validation |
+| `/invoices/[id]/pdf` | `app/(dashboard)/invoices/[id]/pdf/route.ts` | **Verified**: Printable HTML/PDF stream with ParkAvenue rose header |
 | `/quotations` | `app/(dashboard)/quotations/page.tsx` | **Verified**: Rate Quotation ledger with 1-click invoice converter |
 | `/quotations/new` | `app/(dashboard)/quotations/new/page.tsx` | **Verified**: Create rate quotation with live preview |
 | `/quotations/[id]` | `app/(dashboard)/quotations/[id]/page.tsx` | **Verified**: Quotation detail view, Edit & Convert buttons |
 | `/quotations/[id]/edit` | `app/(dashboard)/quotations/[id]/edit/page.tsx` | **Verified**: Quotation interactive editor |
 | `/quotations/[id]/pdf` | `app/(dashboard)/quotations/[id]/pdf/route.ts` | **Verified**: Printable A4 Rate Quotation stream |
 | `/companies` | `app/(dashboard)/companies/page.tsx` | **Verified**: Client company directory & ledgers |
-| `/companies/[id]` | `app/(dashboard)/companies/[id]/page.tsx` | **Verified**: 8-column Account Statement & FY date range filter |
+| `/companies/[id]` | `app/(dashboard)/companies/[id]/page.tsx` | **Verified**: 8-column Account Statement excluding cancelled bills |
 | `/companies/[id]/statement/print` | `app/(dashboard)/companies/[id]/statement/print/route.ts` | **Verified**: Printable A4 Account Statement matching paper document |
 | `/reports` | `app/(dashboard)/reports/page.tsx` | **Verified**: GST tax summary (CGST/SGST) & company ledgers |
 | `/settings` | `app/(dashboard)/settings/page.tsx` | **Verified**: Edit press company details, GSTIN, & bank account |
@@ -142,14 +142,18 @@ All routes verified active and functional:
 
 ## Completed Works & Implementation Log
 
-### 1. Rate Quotation Feature
-- **[lib/models/Quotation.ts](file:///d:/projects/creative-billing-app/lib/models/Quotation.ts)**: Quotation schema supporting unit quantity strings (e.g. `5 PAD`, `10 PAD`, `8 NOS.`), recipient titles, subject lines, and `GST TAX 18% EXTRA` tax note badges.
-- **[app/api/quotations/route.ts](file:///d:/projects/creative-billing-app/app/api/quotations/route.ts)**, **[[id]/route.ts](file:///d:/projects/creative-billing-app/app/api/quotations/[id]/route.ts)**, and **[[id]/convert/route.ts](file:///d:/projects/creative-billing-app/app/api/quotations/[id]/convert/route.ts)**: API routes for CRUD operations and 1-click conversion into a live Tax Invoice or Labour Bill.
-- **[components/quotations/QuotationPreview.tsx](file:///d:/projects/creative-billing-app/components/quotations/QuotationPreview.tsx)** & **[app/(dashboard)/quotations/[id]/pdf/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/quotations/\[id\]/pdf/route.ts)**: Recreates the exact physical Rate Quotation letterhead matching the paper document.
+### 1. Invoice Cancellation & Deletion Workflow
+- **[lib/models/Invoice.ts](file:///d:/projects/creative-billing-app/lib/models/Invoice.ts)** & **[lib/validation/invoice.ts](file:///d:/projects/creative-billing-app/lib/validation/invoice.ts)**: Added `"cancelled"` status enum and transformer for populated `companyId` objects.
+- **[app/api/companies/[id]/statement/route.ts](file:///d:/projects/creative-billing-app/app/api/companies/[id]/statement/route.ts)** & **[statement/print/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/companies/\[id\]/statement/print/route.ts)**: Excluded cancelled bills from total billed and outstanding balance math.
+- **[app/(dashboard)/invoices/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/page.tsx)** & **[invoices/[id]/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/page.tsx)**: Added **Cancel Bill** and **Delete Cancelled Bill** action buttons.
+
+### 2. Input UX Cleanup
+- **[app/globals.css](file:///d:/projects/creative-billing-app/app/globals.css)**: Hidden browser up/down number spinner arrows.
+- **[components/invoices/InvoiceForm.tsx](file:///d:/projects/creative-billing-app/components/invoices/InvoiceForm.tsx)** & **[components/quotations/QuotationForm.tsx](file:///d:/projects/creative-billing-app/components/quotations/QuotationForm.tsx)**: Numeric inputs render empty blank boxes when zero, allowing typing without erasing zero.
 
 ---
 
 ## Verification & Build Status
 
 - TypeScript compilation and Next.js route validation verified via `npm run build`.
-- All routes and components adhere to the non-negotiables: mobile-responsive counter billing with persistent left sidebar, overridable bill types, GST field scoping, physical bill replica styling, dynamic press settings, full invoice editing capability, paper-replica company account statements, and rate quotations with 1-click invoice conversion.
+- All routes and components adhere to the non-negotiables: mobile-responsive counter billing with persistent left sidebar, overridable bill types, GST field scoping, physical bill replica styling, dynamic press settings, full invoice editing capability, paper-replica company account statements, rate quotations with 1-click invoice conversion, and invoice cancellation/deletion workflows.

@@ -35,7 +35,7 @@ export interface IInvoice extends Document {
   roundOff: number;
   grandTotal: number;
   amountInWords: string;
-  status: "draft" | "sent" | "paid";
+  status: "draft" | "sent" | "paid" | "cancelled";
   paidAmount: number;
   balanceAmount: number;
   notes?: string;
@@ -85,7 +85,7 @@ const InvoiceSchema: Schema = new Schema(
     amountInWords: { type: String, required: true, default: "" },
     status: {
       type: String,
-      enum: ["draft", "sent", "paid"],
+      enum: ["draft", "sent", "paid", "cancelled"],
       default: "draft",
     },
     paidAmount: { type: Number, default: 0 },
