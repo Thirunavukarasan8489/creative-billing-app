@@ -54,7 +54,7 @@ export default function InvoiceDetailPage({
   const handleCancel = async () => {
     if (
       !confirm(
-        `Are you sure you want to CANCEL Bill #${invoice.number}? This will remove its amount from company account statements.`
+        `Are you sure you want to CANCEL Bill #${invoice.number}? This will remove its amount from company account statements.`,
       )
     )
       return;
@@ -77,7 +77,11 @@ export default function InvoiceDetailPage({
   };
 
   const handleDelete = async () => {
-    if (!confirm(`Permanently DELETE Bill #${invoice.number}? This action cannot be undone.`))
+    if (
+      !confirm(
+        `Permanently DELETE Bill #${invoice.number}? This action cannot be undone.`,
+      )
+    )
       return;
 
     try {
@@ -100,7 +104,11 @@ export default function InvoiceDetailPage({
   };
 
   if (loading) {
-    return <div className="p-12 text-center text-xs text-[#0F172A]">Loading invoice...</div>;
+    return (
+      <div className="p-12 text-center text-xs text-[#0F172A]">
+        Loading invoice...
+      </div>
+    );
   }
 
   if (error || !invoice) {
@@ -182,7 +190,7 @@ export default function InvoiceDetailPage({
             className="px-4 py-2 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5"
           >
             <Printer className="w-4 h-4" />
-            <span>Print / ExportPrint /  PDF</span>
+            <span>Print / ExportPrint / PDF</span>
           </button>
 
           {!isCancelled ? (
@@ -214,7 +222,10 @@ export default function InvoiceDetailPage({
             Grand Total Amount
           </span>
           <p className="font-mono text-xl font-bold text-[#0F172A] mt-0.5">
-            ₹{invoice.grandTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+            ₹
+            {invoice.grandTotal.toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+            })}
           </p>
         </div>
 
@@ -223,7 +234,10 @@ export default function InvoiceDetailPage({
             Total Payments Received
           </span>
           <p className="font-mono text-xl font-bold text-emerald-800 mt-0.5">
-            ₹{(invoice.paidAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+            ₹
+            {(invoice.paidAmount || 0).toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+            })}
           </p>
         </div>
 
@@ -232,7 +246,10 @@ export default function InvoiceDetailPage({
             Balance Outstanding
           </span>
           <p className="font-mono text-xl font-bold text-[#E11D48] mt-0.5">
-            ₹{(invoice.balanceAmount || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+            ₹
+            {(invoice.balanceAmount || 0).toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+            })}
           </p>
         </div>
       </div>
@@ -276,11 +293,20 @@ export default function InvoiceDetailPage({
               <tbody className="divide-y divide-slate-100 font-mono">
                 {payments.map((p) => (
                   <tr key={p._id}>
-                    <td className="p-2">{new Date(p.date).toLocaleDateString("en-IN")}</td>
-                    <td className="p-2 uppercase font-bold text-blue-800">{p.mode}</td>
-                    <td className="p-2 text-slate-700">{p.referenceNo || "—"}</td>
+                    <td className="p-2">
+                      {new Date(p.date).toLocaleDateString("en-IN")}
+                    </td>
+                    <td className="p-2 uppercase font-bold text-blue-800">
+                      {p.mode}
+                    </td>
+                    <td className="p-2 text-slate-700">
+                      {p.referenceNo || "—"}
+                    </td>
                     <td className="p-2 text-right font-bold text-emerald-800">
-                      ₹{p.amountPaid.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                      ₹
+                      {p.amountPaid.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                      })}
                     </td>
                   </tr>
                 ))}

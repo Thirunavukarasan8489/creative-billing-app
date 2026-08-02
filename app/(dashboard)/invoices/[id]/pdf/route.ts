@@ -8,7 +8,7 @@ const DEFAULT_PRESS = {
   name: "Creative Line Graphics",
   tagline: "OFFSET PRINTING PRESS",
   address:
-    "No. 2/412, Thirumalai Nagar, Ganapathypalayam, Veerapandi (PO), palladam (T.K), Tiruppur - 641 605",
+    "No. 2/412, Thirumalai Nagar, Ganapathypalayam,\n Veerapandi (PO), Palladam (T.K), Tiruppur - 641 605",
   phone: "8489 902 902, 93442 16902",
   email: "creativetpr@gmail.com",
   gstin: "33DDIPG2441F1Z0",
@@ -81,43 +81,56 @@ export async function GET(
   </div>
 
   <div style="max-width: 800px; margin: 20px auto;" class="bill-card">
-    <!-- Centered Header without dark background -->
-    <div style="border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px;">
-      <h1 style="font-family: Georgia, serif; font-size: 18px; font-weight: bold; margin: 0; text-align: center; text-transform: uppercase; letter-spacing: 1px; color: #000;">
-        ${isTaxInvoice ? "TAX INVOICE" : "LABOUR BILL"}
-      </h1>
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; font-family: monospace; font-size: 12px; font-weight: bold; color: #000;">
-        <div>
-          BILL NO: ${invoice.number} &nbsp;|&nbsp; DATE: ${new Date(invoice.date).toLocaleDateString("en-GB").replace(/\//g, ".")}
-        </div>
-        ${
-          invoice.poNumber || invoice.poDate
-            ? `<div>
-                ${invoice.poNumber ? `P.O. NO: ${invoice.poNumber}` : ""}
-                ${invoice.poNumber && invoice.poDate ? " &nbsp;|&nbsp; " : ""}
-                ${invoice.poDate ? `P.O. DATE: ${new Date(invoice.poDate).toLocaleDateString("en-GB").replace(/\//g, ".")}` : ""}
-              </div>`
-            : ""
-        }
+    <!-- Header: Centered Title, Right-Aligned Bill Details -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #000; padding-bottom: 6px; margin-bottom: 12px;">
+      <div style="flex: 1;"></div>
+      <div style="flex: 2; text-align: center;">
+        <h1 style="font-family: Georgia, serif; font-size: 18px; font-weight: bold; margin: 0; text-transform: uppercase; letter-spacing: 1px; color: #000;">
+          ${isTaxInvoice ? "TAX INVOICE" : "LABOUR BILL"}
+        </h1>
       </div>
+      <div style="flex: 1;"></div>
     </div>
 
     <!-- Letterhead -->
-    <div style="border-bottom: 1px solid #000; padding-bottom: 10px; margin-bottom: 12px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #000; padding-bottom: 10px; margin-bottom: 12px;">
+    <div>
       <h2 class="letterhead-title">Creative Line Graphics</h2>
       <p style="margin: 2px 0 0 0; font-size: 11px; font-weight: bold; color: #0F172A; text-transform: uppercase;">${press.tagline || DEFAULT_PRESS.tagline}</p>
-      <p style="margin: 4px 0 0 0; font-size: 11px; color: #334155;">${press.address || DEFAULT_PRESS.address}</p>
+      <p style="margin: 4px 0 0 0; font-size: 11px; color: #334155; white-space: pre-line;">${press.address || DEFAULT_PRESS.address}</p>
       <p style="margin: 2px 0 0 0; font-size: 11px; color: #334155;">Phone: ${press.phone || DEFAULT_PRESS.phone} | Email: ${press.email || DEFAULT_PRESS.email}</p>
       ${isTaxInvoice ? `<p style="margin: 2px 0 0 0; font-size: 11px; font-weight: bold; color: #0F172A; font-family: monospace;">GSTIN: ${press.gstin || DEFAULT_PRESS.gstin} | State: ${press.state || DEFAULT_PRESS.state} (${press.stateCode || DEFAULT_PRESS.stateCode})</p>` : ""}
+      </div>
+      <div style="flex: 2; text-align: right; font-family: monospace; font-size: 12px; font-weight: bold; color: #000; line-height: 1.4;">
+        <div>BILL NO: ${invoice.number}</div>
+        <div>DATE: ${new Date(invoice.date).toLocaleDateString("en-GB").replace(/\//g, ".")}</div>
+        ${invoice.poNumber ? `<div>P.O. NO: ${invoice.poNumber}</div>` : ""}
+        ${invoice.poDate ? `<div>P.O. DATE: ${new Date(invoice.poDate).toLocaleDateString("en-GB").replace(/\//g, ".")}</div>` : ""}
+      </div>
     </div>
 
-    <!-- Client Info -->
-    <div style="padding: 10px; border: 1px solid #000; border-radius: 4px; margin-bottom: 14px; background: #fff;">
-      <p style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #475569; margin: 0;">Billed To</p>
-      <h3 style="font-size: 15px; font-weight: bold; color: #0F172A; margin: 2px 0;">${invoice.companySnapshot.name}</h3>
-      <p style="margin: 2px 0; color: #334155; white-space: pre-line;">${invoice.companySnapshot.address}</p>
-      <p style="margin: 2px 0; color: #334155;">Phone: ${invoice.companySnapshot.phone}</p>
-      ${invoice.companySnapshot.gstin ? `<p style="font-family: monospace; font-weight: bold; color: #0F172A; margin: 4px 0 0 0;">GSTIN: ${invoice.companySnapshot.gstin}</p>` : ""}
+    <!-- Client Info (Optimized without empty whitespace) -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 12px; border: 1px solid #000; border-radius: 4px; margin-bottom: 14px; background: #fff;">
+      <div>
+        <p style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #475569; margin: 0;">Billed To</p>
+        <h3 style="font-size: 15px; font-weight: bold; color: #0F172A; margin: 2px 0;">${invoice.companySnapshot.name}</h3>
+        <p style="margin: 2px 0; color: #334155; white-space: pre-line;">${invoice.companySnapshot.address}</p>
+        <p style="margin: 2px 0; color: #334155;">Phone: ${invoice.companySnapshot.phone}</p>
+      </div>
+      ${
+        invoice.companySnapshot.gstin
+          ? `
+        <div style="text-align: right; font-family: monospace; font-size: 12px; font-weight: bold; color: #000;">
+          <p style="margin: 0;">Party GSTIN: <span style="color: #E11D48;">${invoice.companySnapshot.gstin}</span></p>
+          <p style="margin: 2px 0 0 0; color: #475569; font-size: 11px;">State: ${invoice.companySnapshot.state || "Tamil Nadu"} (${invoice.companySnapshot.stateCode || "33"})</p>
+        </div>
+        `
+          : `
+        <div style="text-align: right; font-family: monospace; font-size: 11px; color: #475569;">
+          <p style="margin: 0;">State: ${invoice.companySnapshot.state || "Tamil Nadu"} (${invoice.companySnapshot.stateCode || "33"})</p>
+        </div>
+        `
+      }
     </div>
 
     <!-- Items Table with Black Borders -->
@@ -159,7 +172,7 @@ export async function GET(
       </div>
 
       <div style="width: 40%;">
-        <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px border-slate-200;">
+        <div style="display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #E2E8F0;">
           <span>Subtotal:</span>
           <span style="font-family: monospace; font-weight: bold;">₹${invoice.subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
         </div>
@@ -198,7 +211,7 @@ export async function GET(
     <div style="margin-top: 40px; display: flex; justify-content: flex-end; text-align: right;">
       <div>
         <p style="font-weight: bold; margin: 0 0 45px 0;">For Creative Line Graphics</p>
-        <p style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #64748B; margin: 0; border-top: 1px solid #000; pt: 4px; padding-top: 4px;">AUTHORIZED SIGNATORY</p>
+        <p style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #64748B; margin: 0; border-top: 1px solid #000; padding-top: 4px; display: inline-block; min-width: 140px; text-align: center;">AUTHORIZED SIGNATORY</p>
       </div>
     </div>
 

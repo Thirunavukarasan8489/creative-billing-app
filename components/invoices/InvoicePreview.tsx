@@ -63,7 +63,7 @@ export function InvoicePreview({
       name: "Creative Line Graphics",
       tagline: "OFFSET PRINTING PRESS",
       address:
-        "No. 2/412, Thirumalai Nagar, Ganapathypalayam, Veerapandi (PO), palladam (T.K), Tiruppur - 641 605",
+        "No. 2/412, Thirumalai Nagar, Ganapathypalayam,\nVeerapandi (PO), palladam (T.K), Tiruppur - 641 605",
       phone: "8489 902 902, 93442 16902",
       email: "creativetpr@gmail.com",
       gstin: "33DDIPG2441F1Z0",
@@ -86,21 +86,25 @@ export function InvoicePreview({
 
   return (
     <div className="rounded-xl overflow-hidden transition-all border-2 border-slate-900 bg-white p-6 text-[#0F172A] space-y-5">
-      {/* Centered Top Header Banner without dark fill */}
-      <div className="border-b-2 border-slate-900 pb-2">
-        <h2 className="font-serif text-lg font-bold tracking-widest text-center uppercase text-[#0F172A]">
-          {isTaxInvoice ? "TAX INVOICE" : "LABOUR BILL"}
-        </h2>
-        <div className="flex flex-wrap items-center justify-between mt-1 text-xs font-mono font-bold text-slate-900">
+      {/* Top Header: Centered Title, Right-Aligned Bill & PO Details */}
+      <div className="border-b-2 border-slate-900 pb-2 flex justify-between items-end">
+        <div className="flex-1"></div>
+        <div className="flex-2 text-center">
+          <h2 className="font-serif text-lg font-bold tracking-widest uppercase text-[#0F172A]">
+            {isTaxInvoice ? "TAX INVOICE" : "LABOUR BILL"}
+          </h2>
+        </div>
+        <div className="flex-2 text-right text-xs font-mono font-bold text-slate-900 leading-tight">
           <div>
-            BILL NO: {number || "TI/26-27/XXXX"} &nbsp;|&nbsp; DATE:{" "}
-            {date ? new Date(date).toLocaleDateString("en-GB").replace(/\//g, ".") : "DD.MM.YYYY"}
+            BILL NO: {number || "TI/26-27/XXXX"}
           </div>
-          {(poNumber || poDate) && (
+          <div>
+            DATE: {date ? new Date(date).toLocaleDateString("en-GB").replace(/\//g, ".") : "DD.MM.YYYY"}
+          </div>
+          {poNumber && <div>P.O. NO: {poNumber}</div>}
+          {poDate && (
             <div>
-              {poNumber && <span>P.O. NO: {poNumber}</span>}
-              {poNumber && poDate && <span> &nbsp;|&nbsp; </span>}
-              {poDate && <span>P.O. DATE: {new Date(poDate).toLocaleDateString("en-GB").replace(/\//g, ".")}</span>}
+              P.O. DATE: {new Date(poDate).toLocaleDateString("en-GB").replace(/\//g, ".")}
             </div>
           )}
         </div>
@@ -114,7 +118,7 @@ export function InvoicePreview({
         <p className="text-xs font-semibold text-[#0F172A] uppercase tracking-wider">
           {pressProfile.tagline}
         </p>
-        <p className="text-xs text-slate-600 mt-0.5">
+        <p className="text-xs text-slate-600 mt-0.5 whitespace-pre-line">
           {pressProfile.address}
         </p>
         <p className="text-xs text-slate-600 font-mono">
@@ -127,8 +131,8 @@ export function InvoicePreview({
         )}
       </div>
 
-      {/* Billed To Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white p-3 rounded-lg border border-slate-900">
+      {/* Billed To Section (Optimized without empty whitespace) */}
+      <div className="flex justify-between items-start bg-white p-3 rounded-lg border border-slate-900 gap-4">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
             BILLED TO:
@@ -152,15 +156,15 @@ export function InvoicePreview({
           )}
         </div>
 
-        {isTaxInvoice && company && (
-          <div className="sm:text-right flex flex-col justify-end">
-            <p className="text-xs font-mono font-bold text-[#0F172A]">
-              Party GSTIN:{" "}
-              <span className="text-[#E11D48]">{company.gstin || "N/A"}</span>
-            </p>
-            <p className="text-xs font-mono text-slate-600">
-              State: {company.state || "Tamil Nadu"} (
-              {company.stateCode || "33"})
+        {company && (
+          <div className="text-right font-mono text-xs text-slate-800 shrink-0">
+            {company.gstin && (
+              <p className="font-bold text-[#0F172A]">
+                Party GSTIN: <span className="text-[#E11D48]">{company.gstin}</span>
+              </p>
+            )}
+            <p className="text-slate-600 mt-0.5">
+              State: {company.state || "Tamil Nadu"} ({company.stateCode || "33"})
             </p>
           </div>
         )}
@@ -171,12 +175,24 @@ export function InvoicePreview({
         <table className="w-full text-xs text-left border-collapse border border-slate-900">
           <thead>
             <tr className="uppercase font-bold tracking-wider bg-white text-slate-900 border-b border-slate-900 text-[11px]">
-              <th className="p-2 text-center w-10 border border-slate-900">S.No</th>
-              <th className="p-2 border border-slate-900">Particulars / Job Description</th>
-              {isTaxInvoice && <th className="p-2 text-center border border-slate-900">HSN/SAC</th>}
+              <th className="p-2 text-center w-10 border border-slate-900">
+                S.No
+              </th>
+              <th className="p-2 border border-slate-900">
+                Particulars / Job Description
+              </th>
+              {isTaxInvoice && (
+                <th className="p-2 text-center border border-slate-900">
+                  HSN/SAC
+                </th>
+              )}
               <th className="p-2 text-right border border-slate-900">Qty</th>
-              <th className="p-2 text-right border border-slate-900">Rate (₹)</th>
-              <th className="p-2 text-right border border-slate-900">Amount (₹)</th>
+              <th className="p-2 text-right border border-slate-900">
+                Rate (₹)
+              </th>
+              <th className="p-2 text-right border border-slate-900">
+                Amount (₹)
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -340,9 +356,7 @@ export function InvoicePreview({
         </div>
 
         <div className="text-right space-y-8">
-          <p className="font-bold text-[#0F172A]">
-            For Creative Line Graphics
-          </p>
+          <p className="font-bold text-[#0F172A]">For Creative Line Graphics</p>
           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider border-t border-slate-900 pt-1 inline-block min-w-[140px] text-center">
             Authorised Signatory
           </p>

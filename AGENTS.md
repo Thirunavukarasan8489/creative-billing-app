@@ -154,14 +154,14 @@ All routes verified active and functional:
 
 ## Completed Works & Implementation Log
 
-### 1. B&W Print Layout Redesign
-- **[app/(dashboard)/invoices/[id]/pdf/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/pdf/route.ts)** & **[components/invoices/InvoicePreview.tsx](file:///d:/projects/creative-billing-app/components/invoices/InvoicePreview.tsx)**: Removed solid dark background fills, centered header title, placed `BILL NO` & `DATE` on left, moved Press GSTIN under phone details on left, and added crisp black borders (`border: 1px solid #000`) around all table cells for crisp Black & White printing.
+### 1. Right-Aligned Header Details & Whitespace Optimization
+- **[app/(dashboard)/invoices/[id]/pdf/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/pdf/route.ts)** & **[components/invoices/InvoicePreview.tsx](file:///d:/projects/creative-billing-app/components/invoices/InvoicePreview.tsx)**: Centered `TAX INVOICE` / `LABOUR BILL` title, right-aligned `BILL NO`, `DATE`, `P.O. NO`, and `P.O. DATE`, and optimized `BILLED TO` box layout to eliminate unused right whitespace.
 
-### 2. Optional Purchase Order Fields (`poNumber` & `poDate`)
+### 2. B&W Print Layout Redesign
+- **[app/(dashboard)/invoices/[id]/pdf/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/pdf/route.ts)** & **[components/invoices/InvoicePreview.tsx](file:///d:/projects/creative-billing-app/components/invoices/InvoicePreview.tsx)**: Removed solid dark background fills, moved Press GSTIN under phone details on left, and added crisp black borders (`border: 1px solid #000`) around all table cells.
+
+### 3. Optional Purchase Order Fields (`poNumber` & `poDate`)
 - **[lib/models/Invoice.ts](file:///d:/projects/creative-billing-app/lib/models/Invoice.ts)** & **[lib/validation/invoice.ts](file:///d:/projects/creative-billing-app/lib/validation/invoice.ts)**: Added optional `poNumber` and `poDate` fields.
-
-### 3. Financial Year (A.Y.) & Custom Date Range Statement Feature
-- **[app/api/reports/annual-statement/route.ts](file:///d:/projects/creative-billing-app/app/api/reports/annual-statement/route.ts)** & **[page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/reports/page.tsx)**: Assessment Year & custom date range sales statements in A4 Landscape format.
 
 ---
 
