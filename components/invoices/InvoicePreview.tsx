@@ -87,48 +87,53 @@ export function InvoicePreview({
   return (
     <div className="rounded-xl overflow-hidden transition-all border-2 border-slate-900 bg-white p-6 text-[#0F172A] space-y-5">
       {/* Top Header: Centered Title, Right-Aligned Bill & PO Details */}
-      <div className="border-b-2 border-slate-900 pb-2 flex justify-between items-end">
-        <div className="flex-1"></div>
-        <div className="flex-2 text-center">
+      <div className="border-b-2 border-slate-900 pb-2 flex justify-center items-center">
+        <div className="flex-1 text-center">
           <h2 className="font-serif text-lg font-bold tracking-widest uppercase text-[#0F172A]">
             {isTaxInvoice ? "TAX INVOICE" : "LABOUR BILL"}
           </h2>
         </div>
+      </div>
+
+      {/* Creative Line Graphics Letterhead Banner */}
+      <div className="flex justify-between items-center border-b border-slate-900 pb-3">
+        <div>
+          <h2 className="park-avenue normal-case text-3xl sm:text-4xl font-normal tracking-tight text-[#E11D48] leading-tight">
+            Creative Line Graphics
+          </h2>
+          <p className="text-xs font-semibold text-[#0F172A] uppercase tracking-wider">
+            {pressProfile.tagline}
+          </p>
+          <p className="text-xs text-slate-600 mt-0.5 whitespace-pre-line">
+            {pressProfile.address}
+          </p>
+          <p className="text-xs text-slate-600 font-mono">
+            Ph: {pressProfile.phone} | Email: {pressProfile.email}
+          </p>
+          {isTaxInvoice && (
+            <p className="text-xs font-bold text-[#0F172A] font-mono mt-0.5">
+              GSTIN: {pressProfile.gstin} | State:{" "}
+              {pressProfile.state || "Tamil Nadu"} (
+              {pressProfile.stateCode || "33"})
+            </p>
+          )}
+        </div>
         <div className="flex-2 text-right text-xs font-mono font-bold text-slate-900 leading-tight">
+          <div>BILL NO: {number || "TI/26-27/XXXX"}</div>
           <div>
-            BILL NO: {number || "TI/26-27/XXXX"}
-          </div>
-          <div>
-            DATE: {date ? new Date(date).toLocaleDateString("en-GB").replace(/\//g, ".") : "DD.MM.YYYY"}
+            DATE:{" "}
+            {date
+              ? new Date(date).toLocaleDateString("en-GB").replace(/\//g, ".")
+              : "DD.MM.YYYY"}
           </div>
           {poNumber && <div>P.O. NO: {poNumber}</div>}
           {poDate && (
             <div>
-              P.O. DATE: {new Date(poDate).toLocaleDateString("en-GB").replace(/\//g, ".")}
+              P.O. DATE:{" "}
+              {new Date(poDate).toLocaleDateString("en-GB").replace(/\//g, ".")}
             </div>
           )}
         </div>
-      </div>
-
-      {/* Creative Line Graphics Letterhead Banner */}
-      <div className="border-b border-slate-900 pb-3">
-        <h2 className="park-avenue normal-case text-3xl sm:text-4xl font-normal tracking-tight text-[#E11D48] leading-tight">
-          Creative Line Graphics
-        </h2>
-        <p className="text-xs font-semibold text-[#0F172A] uppercase tracking-wider">
-          {pressProfile.tagline}
-        </p>
-        <p className="text-xs text-slate-600 mt-0.5 whitespace-pre-line">
-          {pressProfile.address}
-        </p>
-        <p className="text-xs text-slate-600 font-mono">
-          Ph: {pressProfile.phone} | Email: {pressProfile.email}
-        </p>
-        {isTaxInvoice && (
-          <p className="text-xs font-bold text-[#0F172A] font-mono mt-0.5">
-            GSTIN: {pressProfile.gstin} | State: {pressProfile.state || "Tamil Nadu"} ({pressProfile.stateCode || "33"})
-          </p>
-        )}
       </div>
 
       {/* Billed To Section (Optimized without empty whitespace) */}
@@ -160,11 +165,13 @@ export function InvoicePreview({
           <div className="text-right font-mono text-xs text-slate-800 shrink-0">
             {company.gstin && (
               <p className="font-bold text-[#0F172A]">
-                Party GSTIN: <span className="text-[#E11D48]">{company.gstin}</span>
+                Party GSTIN:{" "}
+                <span className="text-[#E11D48]">{company.gstin}</span>
               </p>
             )}
             <p className="text-slate-600 mt-0.5">
-              State: {company.state || "Tamil Nadu"} ({company.stateCode || "33"})
+              State: {company.state || "Tamil Nadu"} (
+              {company.stateCode || "33"})
             </p>
           </div>
         )}
