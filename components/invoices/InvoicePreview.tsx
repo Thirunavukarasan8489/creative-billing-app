@@ -231,7 +231,7 @@ export function InvoicePreview({
                     </td>
                     {isTaxInvoice && (
                       <td className="p-2.5 text-center font-mono text-slate-600">
-                        {item.hsnSac || "9989"}
+                        {item.hsnSac || "4820"}
                       </td>
                     )}
                     <td className="p-2.5 text-right font-mono font-semibold">

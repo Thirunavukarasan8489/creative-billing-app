@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { dbConnect } from "@/lib/db";
 import Invoice from "@/lib/models/Invoice";
+import Company from "@/lib/models/Company";
 import Payment from "@/lib/models/Payment";
 import { invoiceSchema } from "@/lib/validation/invoice";
 import { numberToWords } from "@/lib/numberToWords";
@@ -12,13 +14,23 @@ export async function GET(
   try {
     await dbConnect();
     const { id } = await params;
-    const invoice = await Invoice.findById(id).populate("companyId");
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid invoice ID" }, { status: 400 });
+    }
+
+    // Ensure Company model schema is registered in serverless context
+    if (!mongoose.models.Company) {
+      mongoose.model("Company", Company.schema);
+    }
+
+    const invoice = await Invoice.findById(id).populate("companyId").lean();
 
     if (!invoice) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
-    const payments = await Payment.find({ invoiceId: id }).sort({ date: -1 });
+    const payments = await Payment.find({ invoiceId: id }).sort({ date: -1 }).lean();
 
     return NextResponse.json({
       invoice,
@@ -40,6 +52,11 @@ export async function PUT(
   try {
     await dbConnect();
     const { id } = await params;
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid invoice ID" }, { status: 400 });
+    }
+
     const body = await req.json();
 
     if (body.status === "cancelled" && Object.keys(body).length === 1) {
@@ -121,6 +138,10 @@ export async function DELETE(
   try {
     await dbConnect();
     const { id } = await params;
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ error: "Invalid invoice ID" }, { status: 400 });
+    }
 
     const invoice = await Invoice.findByIdAndDelete(id);
     if (!invoice) {

@@ -44,7 +44,10 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
 
   const [selectedCompany, setSelectedCompany] = useState<any | null>(
     initialValues?.companySnapshot
-      ? { ...initialValues.companySnapshot, _id: getCompanyIdString(initialValues.companyId) }
+      ? {
+          ...initialValues.companySnapshot,
+          _id: getCompanyIdString(initialValues.companyId),
+        }
       : null,
   );
 
@@ -66,7 +69,7 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
     initialValues?.items || [
       {
         description: "",
-        hsnSac: "9989",
+        hsnSac: "4820",
         quantity: 0,
         rate: 0,
         amount: 0,
@@ -151,7 +154,7 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
       ...items,
       {
         description: "",
-        hsnSac: type === "tax_invoice" ? "9989" : "",
+        hsnSac: type === "tax_invoice" ? "4820" : "",
         quantity: 1,
         rate: 0,
         amount: 0,
@@ -203,7 +206,11 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
         type,
         number: invoiceNumber,
         date,
-        companyId: getCompanyIdString(selectedCompany?._id || selectedCompany?.id || initialValues?.companyId),
+        companyId: getCompanyIdString(
+          selectedCompany?._id ||
+            selectedCompany?.id ||
+            initialValues?.companyId,
+        ),
         items: items.map((i) => ({
           ...i,
           quantity: Number(i.quantity) || 0,
@@ -409,7 +416,7 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
                           onChange={(e) =>
                             handleItemChange(index, "hsnSac", e.target.value)
                           }
-                          placeholder="9989"
+                          placeholder="4820"
                           className="w-full px-2 py-1 border border-slate-300 rounded font-mono bg-white"
                         />
                       </div>
