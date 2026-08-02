@@ -262,7 +262,7 @@ export default function CompanyDetailPage({
 
         {/* 8-Column Ledger Table */}
         <div className="overflow-x-auto border border-slate-300 rounded-lg">
-          <table className="w-full text-xs text-left border-collapse">
+          <table className="w-full text-xs text-left border-collapse min-w-[750px]">
             <thead className="bg-[#0F172A] text-white uppercase text-[10px] font-bold tracking-wider">
               <tr>
                 <th className="p-2.5 border border-slate-800 text-center w-24">

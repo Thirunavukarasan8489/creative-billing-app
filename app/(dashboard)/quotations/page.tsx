@@ -144,7 +144,7 @@ export default function QuotationsPage() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left">
+            <table className="w-full text-xs text-left min-w-[640px]">
               <thead className="bg-slate-100 text-[#0F172A] font-bold uppercase tracking-wider border-b border-slate-200">
                 <tr>
                   <th className="p-3">Quotation No.</th>

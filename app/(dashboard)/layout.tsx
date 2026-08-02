@@ -6,7 +6,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex bg-[#F8FAFC] text-[#0F172A]">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-[#F8FAFC] text-[#0F172A]">
       {/* Persistent Left Sidebar */}
       <Sidebar />
 
@@ -16,7 +16,7 @@ export default function DashboardLayout({
           {children}
         </main>
         <footer className="border-t border-slate-200 bg-white text-slate-500 text-xs py-4 px-6 text-center">
-          <p className="font-medium ">
+          <p className="font-medium">
             <span className="park-avenue text-brand-rose text-lg">Creative Line Graphics</span> —
             Printing Press Billing Management System • Tiruppur, Tamil Nadu
           </p>

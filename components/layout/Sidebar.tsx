@@ -18,8 +18,8 @@ import {
 
 export function Sidebar() {
   const pathname = usePathname();
-  // Sidebar default is OPEN on both desktop and mobile as requested
-  const [isOpenMobile, setIsOpenMobile] = useState(true);
+  // Sidebar default is CLOSED on mobile (< lg), always OPEN on desktop (lg:)
+  const [isOpenMobile, setIsOpenMobile] = useState(false);
 
   const navLinks = [
     { href: "/", label: "Overview", icon: LayoutDashboard },
@@ -32,8 +32,8 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile Top Header Toggle */}
-      <div className="lg:hidden bg-[#0F172A] text-white px-4 py-3 flex items-center justify-between sticky top-0 z-40 border-b border-slate-800 shadow-sm">
+      {/* Mobile Top Header */}
+      <div className="lg:hidden bg-[#0F172A] text-white px-4 py-3 flex items-center justify-between sticky top-0 z-30 border-b border-slate-800 shadow-sm">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-[#E11D48] flex items-center justify-center font-bold text-white shadow-sm">
             <span className="font-serif text-sm">CL</span>
@@ -44,22 +44,34 @@ export function Sidebar() {
         </div>
         <button
           onClick={() => setIsOpenMobile(!isOpenMobile)}
-          className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200"
-          title="Toggle Navigation Sidebar"
+          className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition-colors"
+          title="Toggle Navigation Menu"
         >
           {isOpenMobile ? <ChevronLeft className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
+      {/* Mobile Backdrop Overlay */}
+      {isOpenMobile && (
+        <div
+          onClick={() => setIsOpenMobile(false)}
+          className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs z-40 lg:hidden transition-opacity"
+        />
+      )}
+
       {/* Sidebar Container */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 z-30 h-screen w-64 bg-[#0F172A] text-slate-200 border-r border-slate-800 flex flex-col justify-between transition-transform duration-200 ease-in-out ${
+        className={`fixed lg:sticky top-0 left-0 z-50 lg:z-30 h-screen w-64 bg-[#0F172A] text-slate-200 border-r border-slate-800 flex flex-col justify-between transition-transform duration-200 ease-in-out ${
           isOpenMobile ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
         <div className="p-5 space-y-6 flex-1 overflow-y-auto">
           {/* Brand Header */}
-          <Link href="/" className="flex items-center gap-3 group border-b border-slate-800 pb-4">
+          <Link
+            href="/"
+            onClick={() => setIsOpenMobile(false)}
+            className="flex items-center gap-3 group border-b border-slate-800 pb-4"
+          >
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E11D48] to-[#9E1356] flex items-center justify-center font-bold text-white shadow-md group-hover:scale-105 transition-transform">
               <span className="font-serif text-xl tracking-tight">CL</span>
             </div>
@@ -81,6 +93,7 @@ export function Sidebar() {
           {/* Create New Bill CTA Button */}
           <Link
             href="/invoices/new"
+            onClick={() => setIsOpenMobile(false)}
             className="w-full py-2.5 px-4 bg-[#E11D48] hover:bg-[#BE123C] text-white font-bold text-xs rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 border border-rose-400/20 group"
           >
             <Plus className="w-4 h-4 group-hover:rotate-90 transition-transform" />
@@ -89,9 +102,6 @@ export function Sidebar() {
 
           {/* Navigation Links */}
           <nav className="space-y-1 pt-2">
-            {/* <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
-              Main Menu
-            </div> */}
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive =
@@ -102,6 +112,7 @@ export function Sidebar() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  onClick={() => setIsOpenMobile(false)}
                   className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
                     isActive
                       ? "bg-blue-600 text-white shadow-sm font-bold"
