@@ -8,6 +8,7 @@ Build a billing management web app for **Creative Line Graphics**, a printing pr
 2. **Labour Bill** — issued to small-scale companies with no GST requirement. Simple particulars/quantity/amount format.
 3. **Rate Quotation** — official quotation document issued to potential clients with customizable unit quantities, tax badges (`GST TAX 18% EXTRA`), and 1-click conversion to Tax Invoice/Labour Bill.
 4. **Monthly Sales Bill Statement** — 10-column physical ledger sheet statement (`SALES BILL [MONTH] [YEAR]`) summarizing all bills issued within any selected month with subtotal, CGST, SGST, and grand total sums.
+5. **Financial Year (A.Y.) Sales Statement** — Annual 10-column sales statement for Assessment Years (e.g. `A.Y. 2026-2027`) and custom date ranges, with 1-click A4 Landscape PDF export.
 
 Core principle: **Company-first workflow.** The user selects or creates a Company record first; the document type is auto-suggested, but the user can customize parameters per bill/quotation.
 
@@ -68,10 +69,13 @@ app/
         pdf/
           route.ts              # Printable A4 Rate Quotation stream (/quotations/[id]/pdf)
     reports/
-      page.tsx                  # Monthly Sales Statement, GST tax summary (CGST/SGST), & company ledgers (/reports)
+      page.tsx                  # Monthly Sales Statement, Financial Year Statement (A.Y.), & GST tax summary (/reports)
       monthly-sales/
         print/
           route.ts              # Printable A4 10-column Monthly Sales Statement PDF stream
+      annual-statement/
+        print/
+          route.ts              # Printable A4 Landscape Financial Year (A.Y. 2026-2027) PDF stream
     settings/
       page.tsx                  # Press company details, GSTIN, & bank account settings (/settings)
   api/
@@ -87,6 +91,7 @@ app/
     quotations/[id]/convert/route.ts # 1-click convert quotation into Tax Invoice/Labour Bill
     reports/route.ts            # Tax & ledger reporting calculations
     reports/monthly-sales/route.ts # Monthly sales bill statement API
+    reports/annual-statement/route.ts # Financial Year (A.Y.) sales statement API
     settings/route.ts           # GET and PUT PressProfile company settings
   layout.tsx
   globals.css                   # Tailwind CSS v4 @theme tokens, ParkAvenue font & paper styling
@@ -140,31 +145,29 @@ All routes verified active and functional:
 | `/companies` | `app/(dashboard)/companies/page.tsx` | **Verified**: Client company directory & ledgers |
 | `/companies/[id]` | `app/(dashboard)/companies/[id]/page.tsx` | **Verified**: 8-column Account Statement excluding cancelled bills |
 | `/companies/[id]/statement/print` | `app/(dashboard)/companies/[id]/statement/print/route.ts` | **Verified**: Printable A4 Account Statement matching paper document |
-| `/reports` | `app/(dashboard)/reports/page.tsx` | **Verified**: Monthly Sales Statement, GST tax summary (CGST/SGST) & company ledgers |
-| `/reports/monthly-sales/print` | `app/(dashboard)/reports/monthly-sales/print/route.ts` | **Verified**: Printable A4 10-column Monthly Sales Statement matching physical paper reference |
+| `/reports` | `app/(dashboard)/reports/page.tsx` | **Verified**: Monthly Sales Statement, Financial Year Statement (A.Y.) & GST tax summary |
+| `/reports/monthly-sales/print` | `app/(dashboard)/reports/monthly-sales/print/route.ts` | **Verified**: Printable A4 10-column Monthly Sales Statement PDF stream |
+| `/reports/annual-statement/print` | `app/(dashboard)/reports/annual-statement/print/route.ts` | **Verified**: Printable A4 Landscape Financial Year (A.Y. 2026-2027) Statement PDF stream |
 | `/settings` | `app/(dashboard)/settings/page.tsx` | **Verified**: Edit press company details, GSTIN, & bank account |
 
 ---
 
 ## Completed Works & Implementation Log
 
-### 1. Monthly Sales Bill Statement Feature
-- **[app/api/reports/monthly-sales/route.ts](file:///d:/projects/creative-billing-app/app/api/reports/monthly-sales/route.ts)**: API returning monthly bill items, subtotal, CGST, SGST, and grand total sums.
-- **[app/(dashboard)/reports/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/reports/page.tsx)**: Added **Monthly Sales Statement** tab with Month & Year pickers, 10-column live paper preview, and Print PDF button.
-- **[app/(dashboard)/reports/monthly-sales/print/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/reports/monthly-sales/print/route.ts)**: Printable A4 HTML/PDF route with ParkAvenue header, double border box, and 10-column ledger grid matching physical paper sheet.
+### 1. Financial Year (A.Y.) & Custom Date Range Statement Feature
+- **[app/api/reports/annual-statement/route.ts](file:///d:/projects/creative-billing-app/app/api/reports/annual-statement/route.ts)**: API returning annual bill items, subtotal, CGST, SGST, and grand total sums.
+- **[app/(dashboard)/reports/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/reports/page.tsx)**: Replaced "Client Company Ledgers" tab with **Financial Year (A.Y.) Statement** tab supporting FY pickers (`A.Y. 2024-2025` to `2027-2028`), custom `From:` / `To:` date range pickers, live landscape paper preview, and PDF download.
+- **[app/(dashboard)/reports/annual-statement/print/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/reports/annual-statement/print/route.ts)**: Printable A4 Landscape HTML/PDF route with ParkAvenue header and 10-column ledger grid.
 
-### 2. Invoice Cancellation & Deletion Workflow
+### 2. Monthly Sales Bill Statement Feature
+- **[app/api/reports/monthly-sales/route.ts](file:///d:/projects/creative-billing-app/app/api/reports/monthly-sales/route.ts)** & **[print/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/reports/monthly-sales/print/route.ts)**: Monthly sales statement API and A4 Landscape PDF stream.
+
+### 3. Invoice Cancellation & Deletion Workflow
 - **[lib/models/Invoice.ts](file:///d:/projects/creative-billing-app/lib/models/Invoice.ts)** & **[lib/validation/invoice.ts](file:///d:/projects/creative-billing-app/lib/validation/invoice.ts)**: Added `"cancelled"` status enum and transformer for populated `companyId` objects.
-- **[app/api/companies/[id]/statement/route.ts](file:///d:/projects/creative-billing-app/app/api/companies/[id]/statement/route.ts)** & **[statement/print/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/companies/\[id\]/statement/print/route.ts)**: Excluded cancelled bills from total billed and outstanding balance math.
-- **[app/(dashboard)/invoices/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/page.tsx)** & **[invoices/[id]/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/page.tsx)**: Added **Cancel Bill** and **Delete Cancelled Bill** action buttons.
-
-### 3. Input UX Cleanup
-- **[app/globals.css](file:///d:/projects/creative-billing-app/app/globals.css)**: Hidden browser up/down number spinner arrows.
-- **[components/invoices/InvoiceForm.tsx](file:///d:/projects/creative-billing-app/components/invoices/InvoiceForm.tsx)** & **[components/quotations/QuotationForm.tsx](file:///d:/projects/creative-billing-app/components/quotations/QuotationForm.tsx)**: Numeric inputs render empty blank boxes when zero, allowing typing without erasing zero.
 
 ---
 
 ## Verification & Build Status
 
 - TypeScript compilation and Next.js route validation verified via `npm run build`.
-- All routes and components adhere to the non-negotiables: mobile-responsive counter billing with persistent left sidebar, overridable bill types, GST field scoping, physical bill replica styling, dynamic press settings, full invoice editing capability, paper-replica company account statements, rate quotations with 1-click invoice conversion, monthly sales bill statement ledgers, and invoice cancellation/deletion workflows.
+- All routes and components adhere to the non-negotiables: mobile-responsive counter billing with persistent left sidebar, overridable bill types, GST field scoping, physical bill replica styling, dynamic press settings, full invoice editing capability, paper-replica company account statements, rate quotations with 1-click invoice conversion, monthly sales bill statement ledgers, financial year statement exports, and invoice cancellation/deletion workflows.

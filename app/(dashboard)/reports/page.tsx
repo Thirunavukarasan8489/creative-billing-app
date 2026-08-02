@@ -4,12 +4,12 @@ import { useState, useEffect } from "react";
 import {
   PieChart,
   Calendar,
-  Building2,
   FileSpreadsheet,
   RefreshCw,
   Printer,
   FileText,
   Download,
+  Award,
 } from "lucide-react";
 
 const MONTH_NAMES = [
@@ -29,7 +29,7 @@ const MONTH_NAMES = [
 
 export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState<
-    "monthly" | "gst" | "client_ledgers"
+    "monthly" | "gst" | "annual"
   >("monthly");
 
   // Monthly Statement State
@@ -41,7 +41,15 @@ export default function ReportsPage() {
   const [monthlyData, setMonthlyData] = useState<any | null>(null);
   const [loadingMonthly, setLoadingMonthly] = useState<boolean>(true);
 
-  // Overall GST & Ledger State
+  // Financial Year & Custom Date Range Statement State
+  const defaultFY = now.getMonth() >= 3 ? `${now.getFullYear()}-${now.getFullYear() + 1}` : `${now.getFullYear() - 1}-${now.getFullYear()}`;
+  const [selectedFY, setSelectedFY] = useState<string>(defaultFY);
+  const [customStart, setCustomStart] = useState<string>("");
+  const [customEnd, setCustomEnd] = useState<string>("");
+  const [annualData, setAnnualData] = useState<any | null>(null);
+  const [loadingAnnual, setLoadingAnnual] = useState<boolean>(true);
+
+  // Overall GST Tax Summary State
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [reportData, setReportData] = useState<any | null>(null);
@@ -65,7 +73,31 @@ export default function ReportsPage() {
     }
   };
 
-  // Fetch General GST Reports Data
+  // Fetch Annual / Custom Period Statement Data
+  const fetchAnnualStatement = async () => {
+    setLoadingAnnual(true);
+    try {
+      const params = new URLSearchParams();
+      if (customStart || customEnd) {
+        if (customStart) params.set("startDate", customStart);
+        if (customEnd) params.set("endDate", customEnd);
+      } else {
+        params.set("fy", selectedFY);
+      }
+
+      const res = await fetch(`/api/reports/annual-statement?${params.toString()}`);
+      const data = await res.json();
+      if (res.ok) {
+        setAnnualData(data);
+      }
+    } catch (err) {
+      console.error("Failed to load annual statement:", err);
+    } finally {
+      setLoadingAnnual(false);
+    }
+  };
+
+  // Fetch General GST Tax Summary
   const fetchGeneralReport = async () => {
     setLoadingGeneral(true);
     try {
@@ -90,14 +122,30 @@ export default function ReportsPage() {
   }, [selectedMonth, selectedYear]);
 
   useEffect(() => {
+    fetchAnnualStatement();
+  }, [selectedFY, customStart, customEnd]);
+
+  useEffect(() => {
     fetchGeneralReport();
   }, [startDate, endDate]);
 
   const handleDownloadMonthly = () => {
     window.open(
-      `/reports/monthly-sales/print?month=${selectedMonth}&year=${selectedYear}&download=true`,
+      `/reports/monthly-sales/print?month=${selectedMonth}&year=${selectedYear}&autoPrint=true`,
       "_blank"
     );
+  };
+
+  const handleDownloadAnnual = () => {
+    const params = new URLSearchParams();
+    if (customStart || customEnd) {
+      if (customStart) params.set("startDate", customStart);
+      if (customEnd) params.set("endDate", customEnd);
+    } else {
+      params.set("fy", selectedFY);
+    }
+    params.set("autoPrint", "true");
+    window.open(`/reports/annual-statement/print?${params.toString()}`, "_blank");
   };
 
   return (
@@ -107,10 +155,10 @@ export default function ReportsPage() {
         <div>
           <h1 className="font-serif text-2xl font-bold text-[#0F172A] flex items-center gap-2">
             <PieChart className="w-6 h-6 text-blue-600" />
-            <span>Reports & Monthly Statements</span>
+            <span>Reports & Billing Statements</span>
           </h1>
           <p className="text-xs text-slate-500">
-            Monthly billing statement ledgers, GSTR-1/3B tax summaries, and company outstanding balances
+            Monthly statements, Financial Year (A.Y.) sales ledgers, and GSTR-1/3B tax summaries
           </p>
         </div>
 
@@ -121,13 +169,24 @@ export default function ReportsPage() {
               className="px-4 py-2 bg-[#E11D48] hover:bg-[#BE123C] text-white rounded-xl font-bold text-xs shadow flex items-center gap-2"
             >
               <Download className="w-4 h-4" />
-              <span>Download Monthly Statement</span>
+              <span>Download Monthly Statement (PDF)</span>
+            </button>
+          )}
+
+          {activeTab === "annual" && (
+            <button
+              onClick={handleDownloadAnnual}
+              className="px-4 py-2 bg-[#E11D48] hover:bg-[#BE123C] text-white rounded-xl font-bold text-xs shadow flex items-center gap-2"
+            >
+              <Download className="w-4 h-4" />
+              <span>Download Financial Year Statement (PDF)</span>
             </button>
           )}
 
           <button
             onClick={() => {
               if (activeTab === "monthly") fetchMonthlyStatement();
+              else if (activeTab === "annual") fetchAnnualStatement();
               else fetchGeneralReport();
             }}
             className="px-4 py-2 bg-[#0F172A] hover:bg-slate-800 text-white rounded-xl font-bold text-xs shadow flex items-center gap-2"
@@ -153,6 +212,18 @@ export default function ReportsPage() {
         </button>
 
         <button
+          onClick={() => setActiveTab("annual")}
+          className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition-colors ${
+            activeTab === "annual"
+              ? "border-[#E11D48] text-[#E11D48]"
+              : "border-transparent text-slate-500 hover:text-slate-800"
+          }`}
+        >
+          <Award className="w-4 h-4 text-[#E11D48]" />
+          <span>Financial Year (A.Y.) Statement</span>
+        </button>
+
+        <button
           onClick={() => setActiveTab("gst")}
           className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition-colors ${
             activeTab === "gst"
@@ -162,18 +233,6 @@ export default function ReportsPage() {
         >
           <FileSpreadsheet className="w-4 h-4" />
           <span>GST Tax Summary</span>
-        </button>
-
-        <button
-          onClick={() => setActiveTab("client_ledgers")}
-          className={`pb-3 px-4 flex items-center gap-2 border-b-2 transition-colors ${
-            activeTab === "client_ledgers"
-              ? "border-blue-600 text-blue-600"
-              : "border-transparent text-slate-500 hover:text-slate-800"
-          }`}
-        >
-          <Building2 className="w-4 h-4" />
-          <span>Client Company Ledgers</span>
         </button>
       </div>
 
@@ -402,7 +461,255 @@ export default function ReportsPage() {
         </div>
       )}
 
-      {/* TAB 2: OVERALL GST TAX SUMMARY */}
+      {/* TAB 2: FINANCIAL YEAR (A.Y.) & CUSTOM DATE RANGE STATEMENT */}
+      {activeTab === "annual" && (
+        <div className="space-y-6">
+          {/* Assessment Year & Custom Date Controls */}
+          <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-3 text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <Award className="w-4 h-4 text-[#E11D48]" />
+                  <span className="font-semibold text-slate-700 uppercase">
+                    Financial / Assessment Year:
+                  </span>
+                </div>
+
+                <select
+                  value={selectedFY}
+                  onChange={(e) => {
+                    setSelectedFY(e.target.value);
+                    setCustomStart("");
+                    setCustomEnd("");
+                  }}
+                  className="px-3 py-1.5 border border-slate-300 rounded-lg font-bold bg-white text-slate-800 focus:ring-2 focus:ring-rose-500 outline-none"
+                >
+                  <option value="2024-2025">A.Y. 2024 - 2025 (01/04/24 to 31/03/25)</option>
+                  <option value="2025-2026">A.Y. 2025 - 2026 (01/04/25 to 31/03/26)</option>
+                  <option value="2026-2027">A.Y. 2026 - 2027 (01/04/26 to 31/03/27)</option>
+                  <option value="2027-2028">A.Y. 2027 - 2028 (01/04/27 to 31/03/28)</option>
+                </select>
+              </div>
+
+              <button
+                onClick={handleDownloadAnnual}
+                className="px-4 py-2 bg-[#E11D48] hover:bg-[#BE123C] text-white rounded-xl font-bold text-xs shadow flex items-center gap-2"
+              >
+                <Download className="w-4 h-4" />
+                <span>Download Annual Statement (PDF)</span>
+              </button>
+            </div>
+
+            {/* Custom Date Range Filter */}
+            <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-4">
+              <span className="font-bold text-slate-600 uppercase text-[11px]">
+                Or Set Custom Date Range:
+              </span>
+              <div className="flex items-center gap-2">
+                <label className="text-slate-500">From:</label>
+                <input
+                  type="date"
+                  value={customStart}
+                  onChange={(e) => setCustomStart(e.target.value)}
+                  className="px-3 py-1.5 border border-slate-300 rounded-lg font-mono bg-white"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="text-slate-500">To:</label>
+                <input
+                  type="date"
+                  value={customEnd}
+                  onChange={(e) => setCustomEnd(e.target.value)}
+                  className="px-3 py-1.5 border border-slate-300 rounded-lg font-mono bg-white"
+                />
+              </div>
+              {(customStart || customEnd) && (
+                <button
+                  onClick={() => {
+                    setCustomStart("");
+                    setCustomEnd("");
+                  }}
+                  className="text-rose-600 font-bold hover:underline"
+                >
+                  Reset Custom Range
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Live Paper Annual Statement Replica */}
+          {loadingAnnual ? (
+            <div className="p-12 text-center text-xs text-slate-500">
+              Generating annual sales statement...
+            </div>
+          ) : !annualData ? (
+            <div className="p-8 text-center text-xs text-rose-600">
+              Failed to load annual statement data.
+            </div>
+          ) : (
+            <div className="bg-white p-4 sm:p-8 rounded-xl border-2 border-slate-900 shadow-lg space-y-4 max-w-5xl mx-auto overflow-x-auto">
+              <div className="border border-slate-900 p-4 sm:p-6 min-w-[700px]">
+                {/* ParkAvenue Heading */}
+                <h2 className="park-avenue text-3xl sm:text-4xl text-center text-[#E11D48]">
+                  Creative Line Graphics
+                </h2>
+
+                {/* Sub-Header Title & Period */}
+                <div className="flex justify-between items-center border-t border-b-2 border-slate-900 py-1.5 my-3 text-xs sm:text-sm font-bold">
+                  <div className="w-1/4"></div>
+                  <div className="w-2/4 text-center text-[#BE123C] tracking-wide uppercase">
+                    SALES STATEMENT — {annualData.periodLabel}
+                  </div>
+                  <div className="w-1/4 text-right text-[#BE123C] font-mono">
+                    {new Date().toLocaleDateString("en-GB").replace(/\//g, " - ")}
+                  </div>
+                </div>
+
+                {/* 10-Column Annual Sales Grid */}
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs border-collapse border border-slate-900 font-mono">
+                    <thead>
+                      <tr className="bg-slate-50 text-slate-900 font-bold uppercase text-[10px] border-b border-slate-900">
+                        <th className="border border-slate-900 p-1.5 text-center w-14">
+                          BILL No.
+                        </th>
+                        <th className="border border-slate-900 p-1.5 text-center w-20">
+                          Date
+                        </th>
+                        <th className="border border-slate-900 p-1.5 text-left">
+                          Particulars
+                        </th>
+                        <th className="border border-slate-900 p-1.5 text-center w-36">
+                          GST NO.
+                        </th>
+                        <th className="border border-slate-900 p-1.5 text-right w-20">
+                          TOTAL
+                        </th>
+                        <th className="border border-slate-900 p-1.5 text-center w-8">
+                          %
+                        </th>
+                        <th className="border border-slate-900 p-1.5 text-right w-20">
+                          CGST
+                        </th>
+                        <th className="border border-slate-900 p-1.5 text-center w-8">
+                          %
+                        </th>
+                        <th className="border border-slate-900 p-1.5 text-right w-20">
+                          SGST
+                        </th>
+                        <th className="border border-slate-900 p-1.5 text-right w-24">
+                          Amount
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-900">
+                      {annualData.rows.length === 0 ? (
+                        <tr>
+                          <td
+                            colSpan={10}
+                            className="p-8 text-center text-slate-400 font-sans text-xs italic"
+                          >
+                            No bills found for {annualData.periodLabel}
+                          </td>
+                        </tr>
+                      ) : (
+                        annualData.rows.map((r: any) => (
+                          <tr key={r._id} className="hover:bg-slate-50">
+                            <td className="border border-slate-900 p-1.5 text-center font-bold text-slate-900">
+                              {r.billNo}
+                            </td>
+                            <td className="border border-slate-900 p-1.5 text-center text-slate-700">
+                              {new Date(r.date)
+                                .toLocaleDateString("en-GB")
+                                .replace(/\//g, ".")}
+                            </td>
+                            <td className="border border-slate-900 p-1.5 font-sans font-semibold text-slate-800">
+                              {r.particulars}
+                            </td>
+                            <td className="border border-slate-900 p-1.5 text-center text-slate-600 text-[10px]">
+                              {r.gstin}
+                            </td>
+                            <td className="border border-slate-900 p-1.5 text-right text-slate-800">
+                              {r.subtotal > 0
+                                ? r.subtotal.toLocaleString("en-IN", {
+                                    minimumFractionDigits: 2,
+                                  })
+                                : ""}
+                            </td>
+                            <td className="border border-slate-900 p-1.5 text-center text-slate-600">
+                              {r.cgstPercent > 0 ? r.cgstPercent : ""}
+                            </td>
+                            <td className="border border-slate-900 p-1.5 text-right text-slate-800">
+                              {r.cgstAmount > 0
+                                ? r.cgstAmount.toLocaleString("en-IN", {
+                                    minimumFractionDigits: 2,
+                                  })
+                                : ""}
+                            </td>
+                            <td className="border border-slate-900 p-1.5 text-center text-slate-600">
+                              {r.sgstPercent > 0 ? r.sgstPercent : ""}
+                            </td>
+                            <td className="border border-slate-900 p-1.5 text-right text-slate-800">
+                              {r.sgstAmount > 0
+                                ? r.sgstAmount.toLocaleString("en-IN", {
+                                    minimumFractionDigits: 2,
+                                  })
+                                : ""}
+                            </td>
+                            <td className="border border-slate-900 p-1.5 text-right font-bold text-slate-900">
+                              {r.grandTotal.toLocaleString("en-IN", {
+                                minimumFractionDigits: 2,
+                              })}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+
+                      {/* Summary Totals Row */}
+                      <tr className="bg-rose-50/50 font-bold border-t-2 border-slate-900 text-xs">
+                        <td
+                          colSpan={4}
+                          className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold uppercase font-sans"
+                        >
+                          TOTAL ({annualData.totals.totalBills} BILLS)
+                        </td>
+                        <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
+                          {annualData.totals.totalSubtotal.toLocaleString(
+                            "en-IN",
+                            { minimumFractionDigits: 2 }
+                          )}
+                        </td>
+                        <td className="border border-slate-900 p-2"></td>
+                        <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
+                          {annualData.totals.totalCGST.toLocaleString(
+                            "en-IN",
+                            { minimumFractionDigits: 2 }
+                          )}
+                        </td>
+                        <td className="border border-slate-900 p-2"></td>
+                        <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
+                          {annualData.totals.totalSGST.toLocaleString(
+                            "en-IN",
+                            { minimumFractionDigits: 2 }
+                          )}
+                        </td>
+                        <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold text-sm">
+                          {annualData.totals.grandTotalSum.toLocaleString(
+                            "en-IN",
+                            { minimumFractionDigits: 2 }
+                          )}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TAB 3: OVERALL GST TAX SUMMARY */}
       {activeTab === "gst" && (
         <div className="space-y-6">
           {/* Date Range Selector */}
@@ -501,61 +808,6 @@ export default function ReportsPage() {
                   </p>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* TAB 3: CLIENT COMPANY LEDGERS */}
-      {activeTab === "client_ledgers" && (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden space-y-3">
-          <div className="p-4 border-b border-slate-100 flex items-center justify-between">
-            <h2 className="font-serif font-bold text-lg text-[#0F172A] flex items-center gap-2">
-              <Building2 className="w-5 h-5 text-blue-600" />
-              <span>Client Company Ledger Balances</span>
-            </h2>
-          </div>
-
-          {loadingGeneral ? (
-            <div className="p-12 text-center text-xs text-slate-500">
-              Loading company ledgers...
-            </div>
-          ) : !reportData ? (
-            <div className="p-8 text-center text-xs text-rose-600">
-              Failed to load company ledgers.
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs text-left min-w-[600px]">
-                <thead className="bg-slate-100 text-[#0F172A] font-bold uppercase tracking-wider border-b border-slate-200">
-                  <tr>
-                    <th className="p-3">Company Name</th>
-                    <th className="p-3">GSTIN</th>
-                    <th className="p-3 text-center">Invoices</th>
-                    <th className="p-3 text-right">Total Billed (₹)</th>
-                    <th className="p-3 text-right">Total Paid (₹)</th>
-                    <th className="p-3 text-right">Outstanding (₹)</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {reportData.companyLedgers.map((cl: any) => (
-                    <tr key={cl.companyId} className="hover:bg-slate-50">
-                      <td className="p-3 font-bold text-[#0F172A]">{cl.name}</td>
-                      <td className="p-3 font-mono text-slate-600">{cl.gstin}</td>
-                      <td className="p-3 text-center font-mono">{cl.totalInvoices}</td>
-                      <td className="p-3 font-mono font-semibold text-right">
-                        ₹{cl.totalBilled.toLocaleString("en-IN")}
-                      </td>
-                      <td className="p-3 font-mono text-emerald-700 font-semibold text-right">
-                        ₹{cl.totalPaid.toLocaleString("en-IN")}
-                      </td>
-                      <td className="p-3 font-mono font-bold text-right text-[#E11D48]">
-                        ₹{cl.outstanding.toLocaleString("en-IN")}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           )}
         </div>
