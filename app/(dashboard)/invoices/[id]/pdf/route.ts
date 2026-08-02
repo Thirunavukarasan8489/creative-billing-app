@@ -3,55 +3,50 @@ import { dbConnect } from "@/lib/db";
 import Invoice from "@/lib/models/Invoice";
 import PressProfile from "@/lib/models/PressProfile";
 
-const DEFAULT_PROFILE = {
-  name: "CREATIVE LINE GRAPHICS",
+const DEFAULT_PRESS = {
+  name: "Creative Line Graphics",
   tagline: "OFFSET & DIGITAL PRINTING PRESS",
-  address:
-    "12, Printing Press Colony, Main Road, Tiruppur - 641601, Tamil Nadu.",
-  phone: "+91 98421 00000",
-  email: "creativeline.tpr@gmail.com",
-  gstin: "33AAAAA0000A1Z5",
+  address: "No. 2/412, Thirumalai Nagar, Ganapathypalayam, Veerapandi PO, TIRUPUR - 641 605.",
+  phone: "8489 902 902, 93442 16902",
+  email: "creativetpr@gmail.com",
+  gstin: "33DDIPG2441F1Z0",
   state: "Tamil Nadu",
   stateCode: "33",
-  bankName: "Union Bank of India",
-  accountNo: "510101001234567",
-  ifscCode: "UBIN0551015",
+  bankName: "FEDERAL BANK, TIRUPUR",
+  accountNo: "13590200065469",
+  ifscCode: "FDRL0001359",
   branchName: "Main Branch, Tiruppur",
-  terms:
-    "Labour bill for printing work rendered. Payment due within 15 days of invoice date.",
 };
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
     const { id } = await params;
-    const invoice = await Invoice.findById(id);
+    const invoice = await Invoice.findById(id).lean();
 
     if (!invoice) {
       return new NextResponse("Invoice Not Found", { status: 404 });
     }
 
     const dbPress = await PressProfile.findOne().lean();
-    const press = (dbPress || DEFAULT_PROFILE) as typeof DEFAULT_PROFILE;
+    const press = (dbPress || DEFAULT_PRESS) as any;
 
     const isTaxInvoice = invoice.type === "tax_invoice";
 
     const itemsHtml = invoice.items
-      .map(
-        (item: any, idx: number) => `
+      .map((item: any, idx: number) => `
         <tr>
-          <td style="padding: 8px; text-align: center; border-bottom: 1px solid #E2E8F0; font-family: monospace;">${idx + 1}</td>
+          <td style="padding: 8px; border-bottom: 1px solid #E2E8F0; text-align: center;">${idx + 1}</td>
           <td style="padding: 8px; border-bottom: 1px solid #E2E8F0; font-weight: 500;">${item.description}</td>
-          ${isTaxInvoice ? `<td style="padding: 8px; text-align: center; border-bottom: 1px solid #E2E8F0; font-family: monospace;">${item.hsnSac || "9989"}</td>` : ""}
-          <td style="padding: 8px; text-align: right; border-bottom: 1px solid #E2E8F0; font-family: monospace;">${item.quantity}</td>
+          ${isTaxInvoice ? `<td style="padding: 8px; border-bottom: 1px solid #E2E8F0; font-family: monospace; text-align: center;">${item.hsnSac || "9988"}</td>` : ""}
+          <td style="padding: 8px; text-align: center; border-bottom: 1px solid #E2E8F0; font-family: monospace;">${item.quantity}</td>
           <td style="padding: 8px; text-align: right; border-bottom: 1px solid #E2E8F0; font-family: monospace;">${item.rate.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
           <td style="padding: 8px; text-align: right; border-bottom: 1px solid #E2E8F0; font-family: monospace; font-weight: bold; color: #0F172A;">${item.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
         </tr>
-      `,
-      )
+      `)
       .join("");
 
     const html = `
@@ -61,12 +56,16 @@ export async function GET(
   <meta charset="UTF-8">
   <title>${isTaxInvoice ? "Tax Invoice" : "Labour Bill"} - ${invoice.number}</title>
   <style>
+    @font-face {
+      font-family: 'ParkAvenue';
+      src: url('/fonts/PARKANA_.TTF') format('truetype');
+    }
     @page { size: A4; margin: 15mm; }
     body { font-family: 'Helvetica Neue', Arial, sans-serif; background: #FFF; color: #0F172A; margin: 0; padding: 0; font-size: 12px; }
     .bill-card { border: 2px solid ${isTaxInvoice ? "#0F172A" : "#E11D48"}; padding: 24px; box-sizing: border-box; }
     .bill-header { background-color: ${isTaxInvoice ? "#0F172A" : "#E11D48"}; color: #FFFFFF; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
     .bill-title { font-family: Georgia, serif; font-size: 24px; font-weight: bold; margin: 0; text-transform: uppercase; }
-    .letterhead-title { font-family: Georgia, serif; font-size: 22px; font-weight: 900; color: #E11D48; margin: 0; }
+    .letterhead-title { font-family: 'ParkAvenue', 'Brush Script MT', cursive, Georgia, serif; font-size: 38px; font-weight: normal; color: #E11D48; margin: 0; line-height: 1.1; }
     .table-header { background-color: ${isTaxInvoice ? "#0F172A" : "#E11D48"}; color: #FFFFFF; text-transform: uppercase; font-size: 10px; font-weight: bold; }
     @media print {
       body { padding: 0; }
@@ -95,40 +94,36 @@ export async function GET(
     <!-- Letterhead -->
     <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #E2E8F0; padding: 16px 0;">
       <div>
-        <h2 class="letterhead-title">${press.name}</h2>
-        <p style="margin: 2px 0 0 0; font-size: 11px; font-weight: bold; color: #0F172A; text-transform: uppercase;">${press.tagline}</p>
-        <p style="margin: 4px 0 0 0; font-size: 11px; color: #475569;">${press.address}</p>
-        <p style="margin: 2px 0 0 0; font-size: 11px; font-family: monospace; color: #475569;">Ph: ${press.phone} | Email: ${press.email}</p>
+        <h2 class="letterhead-title">Creative Line Graphics</h2>
+        <p style="margin: 2px 0 0 0; font-size: 11px; font-weight: bold; color: #0F172A; text-transform: uppercase;">${press.tagline || DEFAULT_PRESS.tagline}</p>
+        <p style="margin: 4px 0 0 0; font-size: 11px; color: #475569;">${press.address || DEFAULT_PRESS.address}</p>
+        <p style="margin: 2px 0 0 0; font-size: 11px; color: #475569;">Phone: ${press.phone || DEFAULT_PRESS.phone} | Email: ${press.email || DEFAULT_PRESS.email}</p>
       </div>
-      ${
-        isTaxInvoice
-          ? `<div style="background-color: #F1F5F9; padding: 10px; border-radius: 6px; text-align: right; border: 1px solid #CBD5E1;">
-              <p style="margin: 0; font-size: 10px; font-weight: bold; color: #0F172A;">GSTIN: <span style="font-family: monospace; font-size: 12px; color: #0F172A;">${press.gstin}</span></p>
-              <p style="margin: 4px 0 0 0; font-size: 10px; font-weight: bold; color: #0F172A;">State Code: <span style="font-family: monospace; font-size: 12px; color: #0F172A;">${press.stateCode} (${press.state})</span></p>
-            </div>`
-          : ""
-      }
+      <div style="text-align: right;">
+        ${isTaxInvoice ? `<p style="font-family: monospace; font-weight: bold; color: #0F172A; font-size: 13px; margin: 0;">GSTIN: ${press.gstin || DEFAULT_PRESS.gstin}</p>` : ""}
+        <p style="font-size: 11px; color: #64748B; margin: 4px 0 0 0;">State: ${press.state || DEFAULT_PRESS.state} (${press.stateCode || DEFAULT_PRESS.stateCode})</p>
+      </div>
     </div>
 
-    <!-- Party Details -->
-    <div style="background: #F8FAFC; padding: 12px; margin: 16px 0; border: 1px solid #E2E8F0; border-radius: 6px;">
-      <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #64748B; display: block; margin-bottom: 4px;">BILLED TO:</span>
-      <h3 style="margin: 0; font-size: 15px; font-weight: bold; color: #0F172A;">${invoice.companySnapshot.name}</h3>
-      <p style="margin: 4px 0 0 0; font-size: 11px; color: #475569; white-space: pre-line;">${invoice.companySnapshot.address}</p>
-      <p style="margin: 4px 0 0 0; font-size: 11px; font-family: monospace; color: #475569;">Ph: ${invoice.companySnapshot.phone}</p>
-      ${isTaxInvoice && invoice.companySnapshot.gstin ? `<p style="margin: 4px 0 0 0; font-size: 11px; font-family: monospace; font-weight: bold; color: #E11D48;">Party GSTIN: ${invoice.companySnapshot.gstin}</p>` : ""}
+    <!-- Client Info -->
+    <div style="padding: 16px 0; border-bottom: 1px solid #E2E8F0;">
+      <p style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #64748B; margin: 0;">Billed To</p>
+      <h3 style="font-size: 16px; font-weight: bold; color: #0F172A; margin: 4px 0;">${invoice.companySnapshot.name}</h3>
+      <p style="margin: 2px 0; color: #475569; white-space: pre-line;">${invoice.companySnapshot.address}</p>
+      <p style="margin: 2px 0; color: #475569;">Phone: ${invoice.companySnapshot.phone}</p>
+      ${invoice.companySnapshot.gstin ? `<p style="font-family: monospace; font-weight: bold; color: #0F172A; margin: 4px 0 0 0;">GSTIN: ${invoice.companySnapshot.gstin}</p>` : ""}
     </div>
 
     <!-- Items Table -->
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+    <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
       <thead>
         <tr class="table-header">
-          <th style="padding: 8px; text-align: center; width: 40px;">S.No</th>
-          <th style="padding: 8px; text-align: left;">Particulars / Job Description</th>
-          ${isTaxInvoice ? `<th style="padding: 8px; text-align: center;">HSN/SAC</th>` : ""}
-          <th style="padding: 8px; text-align: right;">Qty</th>
-          <th style="padding: 8px; text-align: right;">Rate (₹)</th>
-          <th style="padding: 8px; text-align: right;">Amount (₹)</th>
+          <th style="padding: 8px; text-align: center; width: 40px;">#</th>
+          <th style="padding: 8px; text-align: left;">Particulars / Description</th>
+          ${isTaxInvoice ? `<th style="padding: 8px; text-align: center; width: 80px;">HSN/SAC</th>` : ""}
+          <th style="padding: 8px; text-align: center; width: 60px;">Qty</th>
+          <th style="padding: 8px; text-align: right; width: 90px;">Rate (₹)</th>
+          <th style="padding: 8px; text-align: right; width: 100px;">Amount (₹)</th>
         </tr>
       </thead>
       <tbody>
@@ -136,69 +131,60 @@ export async function GET(
       </tbody>
     </table>
 
-    <!-- Totals & Words -->
-    <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-      <div style="width: 50%;">
-        <div style="background: #F8FAFC; padding: 10px; border: 1px solid #E2E8F0; border-radius: 6px;">
-          <span style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #64748B;">Amount in Words:</span>
-          <p style="font-family: Georgia, serif; font-weight: bold; font-size: 12px; color: #0F172A; margin: 4px 0 0 0;">${invoice.amountInWords}</p>
+    <!-- Math Calculations -->
+    <div style="display: flex; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 2px solid #0F172A;">
+      <div style="width: 55%;">
+        ${isTaxInvoice ? `
+          <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 6px;">
+            <p style="font-[10px] font-bold text-transform: uppercase; color: #64748B; margin: 0 0 4px 0;">Bank Account Details</p>
+            <p style="margin: 2px 0; font-weight: bold; color: #0F172A;">Bank: ${press.bankName || DEFAULT_PRESS.bankName}</p>
+            <p style="margin: 2px 0; font-family: monospace; font-weight: bold; color: #0F172A;">A/C No: ${press.accountNo || DEFAULT_PRESS.accountNo}</p>
+            <p style="margin: 2px 0; font-family: monospace; font-weight: bold; color: #0F172A;">IFSC: ${press.ifscCode || DEFAULT_PRESS.ifscCode}</p>
+          </div>
+        ` : ""}
+        <div style="margin-top: 12px;">
+          <p style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #64748B; margin: 0;">Amount in Words</p>
+          <p style="font-family: Georgia, serif; font-weight: bold; color: #0F172A; margin: 2px 0;">Rupees ${invoice.amountInWords} Only</p>
         </div>
       </div>
 
-      <div style="width: 40%; border: 1px solid #E2E8F0; padding: 12px; border-radius: 6px; background: #FFF;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+      <div style="width: 40%;">
+        <div style="display: flex; justify-content: space-between; padding: 4px 0;">
           <span>Subtotal:</span>
           <span style="font-family: monospace; font-weight: bold;">₹${invoice.subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
         </div>
-        ${
-          isTaxInvoice
-            ? `
-          <div style="display: flex; justify-content: space-between; margin-bottom: 4px; color: #475569;">
+        ${isTaxInvoice ? `
+          <div style="display: flex; justify-content: space-between; padding: 4px 0; color: #475569;">
             <span>CGST (${invoice.cgstPercent}%):</span>
             <span style="font-family: monospace;">₹${invoice.cgstAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 4px; color: #475569;">
+          <div style="display: flex; justify-content: space-between; padding: 4px 0; color: #475569;">
             <span>SGST (${invoice.sgstPercent}%):</span>
             <span style="font-family: monospace;">₹${invoice.sgstAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
           </div>
-        `
-            : ""
-        }
-        ${
-          invoice.roundOff !== 0
-            ? `<div style="display: flex; justify-content: space-between; font-style: italic; color: #64748B;">
-                <span>Round Off:</span>
-                <span style="font-family: monospace;">₹${invoice.roundOff.toFixed(2)}</span>
-              </div>`
-            : ""
-        }
-        <div style="border-top: 2px dashed #CBD5E1; margin-top: 8px; padding-top: 8px; display: flex; justify-content: space-between; font-size: 14px; font-weight: bold; color: #0F172A;">
-          <span>GRAND TOTAL:</span>
+          ${invoice.roundOff !== 0 ? `
+            <div style="display: flex; justify-content: space-between; padding: 4px 0; color: #64748B;">
+              <span>Round Off:</span>
+              <span style="font-family: monospace;">₹${invoice.roundOff.toFixed(2)}</span>
+            </div>
+          ` : ""}
+        ` : ""}
+        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 2px solid #0F172A; font-size: 16px; font-weight: bold; color: ${isTaxInvoice ? "#0F172A" : "#E11D48"};">
+          <span>Grand Total:</span>
           <span style="font-family: monospace;">₹${invoice.grandTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
         </div>
       </div>
     </div>
 
-    <!-- Footer -->
-    <div style="border-top: 2px solid #E2E8F0; padding-top: 16px; display: flex; justify-content: space-between; align-items: flex-end;">
-      ${
-        isTaxInvoice
-          ? `<div style="background-color: #F1F5F9; padding: 10px; border-radius: 6px; width: 50%;">
-              <h4 style="margin: 0 0 4px 0; font-size: 11px; font-weight: bold; color: #0F172A; text-transform: uppercase;">Bank Details for Payment:</h4>
-              <p style="margin: 0; font-weight: bold;">${press.bankName}</p>
-              <p style="margin: 2px 0 0 0; font-family: monospace;">A/C No: ${press.accountNo}</p>
-              <p style="margin: 2px 0 0 0; font-family: monospace;">IFSC Code: ${press.ifscCode}</p>
-              <p style="margin: 2px 0 0 0;">Branch: ${press.branchName}</p>
-            </div>`
-          : `<div style="width: 50%; font-size: 11px; color: #64748B;">
-              <p>${press.terms}</p>
-            </div>`
-      }
-
+    <!-- Footer Signature -->
+    <div style="margin-top: 40px; display: flex; justify-content: space-between; align-items: flex-end;">
+      <div>
+        <p style="font-size: 10px; color: #64748B; margin: 0;">Terms: Subject to Tiruppur Jurisdiction.</p>
+      </div>
       <div style="text-align: right;">
-        <p style="font-family: Georgia, serif; font-weight: bold; font-size: 12px; color: #0F172A; margin: 0;">For ${press.name}</p>
+        <p style="font-family: Georgia, serif; font-weight: bold; margin: 0;">For Creative Line Graphics</p>
         <div style="height: 40px;"></div>
-        <p style="margin: 0; font-size: 10px; color: #64748B; text-transform: uppercase; font-weight: bold;">Authorized Signatory</p>
+        <p style="font-size: 10px; text-transform: uppercase; font-weight: bold; color: #64748B; margin: 0;">Authorized Signatory</p>
       </div>
     </div>
   </div>
@@ -210,7 +196,7 @@ export async function GET(
       headers: { "Content-Type": "text/html" },
     });
   } catch (error) {
-    console.error("Error generating printable PDF route:", error);
+    console.error("Error generating printable invoice route:", error);
     return new NextResponse("Server Error", { status: 500 });
   }
 }

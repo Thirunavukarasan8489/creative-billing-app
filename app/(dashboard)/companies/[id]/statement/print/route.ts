@@ -151,10 +151,14 @@ export async function GET(
   <meta charset="UTF-8">
   <title>Account Statement - ${company.name}</title>
   <style>
+    @font-face {
+      font-family: 'ParkAvenue';
+      src: url('/fonts/PARKANA_.TTF') format('truetype');
+    }
     @page { size: A4 portrait; margin: 10mm; }
     body { font-family: Arial, sans-serif; color: #000; background: #FFF; margin: 0; padding: 10px; font-size: 11px; }
     .header-banner { text-align: center; margin-bottom: 10px; }
-    .press-title { font-family: 'Brush Script MT', Georgia, serif; font-size: 32px; color: #B91C1C; margin: 0; font-weight: bold; }
+    .press-title { font-family: 'ParkAvenue', 'Brush Script MT', cursive, Georgia, serif; font-size: 40px; color: #E11D48; margin: 0; font-weight: normal; line-height: 1.1; }
     .press-details { font-size: 11px; color: #1E3A8A; font-weight: bold; margin: 3px 0; }
     .press-gst { font-size: 13px; font-weight: bold; color: #B91C1C; margin-top: 3px; font-family: monospace; }
     .statement-table { width: 100%; border-collapse: collapse; margin-top: 10px; border: 2px solid #000; }
@@ -172,7 +176,7 @@ export async function GET(
 
   <!-- Header Banner -->
   <div class="header-banner">
-    <h1 class="press-title">${press.name}</h1>
+    <h1 class="press-title">Creative Line Graphics</h1>
     <p class="press-details">${press.address}</p>
     <p class="press-details">Cell : ${press.phone}</p>
     <p class="press-gst">GSTIN : ${press.gstin}</p>

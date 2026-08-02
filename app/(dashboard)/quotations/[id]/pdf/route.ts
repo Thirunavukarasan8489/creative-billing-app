@@ -6,8 +6,7 @@ import PressProfile from "@/lib/models/PressProfile";
 const DEFAULT_PRESS = {
   name: "Creative Line Graphics",
   tagline: "OFFSET & DIGITAL PRINTING PRESS",
-  address:
-    "No,28412, Thirumalai Nagar, Ganapathypalayam, Veerapandi PO, TIRUPUR - 641 605.",
+  address: "No,28412, Thirumalai Nagar, Ganapathypalayam, Veerapandi PO, TIRUPUR - 641 605.",
   phone: "8489 902 902, 93442 16902",
   email: "creativeline.tpr@gmail.com",
   gstin: "33DDIPG2441F1Z0",
@@ -15,7 +14,7 @@ const DEFAULT_PRESS = {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
@@ -59,10 +58,14 @@ export async function GET(
   <meta charset="UTF-8">
   <title>Rate Quotation - ${quotation.number}</title>
   <style>
+    @font-face {
+      font-family: 'ParkAvenue';
+      src: url('/fonts/PARKANA_.TTF') format('truetype');
+    }
     @page { size: A4 portrait; margin: 15mm; }
     body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #000; background: #FFF; margin: 0; padding: 10px; font-size: 13px; }
     .header-banner { text-align: center; margin-bottom: 12px; }
-    .press-title { font-family: 'Brush Script MT', Georgia, serif; font-size: 42px; color: #B91C1C; margin: 0; font-weight: normal; text-transform: capitalize; }
+    .press-title { font-family: 'ParkAvenue', 'Brush Script MT', cursive, Georgia, serif; font-size: 46px; color: #E11D48; margin: 0; font-weight: normal; line-height: 1.1; }
     .press-details { font-size: 12px; color: #0F172A; font-weight: bold; margin: 3px 0; }
     .press-gst { font-size: 15px; font-weight: bold; color: #000; margin-top: 4px; font-family: monospace; }
     .quote-title { font-size: 24px; font-weight: bold; text-decoration: underline; text-transform: uppercase; text-align: center; margin: 0; }
@@ -82,7 +85,7 @@ export async function GET(
   <div style="max-w: 800px; margin: 0 auto; padding: 10px;">
     <!-- Header Banner -->
     <div class="header-banner">
-      <h1 class="press-title">${press.name}</h1>
+      <h1 class="press-title">Creative Line Graphics</h1>
       <p class="press-details">${press.address}</p>
       <p class="press-details">Cell : ${press.phone}</p>
       <p class="press-gst">GSTIN : ${press.gstin}</p>
@@ -146,7 +149,7 @@ export async function GET(
     <!-- Signature Bar -->
     <div style="margin-top: 80px; display: flex; justify-content: flex-end; text-align: right;">
       <div>
-        <p style="margin: 0; font-weight: bold; font-size: 14px;">For ${press.name}</p>
+        <p style="margin: 0; font-weight: bold; font-size: 14px;">For Creative Line Graphics</p>
         <div style="height: 50px;"></div>
         <p style="margin: 0; font-size: 11px; text-transform: uppercase; font-weight: bold; color: #475569;">Authorized Signatory</p>
       </div>

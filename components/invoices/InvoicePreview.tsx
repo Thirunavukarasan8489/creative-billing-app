@@ -122,9 +122,9 @@ export function InvoicePreview({
         {/* Creative Line Graphics Letterhead Banner */}
         <div className="flex flex-col sm:flex-row justify-between items-start border-b border-slate-200 pb-4 gap-4">
           <div>
-            <span className="font-serif text-2xl font-black tracking-tight text-[#E11D48]">
-              {pressProfile.name}
-            </span>
+            <h2 className="park-avenue normal-case text-3xl sm:text-4xl font-normal tracking-tight text-[#E11D48] leading-tight">
+              Creative Line Graphics
+            </h2>
             <p className="text-xs font-semibold text-[#0F172A] uppercase tracking-wider">
               {pressProfile.tagline}
             </p>

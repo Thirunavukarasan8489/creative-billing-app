@@ -73,8 +73,8 @@ export function QuotationPreview({
     <div className="bg-white text-black border-2 border-slate-800 rounded-xl p-6 sm:p-8 shadow-md space-y-6 max-w-3xl mx-auto font-sans">
       {/* Press Header Banner */}
       <div className="text-center border-b-4 border-double border-slate-900 pb-4 space-y-1">
-        <h1 className="park-avenue normal-case text-4xl sm:text-5xl font-normal text-slate-900 leading-tight">
-          {"Creative Line Graphics"}
+        <h1 className="park-avenue normal-case text-4xl sm:text-5xl font-normal text-[#E11D48] leading-tight">
+          Creative Line Graphics
         </h1>
         <p className="text-xs sm:text-sm font-semibold text-slate-800">
           {pressProfile.address}
@@ -83,7 +83,7 @@ export function QuotationPreview({
           Cell : {pressProfile.phone}
         </p>
         <p className="text-sm font-bold font-mono text-slate-900 mt-1">
-          GSTIN : <span className="text-rose-700">{pressProfile.gstin}</span>
+          GSTIN : <span className="text-[#E11D48]">{pressProfile.gstin}</span>
         </p>
       </div>
 
@@ -193,7 +193,7 @@ export function QuotationPreview({
       <div className="pt-8 flex justify-between items-end text-xs sm:text-sm">
         <div></div>
         <div className="text-right">
-          <p className="font-serif font-bold text-slate-900">For {pressProfile.name}</p>
+          <p className="font-serif font-bold text-slate-900">For Creative Line Graphics</p>
           <div className="h-12 border-b border-slate-400 w-40 ml-auto mt-2"></div>
           <p className="text-[10px] text-slate-600 uppercase font-semibold mt-1">Authorized Signatory</p>
         </div>
