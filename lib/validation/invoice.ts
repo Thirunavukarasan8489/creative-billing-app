@@ -12,6 +12,8 @@ export const invoiceSchema = z.object({
   type: z.enum(["tax_invoice", "labour_bill"]),
   number: z.string().optional(), // If omitted, API will generate next number
   date: z.string().or(z.date()),
+  poNumber: z.string().optional().nullable(),
+  poDate: z.string().or(z.date()).optional().nullable(),
   companyId: z
     .any()
     .transform((val) => {

@@ -24,6 +24,8 @@ export interface IInvoice extends Document {
   financialYear: string;
   sequenceNumber: number;
   date: Date;
+  poNumber?: string;
+  poDate?: Date;
   companyId: mongoose.Types.ObjectId;
   companySnapshot: IInvoiceCompanySnapshot;
   items: IInvoiceItem[];
@@ -72,6 +74,8 @@ const InvoiceSchema: Schema = new Schema(
     financialYear: { type: String, required: true, trim: true },
     sequenceNumber: { type: Number, required: true },
     date: { type: Date, required: true, default: Date.now },
+    poNumber: { type: String, trim: true, default: "" },
+    poDate: { type: Date, default: null },
     companyId: { type: Schema.Types.ObjectId, ref: "Company", required: true },
     companySnapshot: { type: CompanySnapshotSchema, required: true },
     items: { type: [InvoiceItemSchema], required: true },

@@ -105,6 +105,8 @@ export async function PUT(
       {
         type: data.type,
         date: new Date(data.date),
+        poNumber: data.poNumber || "",
+        poDate: data.poDate ? new Date(data.poDate) : null,
         items: data.items,
         subtotal,
         cgstPercent,

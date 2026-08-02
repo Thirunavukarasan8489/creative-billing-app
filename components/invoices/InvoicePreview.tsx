@@ -14,6 +14,8 @@ interface InvoicePreviewProps {
   type: "tax_invoice" | "labour_bill";
   number: string;
   date: string;
+  poNumber?: string;
+  poDate?: string;
   company?: {
     name: string;
     address: string;
@@ -39,6 +41,8 @@ export function InvoicePreview({
   type,
   number,
   date,
+  poNumber,
+  poDate,
   company,
   items,
   subtotal,
@@ -106,6 +110,11 @@ export function InvoicePreview({
           <p className="text-xs font-mono opacity-90">
             BILL NO: {number || "TI/26-27/XXXX"}
           </p>
+          {poNumber && (
+            <p className="text-xs font-mono opacity-90 mt-0.5">
+              P.O. NO: <span className="font-bold">{poNumber}</span>
+            </p>
+          )}
         </div>
         <div className="text-right">
           <p className="text-[10px] uppercase tracking-widest opacity-80">
@@ -114,6 +123,11 @@ export function InvoicePreview({
           <p className="font-mono font-bold text-sm">
             {date ? new Date(date).toLocaleDateString("en-IN") : "DD/MM/YYYY"}
           </p>
+          {poDate && (
+            <p className="text-xs font-mono opacity-90 mt-0.5">
+              P.O. Date: <span className="font-bold">{new Date(poDate).toLocaleDateString("en-IN")}</span>
+            </p>
+          )}
         </div>
       </div>
 

@@ -140,6 +140,8 @@ export async function POST(req: NextRequest) {
       financialYear,
       sequenceNumber,
       date: new Date(data.date),
+      poNumber: data.poNumber || "",
+      poDate: data.poDate ? new Date(data.poDate) : null,
       companyId: company._id,
       companySnapshot,
       items: data.items,

@@ -65,6 +65,13 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
       : new Date().toISOString().split("T")[0],
   );
 
+  const [poNumber, setPoNumber] = useState<string>(initialValues?.poNumber || "");
+  const [poDate, setPoDate] = useState<string>(
+    initialValues?.poDate
+      ? new Date(initialValues.poDate).toISOString().split("T")[0]
+      : "",
+  );
+
   const [items, setItems] = useState<LineItem[]>(
     initialValues?.items || [
       {
@@ -206,6 +213,8 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
         type,
         number: invoiceNumber,
         date,
+        poNumber: poNumber.trim(),
+        poDate: poDate || null,
         companyId: getCompanyIdString(
           selectedCompany?._id ||
             selectedCompany?.id ||
@@ -349,6 +358,33 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
+                  P.O. Number (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. PO-98214 (Optional)"
+                  value={poNumber}
+                  onChange={(e) => setPoNumber(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono text-[#0F172A] bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
+                  P.O. Issue Date (Optional)
+                </label>
+                <input
+                  type="date"
+                  value={poDate}
+                  onChange={(e) => setPoDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-mono"
                 />
               </div>
             </div>
@@ -604,6 +640,8 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
             type={type}
             number={invoiceNumber}
             date={date}
+            poNumber={poNumber}
+            poDate={poDate}
             company={selectedCompany}
             items={items}
             subtotal={subtotal}

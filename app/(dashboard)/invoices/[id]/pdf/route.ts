@@ -7,7 +7,7 @@ const DEFAULT_PRESS = {
   name: "Creative Line Graphics",
   tagline: "OFFSET PRINTING PRESS",
   address:
-    "No. 2/412, Thirumalai Nagar, Ganapathypalayam, Veerapandi PO, TIRUPUR - 641 605.",
+    "No. 2/412, Thirumalai Nagar, Ganapathypalayam, Veerapandi (PO), palladam (T.K), Tiruppur - 641 605",
   phone: "8489 902 902, 93442 16902",
   email: "creativetpr@gmail.com",
   gstin: "33DDIPG2441F1Z0",
@@ -87,10 +87,12 @@ export async function GET(
       <div>
         <h1 class="bill-title">${isTaxInvoice ? "TAX INVOICE" : "LABOUR BILL"}</h1>
         <p style="margin: 4px 0 0 0; font-family: monospace; font-size: 13px;">BILL NO: ${invoice.number}</p>
+        ${invoice.poNumber ? `<p style="margin: 2px 0 0 0; font-family: monospace; font-size: 12px; opacity: 0.9;">P.O. NO: <strong>${invoice.poNumber}</strong></p>` : ""}
       </div>
       <div style="text-align: right;">
         <p style="margin: 0; font-size: 10px; text-transform: uppercase;">Date</p>
         <p style="margin: 4px 0 0 0; font-family: monospace; font-weight: bold; font-size: 14px;">${new Date(invoice.date).toLocaleDateString("en-IN")}</p>
+        ${invoice.poDate ? `<p style="margin: 2px 0 0 0; font-family: monospace; font-size: 12px; opacity: 0.9;">P.O. Date: <strong>${new Date(invoice.poDate).toLocaleDateString("en-IN")}</strong></p>` : ""}
       </div>
     </div>
 
@@ -151,7 +153,7 @@ export async function GET(
         }
         <div style="margin-top: 12px;">
           <p style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #64748B; margin: 0;">Amount in Words</p>
-          <p style="font-family: Georgia, serif; font-weight: bold; color: #0F172A; margin: 2px 0;">Rupees ${invoice.amountInWords} Only</p>
+          <p style="font-family: Georgia, serif; font-weight: bold; color: #0F172A; margin: 2px 0;">${invoice.amountInWords}</p>
         </div>
       </div>
 

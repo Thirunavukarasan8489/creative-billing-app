@@ -242,6 +242,8 @@ export default function InvoiceDetailPage({
         type={invoice.type}
         number={invoice.number}
         date={invoice.date}
+        poNumber={invoice.poNumber}
+        poDate={invoice.poDate}
         company={invoice.companySnapshot}
         items={invoice.items}
         subtotal={invoice.subtotal}
