@@ -2,7 +2,15 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Building2, Plus, Search, Edit, Trash2, Check, AlertCircle, ArrowRight } from "lucide-react";
+import {
+  Building2,
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  AlertCircle,
+  NotebookTabs,
+} from "lucide-react";
 import { CompanyForm } from "@/components/companies/CompanyForm";
 
 export default function CompaniesPage() {
@@ -16,7 +24,9 @@ export default function CompaniesPage() {
   const fetchCompanies = async (query = "") => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/companies?search=${encodeURIComponent(query)}&limit=100`);
+      const res = await fetch(
+        `/api/companies?search=${encodeURIComponent(query)}&limit=100`,
+      );
       const data = await res.json();
       if (res.ok && data.companies) {
         setCompanies(data.companies);
@@ -101,11 +111,15 @@ export default function CompaniesPage() {
       {/* Companies List */}
       <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden">
         {loading ? (
-          <div className="p-12 text-center text-xs text-slate-500">Loading companies...</div>
+          <div className="p-12 text-center text-xs text-slate-500">
+            Loading companies...
+          </div>
         ) : companies.length === 0 ? (
           <div className="p-12 text-center space-y-3">
             <Building2 className="w-12 h-12 text-slate-300 mx-auto" />
-            <p className="text-sm font-semibold text-slate-600">No client companies found</p>
+            <p className="text-sm font-semibold text-slate-600">
+              No client companies found
+            </p>
             <button
               onClick={() => {
                 setEditingCompany(null);
@@ -132,7 +146,10 @@ export default function CompaniesPage() {
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {companies.map((company) => (
-                  <tr key={company._id} className="hover:bg-slate-50 transition-colors">
+                  <tr
+                    key={company._id}
+                    className="hover:bg-slate-50 transition-colors"
+                  >
                     <td className="p-3">
                       <Link
                         href={`/companies/${company._id}`}
@@ -140,7 +157,9 @@ export default function CompaniesPage() {
                       >
                         {company.name}
                       </Link>
-                      <p className="text-[11px] text-slate-500 truncate max-w-xs">{company.address}</p>
+                      <p className="text-[11px] text-slate-500 truncate max-w-xs">
+                        {company.address}
+                      </p>
                     </td>
                     <td className="p-3 font-mono font-semibold">
                       {company.gstin ? (
@@ -151,7 +170,9 @@ export default function CompaniesPage() {
                         <span className="text-slate-400 italic">None</span>
                       )}
                     </td>
-                    <td className="p-3 font-mono text-slate-700">{company.phone}</td>
+                    <td className="p-3 font-mono text-slate-700">
+                      {company.phone}
+                    </td>
                     <td className="p-3 font-mono text-slate-600">
                       {company.state} ({company.stateCode})
                     </td>
@@ -166,12 +187,13 @@ export default function CompaniesPage() {
                         </span>
                       )}
                     </td>
-                    <td className="p-3 text-center space-x-2">
+                    <td className="p-3 text-center flex items-center gap-2">
                       <Link
                         href={`/companies/${company._id}`}
                         className="text-blue-600 hover:text-blue-800 font-semibold text-[11px]"
+                        title="View Company Ledger & Statements"
                       >
-                        Ledger
+                        <NotebookTabs className="w-3.5 h-3.5" />
                       </Link>
                       <button
                         onClick={() => {

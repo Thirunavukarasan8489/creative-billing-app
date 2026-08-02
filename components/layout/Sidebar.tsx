@@ -89,9 +89,9 @@ export function Sidebar() {
 
           {/* Navigation Links */}
           <nav className="space-y-1 pt-2">
-            <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+            {/* <div className="px-3 pb-2 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
               Main Menu
-            </div>
+            </div> */}
             {navLinks.map((link) => {
               const Icon = link.icon;
               const isActive =
