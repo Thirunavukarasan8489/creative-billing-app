@@ -42,6 +42,7 @@ export async function GET(req: NextRequest) {
     const now = new Date();
     const monthParam = searchParams.get("month");
     const yearParam = searchParams.get("year");
+    const autoPrint = searchParams.get("autoPrint") !== "false";
 
     const month = monthParam ? parseInt(monthParam, 10) : now.getMonth() + 1;
     const year = yearParam ? parseInt(yearParam, 10) : now.getFullYear();
@@ -73,13 +74,17 @@ export async function GET(req: NextRequest) {
 
       return {
         billNo: inv.number,
-        date: new Date(inv.date).toLocaleDateString("en-GB").replace(/\//g, "."),
+        date: new Date(inv.date)
+          .toLocaleDateString("en-GB")
+          .replace(/\//g, "."),
         particulars: companyName,
         gstin,
         subtotal: Number(inv.subtotal) || 0,
-        cgstPercent: inv.type === "tax_invoice" ? Number(inv.cgstPercent || 9) : 0,
+        cgstPercent:
+          inv.type === "tax_invoice" ? Number(inv.cgstPercent || 9) : 0,
         cgstAmount: Number(inv.cgstAmount) || 0,
-        sgstPercent: inv.type === "tax_invoice" ? Number(inv.sgstPercent || 9) : 0,
+        sgstPercent:
+          inv.type === "tax_invoice" ? Number(inv.sgstPercent || 9) : 0,
         sgstAmount: Number(inv.sgstAmount) || 0,
         grandTotal: Number(inv.grandTotal) || 0,
       };
@@ -93,8 +98,8 @@ export async function GET(req: NextRequest) {
     const monthLabel = MONTH_NAMES[month - 1] || "JUNE";
     const reportDateStr = now.toLocaleDateString("en-GB").replace(/\//g, " - ");
 
-    // Create empty table rows to fill out full A4 sheet like physical ledger
-    const MIN_ROWS = 22;
+    // Create empty table rows to fill out full A4 landscape sheet
+    const MIN_ROWS = 15;
     const emptyRowsCount = Math.max(0, MIN_ROWS - rows.length);
     const emptyRows = Array.from({ length: emptyRowsCount });
 
@@ -103,15 +108,15 @@ export async function GET(req: NextRequest) {
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SALES BILL ${monthLabel} ${year} — Creative Line Graphics</title>
+  <title>SALES_BILL_${monthLabel}_${year}</title>
   <style>
     @font-face {
       font-family: 'ParkAvenue';
       src: url('/fonts/PARKANA_.TTF') format('truetype');
     }
     @page {
-      size: A4 portrait;
-      margin: 10mm;
+      size: A4 landscape;
+      margin: 6mm;
     }
     * {
       box-sizing: border-box;
@@ -123,7 +128,7 @@ export async function GET(req: NextRequest) {
       font-size: 11px;
       color: #000;
       background: #fff;
-      padding: 10px;
+      padding: 6px;
     }
     .paper-container {
       border: 2px solid #000;
@@ -137,7 +142,7 @@ export async function GET(req: NextRequest) {
     }
     .header-title {
       font-family: 'ParkAvenue', cursive;
-      font-size: 32px;
+      font-size: 36px;
       color: #E11D48;
       text-align: center;
       line-height: 1.1;
@@ -146,13 +151,13 @@ export async function GET(req: NextRequest) {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-top: 1px solid #000;
-      border-bottom: 1.5px solid #000;
-      padding: 4px 8px;
+      border-top: 1.5px solid #000;
+      border-bottom: 2px solid #000;
+      padding: 4px 10px;
       margin-top: 6px;
       margin-bottom: 6px;
       font-weight: bold;
-      font-size: 13px;
+      font-size: 14px;
     }
     .sub-header .title-text {
       color: #BE123C;
@@ -161,7 +166,7 @@ export async function GET(req: NextRequest) {
     .sub-header .date-text {
       color: #BE123C;
       font-family: monospace;
-      font-size: 14px;
+      font-size: 15px;
     }
 
     table {
@@ -171,8 +176,8 @@ export async function GET(req: NextRequest) {
     }
     th, td {
       border: 1px solid #000;
-      padding: 3px 4px;
-      font-size: 10px;
+      padding: 4px 6px;
+      font-size: 11px;
       word-wrap: break-word;
     }
     th {
@@ -181,16 +186,16 @@ export async function GET(req: NextRequest) {
       text-transform: uppercase;
       text-align: center;
     }
-    .col-bill { width: 6%; text-align: center; font-family: monospace; }
-    .col-date { width: 10%; text-align: center; font-family: monospace; }
-    .col-part { width: 30%; text-align: left; font-weight: 500; }
-    .col-gst { width: 18%; text-align: center; font-family: monospace; font-size: 9px; }
-    .col-num { width: 9%; text-align: right; font-family: monospace; }
-    .col-rate { width: 4%; text-align: center; font-family: monospace; }
+    .col-bill { width: 7%; text-align: center; font-family: monospace; font-weight: bold; }
+    .col-date { width: 9%; text-align: center; font-family: monospace; }
+    .col-part { width: 32%; text-align: left; font-weight: 500; }
+    .col-gst { width: 17%; text-align: center; font-family: monospace; font-size: 10px; }
+    .col-num { width: 8.5%; text-align: right; font-family: monospace; }
+    .col-rate { width: 3.5%; text-align: center; font-family: monospace; }
 
     .summary-row td {
       font-weight: bold;
-      font-size: 11px;
+      font-size: 12px;
     }
     .summary-label {
       text-align: right;
@@ -209,11 +214,22 @@ export async function GET(req: NextRequest) {
       .no-print { display: none !important; }
     }
   </style>
+  ${
+    autoPrint
+      ? `<script>
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        window.print();
+      }, 400);
+    });
+  </script>`
+      : ""
+  }
 </head>
 <body>
-  <div class="no-print" style="margin-bottom: 12px; text-align: right;">
-    <button onclick="window.print()" style="padding: 8px 16px; background-color: #E11D48; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">
-      Print / Export PDF
+  <div class="no-print" style="margin-bottom: 12px; display: flex; justify-content: flex-end; gap: 8px;">
+    <button onclick="window.print()" style="padding: 8px 18px; background-color: #E11D48; color: #fff; border: none; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; display: flex; items-center: center; gap: 6px;">
+      📄 Save / Download PDF (Landscape)
     </button>
   </div>
 
@@ -258,29 +274,9 @@ export async function GET(req: NextRequest) {
             <td class="col-num">${r.sgstAmount > 0 ? r.sgstAmount.toFixed(2) : ""}</td>
             <td class="col-num" style="font-weight: bold;">${r.grandTotal.toFixed(2)}</td>
           </tr>
-          `
+          `,
             )
             .join("")}
-
-          ${emptyRows
-            .map(
-              () => `
-          <tr style="height: 22px;">
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-          </tr>
-          `
-            )
-            .join("")}
-
           <tr class="summary-row">
             <td colspan="4" class="summary-label">TOTAL</td>
             <td class="summary-val">${totalSubtotal.toFixed(2)}</td>
@@ -288,7 +284,7 @@ export async function GET(req: NextRequest) {
             <td class="summary-val">${totalCGST.toFixed(2)}</td>
             <td></td>
             <td class="summary-val">${totalSGST.toFixed(2)}</td>
-            <td class="summary-val" style="font-size: 12px; font-weight: 800;">${grandTotalSum.toFixed(2)}</td>
+            <td class="summary-val" style="font-size: 13px; font-weight: 800;">${grandTotalSum.toFixed(2)}</td>
           </tr>
         </tbody>
       </table>
@@ -306,8 +302,8 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error("Error rendering printable monthly sales statement:", error);
     return NextResponse.json(
-      { error: "Failed to generate printable monthly sales statement" },
-      { status: 500 }
+      { error: "Failed to generate monthly sales statement" },
+      { status: 500 },
     );
   }
 }

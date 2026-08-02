@@ -182,7 +182,7 @@ export default function InvoiceDetailPage({
             className="px-4 py-2 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5"
           >
             <Printer className="w-4 h-4" />
-            <span>Print / Export PDF</span>
+            <span>Print / ExportPrint /  PDF</span>
           </button>
 
           {!isCancelled ? (

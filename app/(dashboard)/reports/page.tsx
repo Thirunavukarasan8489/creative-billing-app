@@ -9,6 +9,7 @@ import {
   RefreshCw,
   Printer,
   FileText,
+  Download,
 } from "lucide-react";
 
 const MONTH_NAMES = [
@@ -92,9 +93,9 @@ export default function ReportsPage() {
     fetchGeneralReport();
   }, [startDate, endDate]);
 
-  const handlePrintMonthly = () => {
+  const handleDownloadMonthly = () => {
     window.open(
-      `/reports/monthly-sales/print?month=${selectedMonth}&year=${selectedYear}`,
+      `/reports/monthly-sales/print?month=${selectedMonth}&year=${selectedYear}&download=true`,
       "_blank"
     );
   };
@@ -116,11 +117,11 @@ export default function ReportsPage() {
         <div className="flex items-center gap-2">
           {activeTab === "monthly" && (
             <button
-              onClick={handlePrintMonthly}
+              onClick={handleDownloadMonthly}
               className="px-4 py-2 bg-[#E11D48] hover:bg-[#BE123C] text-white rounded-xl font-bold text-xs shadow flex items-center gap-2"
             >
-              <Printer className="w-4 h-4" />
-              <span>Print Monthly Statement PDF</span>
+              <Download className="w-4 h-4" />
+              <span>Download Monthly Statement</span>
             </button>
           )}
 
@@ -220,11 +221,11 @@ export default function ReportsPage() {
             </div>
 
             <button
-              onClick={handlePrintMonthly}
+              onClick={handleDownloadMonthly}
               className="px-3 py-1.5 bg-[#E11D48] hover:bg-[#BE123C] text-white rounded-lg font-bold text-xs shadow flex items-center gap-1.5"
             >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Print A4 Statement</span>
+              <Download className="w-3.5 h-3.5" />
+              <span>Download A4 Statement</span>
             </button>
           </div>
 
