@@ -42,7 +42,11 @@ app/
     page.tsx                    # Overview dashboard: metrics, recent bills, outstanding dues
     companies/
       page.tsx                  # Client directory & creation modal
-      [id]/page.tsx             # Company profile & historical ledger
+      [id]/
+        page.tsx                # Company profile & 8-column Account Statement ledger
+        statement/
+          print/
+            route.ts            # Printable A4 Account Statement letterhead stream
     invoices/
       page.tsx                  # Filterable invoice ledger (/invoices)
       new/page.tsx              # Company-first invoice creation (/invoices/new)
@@ -59,6 +63,7 @@ app/
   api/
     companies/route.ts          # GET list, POST create
     companies/[id]/route.ts     # GET detail, PUT update, DELETE
+    companies/[id]/statement/route.ts # Chronological company account statement API
     invoices/route.ts           # GET list, POST create
     invoices/[id]/route.ts      # GET detail, PUT update, DELETE
     invoices/[id]/payments/route.ts # POST record payment transaction
@@ -105,8 +110,9 @@ All routes verified active and functional:
 | `/invoices/[id]` | `app/(dashboard)/invoices/[id]/page.tsx` | **Verified**: Invoice details, Edit button, & payment modal |
 | `/invoices/[id]/edit` | `app/(dashboard)/invoices/[id]/edit/page.tsx` | **Verified**: Invoice editing to add/modify items |
 | `/invoices/[id]/pdf` | `app/(dashboard)/invoices/[id]/pdf/route.ts` | **Verified**: Printable HTML/PDF stream with dynamic press info |
-| `/companies` | `app/(dashboard)/companies/page.tsx` | **Verified**: Client company directory |
-| `/companies/[id]` | `app/(dashboard)/companies/[id]/page.tsx` | **Verified**: Company profile & lifetime bill ledger |
+| `/companies` | `app/(dashboard)/companies/page.tsx` | **Verified**: Client company directory & ledgers |
+| `/companies/[id]` | `app/(dashboard)/companies/[id]/page.tsx` | **Verified**: 8-column Account Statement & FY date range filter |
+| `/companies/[id]/statement/print` | `app/(dashboard)/companies/[id]/statement/print/route.ts` | **Verified**: Printable A4 Account Statement matching paper document |
 | `/reports` | `app/(dashboard)/reports/page.tsx` | **Verified**: GST tax summary (CGST/SGST) & company ledgers |
 | `/settings` | `app/(dashboard)/settings/page.tsx` | **Verified**: Edit press company details, GSTIN, & bank account |
 
@@ -114,14 +120,14 @@ All routes verified active and functional:
 
 ## Completed Works & Implementation Log
 
-### 1. Invoice Editing Feature
-- **[app/(dashboard)/invoices/[id]/edit/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/edit/page.tsx)**: Dedicated invoice editor page for editing existing Tax Invoices and Labour Bills, allowing users to add/delete line items, update quantities and rates, and automatically recalculate GST and grand totals.
-- **[app/(dashboard)/invoices/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/page.tsx)**: Added an **"Edit"** action button in the Invoice Ledger table row actions.
-- **[app/(dashboard)/invoices/[id]/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/page.tsx)**: Added a prominent **"Edit Bill"** button in the header actions.
+### 1. Company Account Statement Feature
+- **[app/api/companies/[id]/statement/route.ts](file:///d:/projects/creative-billing-app/app/api/companies/[id]/statement/route.ts)**: Chronological aggregation API for combining invoices and payment transactions per company with FY date filtering.
+- **[app/(dashboard)/companies/[id]/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/companies/\[id\]/page.tsx)**: Interactive Account Statement view rendering the exact 8-column layout matching physical paper statement books (`Date`, `Bill No.`, `Particulars`, `TOTAL`, `%`, `CGST`, `%`, `SGST`, `TOTAL AMOUNT`, `Payment Received Details`).
+- **[app/(dashboard)/companies/[id]/statement/print/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/companies/\[id\]/statement/print/route.ts)**: Printable A4 HTML/PDF route formatting the Account Statement on Creative Line Graphics letterhead with the bottom bank details box.
 
 ---
 
 ## Verification & Build Status
 
 - TypeScript compilation and Next.js route validation verified via `npm run build`.
-- All routes and components adhere to the non-negotiables: mobile-responsive counter billing with persistent left sidebar, overridable bill types, GST field scoping, physical bill replica styling, dynamic press settings, and full invoice editing capability.
+- All routes and components adhere to the non-negotiables: mobile-responsive counter billing with persistent left sidebar, overridable bill types, GST field scoping, physical bill replica styling, dynamic press settings, full invoice editing capability, and paper-replica company account statements.

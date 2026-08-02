@@ -23,7 +23,7 @@ export function Sidebar() {
   const navLinks = [
     { href: "/", label: "Overview", icon: LayoutDashboard },
     { href: "/invoices", label: "Invoices & Ledger", icon: FileText },
-    { href: "/companies", label: "Client Directory", icon: Building2 },
+    { href: "/companies", label: "Client Ledgers & Statements", icon: Building2 },
     { href: "/reports", label: "GST & Tax Reports", icon: PieChart },
     { href: "/settings", label: "Press Settings", icon: Settings },
   ];
