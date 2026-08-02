@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+@theme {
+  --color-slate-navy: #0F172A;
+  --color-slate-navy-light: #1E293B;
+  --color-slate-navy-dark: #090D16;
+
+  --color-brand-blue: #2563EB;
+  --color-brand-blue-hover: #1D4ED8;
+
+  --color-brand-rose: #E11D48;
+  --color-brand-rose-hover: #BE123C;
+
+  --color-brand-teal: #0D9488;
+  --color-brand-teal-light: #CCFBF1;
+
+  --color-warm-slate: #F8FAFC;
+  --color-warm-slate-card: #FFFFFF;
+
+  --font-serif: "Georgia", "Times New Roman", serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Courier New", Courier, monospace;
+}
+
+:root {
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+
+/* Glassmorphism & Elevated Dashboard Cards */
+.dashboard-card {
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+  border-radius: 0.75rem;
+}
+
+.dashboard-card-hover {
+  transition: all 0.2s ease-in-out;
+}
+.dashboard-card-hover:hover {
+  border-color: #CBD5E1;
+  box-shadow: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+}
+
+/* Paper Bill Styling */
+.paper-bill-tax {
+  border: 2px solid #0F172A;
+  background-color: #FFFFFF;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
+}
+
+.paper-bill-labour {
+  border: 2px solid #E11D48;
+  background-color: #FFFFFF;
+  box-shadow: 0 10px 25px -5px rgba(225, 29, 72, 0.1), 0 8px 10px -6px rgba(225, 29, 72, 0.05);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+::-webkit-scrollbar-thumb {
+  background: #94A3B8;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
