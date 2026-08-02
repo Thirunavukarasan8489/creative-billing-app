@@ -7,8 +7,9 @@ import PressProfile from "@/lib/models/PressProfile";
 
 const DEFAULT_PRESS = {
   name: "Creative Line Graphics",
-  tagline: "OFFSET & DIGITAL PRINTING PRESS",
-  address: "No. 2/412, Thirumalai Nagar, Ganapathypalayam, Veerapandi PO, TIRUPUR - 641 605.",
+  tagline: "OFFSET PRINTING PRESS",
+  address:
+    "No. 2/412, Thirumalai Nagar, Ganapathypalayam, Veerapandi PO, TIRUPUR - 641 605.",
   phone: "8489 902 902, 93442 16902",
   email: "creativetpr@gmail.com",
   gstin: "33DDIPG2441F1Z0",
@@ -17,12 +18,12 @@ const DEFAULT_PRESS = {
   bankName: "FEDERAL BANK, TIRUPUR",
   accountNo: "13590200065469",
   ifscCode: "FDRL0001359",
-  branchName: "Main Branch, Tiruppur",
+  branchName: "Industrial Branch, Tiruppur",
 };
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await dbConnect();
@@ -68,11 +69,15 @@ export async function GET(
     const statementRows: any[] = [];
 
     invoices.forEach((inv) => {
-      const itemsDescription = inv.items.map((i: any) => i.description).join(" / ");
+      const itemsDescription = inv.items
+        .map((i: any) => i.description)
+        .join(" / ");
       statementRows.push({
         date: inv.date,
         billNo: inv.number,
-        particulars: itemsDescription || (inv.type === "tax_invoice" ? "Tax Invoice" : "Labour Bill"),
+        particulars:
+          itemsDescription ||
+          (inv.type === "tax_invoice" ? "Tax Invoice" : "Labour Bill"),
         subtotal: inv.subtotal,
         cgstPercent: inv.cgstPercent || 0,
         cgstAmount: inv.cgstAmount || 0,
@@ -84,7 +89,9 @@ export async function GET(
     });
 
     payments.forEach((pmt) => {
-      const parentInvoice = invoices.find((i) => i._id.toString() === pmt.invoiceId.toString());
+      const parentInvoice = invoices.find(
+        (i) => i._id.toString() === pmt.invoiceId.toString(),
+      );
       const modeLabel = pmt.mode ? pmt.mode.toUpperCase() : "PAYMENT";
       const refText = pmt.referenceNo ? ` ${pmt.referenceNo}` : "";
 
@@ -102,10 +109,18 @@ export async function GET(
       });
     });
 
-    statementRows.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    statementRows.sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    );
 
-    const totalBilled = statementRows.reduce((sum, r) => sum + r.totalAmount, 0);
-    const totalReceived = statementRows.reduce((sum, r) => sum + r.paymentReceived, 0);
+    const totalBilled = statementRows.reduce(
+      (sum, r) => sum + r.totalAmount,
+      0,
+    );
+    const totalReceived = statementRows.reduce(
+      (sum, r) => sum + r.paymentReceived,
+      0,
+    );
     const balance = Math.round((totalBilled - totalReceived) * 100) / 100;
 
     const formatDateStr = (d: Date) => {
@@ -125,7 +140,8 @@ export async function GET(
         const sgstPctStr = r.sgstPercent > 0 ? r.sgstPercent : "";
         const sgstAmtStr = r.sgstAmount > 0 ? r.sgstAmount.toFixed(2) : "";
         const totalAmtStr = r.totalAmount > 0 ? r.totalAmount.toFixed(2) : "";
-        const pmtRecStr = r.paymentReceived > 0 ? r.paymentReceived.toFixed(2) : "";
+        const pmtRecStr =
+          r.paymentReceived > 0 ? r.paymentReceived.toFixed(2) : "";
 
         return `
         <tr>

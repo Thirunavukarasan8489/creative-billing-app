@@ -39,7 +39,7 @@ export function Sidebar() {
             <span className="font-serif text-sm">CL</span>
           </div>
           <span className="font-serif font-bold text-sm tracking-wide text-white">
-            CREATIVE LINE GRAPHICS
+            Creative Line Graphics
           </span>
         </div>
         <button

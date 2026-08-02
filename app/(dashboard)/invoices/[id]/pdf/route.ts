@@ -5,8 +5,9 @@ import PressProfile from "@/lib/models/PressProfile";
 
 const DEFAULT_PRESS = {
   name: "Creative Line Graphics",
-  tagline: "OFFSET & DIGITAL PRINTING PRESS",
-  address: "No. 2/412, Thirumalai Nagar, Ganapathypalayam, Veerapandi PO, TIRUPUR - 641 605.",
+  tagline: "OFFSET PRINTING PRESS",
+  address:
+    "No. 2/412, Thirumalai Nagar, Ganapathypalayam, Veerapandi PO, TIRUPUR - 641 605.",
   phone: "8489 902 902, 93442 16902",
   email: "creativetpr@gmail.com",
   gstin: "33DDIPG2441F1Z0",
@@ -15,12 +16,12 @@ const DEFAULT_PRESS = {
   bankName: "FEDERAL BANK, TIRUPUR",
   accountNo: "13590200065469",
   ifscCode: "FDRL0001359",
-  branchName: "Main Branch, Tiruppur",
+  branchName: "Industrial Branch, Tiruppur",
 };
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await dbConnect();
@@ -37,7 +38,8 @@ export async function GET(
     const isTaxInvoice = invoice.type === "tax_invoice";
 
     const itemsHtml = invoice.items
-      .map((item: any, idx: number) => `
+      .map(
+        (item: any, idx: number) => `
         <tr>
           <td style="padding: 8px; border-bottom: 1px solid #E2E8F0; text-align: center;">${idx + 1}</td>
           <td style="padding: 8px; border-bottom: 1px solid #E2E8F0; font-weight: 500;">${item.description}</td>
@@ -46,7 +48,8 @@ export async function GET(
           <td style="padding: 8px; text-align: right; border-bottom: 1px solid #E2E8F0; font-family: monospace;">${item.rate.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
           <td style="padding: 8px; text-align: right; border-bottom: 1px solid #E2E8F0; font-family: monospace; font-weight: bold; color: #0F172A;">${item.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
         </tr>
-      `)
+      `,
+      )
       .join("");
 
     const html = `
@@ -134,14 +137,18 @@ export async function GET(
     <!-- Math Calculations -->
     <div style="display: flex; justify-content: space-between; margin-top: 16px; padding-top: 16px; border-top: 2px solid #0F172A;">
       <div style="width: 55%;">
-        ${isTaxInvoice ? `
+        ${
+          isTaxInvoice
+            ? `
           <div style="background: #F8FAFC; border: 1px solid #E2E8F0; padding: 12px; border-radius: 6px;">
             <p style="font-[10px] font-bold text-transform: uppercase; color: #64748B; margin: 0 0 4px 0;">Bank Account Details</p>
             <p style="margin: 2px 0; font-weight: bold; color: #0F172A;">Bank: ${press.bankName || DEFAULT_PRESS.bankName}</p>
             <p style="margin: 2px 0; font-family: monospace; font-weight: bold; color: #0F172A;">A/C No: ${press.accountNo || DEFAULT_PRESS.accountNo}</p>
             <p style="margin: 2px 0; font-family: monospace; font-weight: bold; color: #0F172A;">IFSC: ${press.ifscCode || DEFAULT_PRESS.ifscCode}</p>
           </div>
-        ` : ""}
+        `
+            : ""
+        }
         <div style="margin-top: 12px;">
           <p style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #64748B; margin: 0;">Amount in Words</p>
           <p style="font-family: Georgia, serif; font-weight: bold; color: #0F172A; margin: 2px 0;">Rupees ${invoice.amountInWords} Only</p>
@@ -153,7 +160,9 @@ export async function GET(
           <span>Subtotal:</span>
           <span style="font-family: monospace; font-weight: bold;">₹${invoice.subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
         </div>
-        ${isTaxInvoice ? `
+        ${
+          isTaxInvoice
+            ? `
           <div style="display: flex; justify-content: space-between; padding: 4px 0; color: #475569;">
             <span>CGST (${invoice.cgstPercent}%):</span>
             <span style="font-family: monospace;">₹${invoice.cgstAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
@@ -162,13 +171,19 @@ export async function GET(
             <span>SGST (${invoice.sgstPercent}%):</span>
             <span style="font-family: monospace;">₹${invoice.sgstAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
           </div>
-          ${invoice.roundOff !== 0 ? `
+          ${
+            invoice.roundOff !== 0
+              ? `
             <div style="display: flex; justify-content: space-between; padding: 4px 0; color: #64748B;">
               <span>Round Off:</span>
               <span style="font-family: monospace;">₹${invoice.roundOff.toFixed(2)}</span>
             </div>
-          ` : ""}
-        ` : ""}
+          `
+              : ""
+          }
+        `
+            : ""
+        }
         <div style="display: flex; justify-content: space-between; padding: 8px 0; border-top: 2px solid #0F172A; font-size: 16px; font-weight: bold; color: ${isTaxInvoice ? "#0F172A" : "#E11D48"};">
           <span>Grand Total:</span>
           <span style="font-family: monospace;">₹${invoice.grandTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>

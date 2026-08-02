@@ -56,19 +56,19 @@ export function InvoicePreview({
 
   const [pressProfile, setPressProfile] = useState<any>(
     initialPressProfile || {
-      name: "CREATIVE LINE GRAPHICS",
-      tagline: "OFFSET & DIGITAL PRINTING PRESS",
+      name: "Creative Line Graphics",
+      tagline: "OFFSET PRINTING PRESS",
       address:
-        "12, Printing Press Colony, Main Road, Tiruppur - 641601, Tamil Nadu.",
-      phone: "+91 98421 00000",
-      email: "creativeline.tpr@gmail.com",
-      gstin: "33AAAAA0000A1Z5",
+        "2/412 72, Thirumalai Nagar, Ganapathypalayam, Veerapandi (P.O), Palladam (T.K), Tiruppur - 641 605, Tamil Nadu.",
+      phone: "+91 90479 02902",
+      email: "creativetpr@gmail.com",
+      gstin: "33DDIPG2441F1Z0",
       state: "Tamil Nadu",
       stateCode: "33",
-      bankName: "Union Bank of India",
-      accountNo: "510101001234567",
-      ifscCode: "UBIN0551015",
-      branchName: "Main Branch, Tiruppur",
+      bankName: "Federal Bank",
+      accountNo: "13590200065469",
+      ifscCode: "FDRL0001359",
+      branchName: "Industrial Branch, Tiruppur",
       terms:
         "Labour bill for printing work rendered. Payment due within 15 days of invoice date.",
     },

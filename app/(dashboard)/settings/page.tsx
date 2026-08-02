@@ -2,23 +2,34 @@
 
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
-import { Settings, Save, Check, AlertCircle, Building2, CreditCard, FileText, Eye } from "lucide-react";
+import {
+  Settings,
+  Save,
+  Check,
+  AlertCircle,
+  Building2,
+  CreditCard,
+  FileText,
+  Eye,
+} from "lucide-react";
 
 export default function SettingsPage() {
   const [formData, setFormData] = useState({
-    name: "CREATIVE LINE GRAPHICS",
-    tagline: "OFFSET & DIGITAL PRINTING PRESS",
-    address: "12, Printing Press Colony, Main Road, Tiruppur - 641601, Tamil Nadu.",
-    phone: "+91 98421 00000",
-    email: "creativeline.tpr@gmail.com",
-    gstin: "33AAAAA0000A1Z5",
+    name: "Creative Line Graphics",
+    tagline: "OFFSET PRINTING PRESS",
+    address:
+      "2/412 72, Thirumalai Nagar, Ganapathypalayam, Veerapandi (P.O), Palladam (T.K), Tiruppur - 641 605, Tamil Nadu.",
+    phone: "+91 90479 02902",
+    email: "creativetpr@gmail.com",
+    gstin: "33DDIPG2441F1Z0",
     state: "Tamil Nadu",
     stateCode: "33",
-    bankName: "Union Bank of India",
-    accountNo: "510101001234567",
-    ifscCode: "UBIN0551015",
-    branchName: "Main Branch, Tiruppur",
-    terms: "Labour bill for printing work rendered. Payment due within 15 days of invoice date.",
+    bankName: "Federal Bank",
+    accountNo: "13590200065469",
+    ifscCode: "FDRL0001359",
+    branchName: "Industrial Branch, Tiruppur",
+    terms:
+      "Labour bill for printing work rendered. Payment due within 15 days of invoice date.",
   });
 
   const [loading, setLoading] = useState(true);
@@ -33,8 +44,8 @@ export default function SettingsPage() {
       const data = await res.json();
       if (res.ok && data) {
         setFormData({
-          name: data.name || "CREATIVE LINE GRAPHICS",
-          tagline: data.tagline || "OFFSET & DIGITAL PRINTING PRESS",
+          name: data.name || "Creative Line Graphics",
+          tagline: data.tagline || "OFFSET PRINTING PRESS",
           address: data.address || "",
           phone: data.phone || "",
           email: data.email || "",
@@ -98,7 +109,8 @@ export default function SettingsPage() {
             <span>Creative Line Graphics Settings</span>
           </h1>
           <p className="text-xs text-slate-500">
-            Edit your printing press details, address, GSTIN, and bank account for Tax Invoices
+            Edit your printing press details, address, GSTIN, and bank account
+            for Tax Invoices
           </p>
         </div>
 
@@ -128,7 +140,9 @@ export default function SettingsPage() {
       )}
 
       {loading ? (
-        <div className="p-12 text-center text-xs text-slate-500">Loading settings...</div>
+        <div className="p-12 text-center text-xs text-slate-500">
+          Loading settings...
+        </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Main Settings Form */}
@@ -152,7 +166,9 @@ export default function SettingsPage() {
                   type="text"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-serif font-bold text-[#0F172A] focus:ring-2 focus:ring-blue-500 outline-none"
                 />
               </div>
@@ -164,8 +180,10 @@ export default function SettingsPage() {
                 <input
                   type="text"
                   value={formData.tagline}
-                  onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
-                  placeholder="OFFSET & DIGITAL PRINTING PRESS"
+                  onChange={(e) =>
+                    setFormData({ ...formData, tagline: e.target.value })
+                  }
+                  placeholder="OFFSET PRINTING PRESS"
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                 />
               </div>
@@ -178,7 +196,9 @@ export default function SettingsPage() {
                   required
                   rows={2}
                   value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, address: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                 />
               </div>
@@ -186,13 +206,16 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
-                    Phone / Contact Number <span className="text-rose-500">*</span>
+                    Phone / Contact Number{" "}
+                    <span className="text-rose-500">*</span>
                   </label>
                   <input
                     type="text"
                     required
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, phone: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none font-mono"
                   />
                 </div>
@@ -204,7 +227,9 @@ export default function SettingsPage() {
                   <input
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none font-mono"
                   />
                 </div>
@@ -226,7 +251,12 @@ export default function SettingsPage() {
                   <input
                     type="text"
                     value={formData.gstin}
-                    onChange={(e) => setFormData({ ...formData, gstin: e.target.value.toUpperCase() })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        gstin: e.target.value.toUpperCase(),
+                      })
+                    }
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono uppercase focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
@@ -238,7 +268,9 @@ export default function SettingsPage() {
                   <input
                     type="text"
                     value={formData.state}
-                    onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, state: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
@@ -250,7 +282,9 @@ export default function SettingsPage() {
                   <input
                     type="text"
                     value={formData.stateCode}
-                    onChange={(e) => setFormData({ ...formData, stateCode: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, stateCode: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
@@ -272,8 +306,10 @@ export default function SettingsPage() {
                   <input
                     type="text"
                     value={formData.bankName}
-                    onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
-                    placeholder="Union Bank of India"
+                    onChange={(e) =>
+                      setFormData({ ...formData, bankName: e.target.value })
+                    }
+                    placeholder="Federal Bank"
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
@@ -285,8 +321,10 @@ export default function SettingsPage() {
                   <input
                     type="text"
                     value={formData.accountNo}
-                    onChange={(e) => setFormData({ ...formData, accountNo: e.target.value })}
-                    placeholder="510101001234567"
+                    onChange={(e) =>
+                      setFormData({ ...formData, accountNo: e.target.value })
+                    }
+                    placeholder="13590200065469"
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
@@ -298,8 +336,13 @@ export default function SettingsPage() {
                   <input
                     type="text"
                     value={formData.ifscCode}
-                    onChange={(e) => setFormData({ ...formData, ifscCode: e.target.value.toUpperCase() })}
-                    placeholder="UBIN0551015"
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        ifscCode: e.target.value.toUpperCase(),
+                      })
+                    }
+                    placeholder="FDRL0001359"
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono uppercase focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
@@ -311,8 +354,10 @@ export default function SettingsPage() {
                   <input
                     type="text"
                     value={formData.branchName}
-                    onChange={(e) => setFormData({ ...formData, branchName: e.target.value })}
-                    placeholder="Main Branch, Tiruppur"
+                    onChange={(e) =>
+                      setFormData({ ...formData, branchName: e.target.value })
+                    }
+                    placeholder="Industrial Branch, Tiruppur"
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                   />
                 </div>
@@ -332,7 +377,9 @@ export default function SettingsPage() {
                 <textarea
                   rows={2}
                   value={formData.terms}
-                  onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, terms: e.target.value })
+                  }
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                 />
               </div>
@@ -357,7 +404,9 @@ export default function SettingsPage() {
                 <Eye className="w-4 h-4 text-blue-600" />
                 <span>Live Letterhead Header Preview</span>
               </span>
-              <span className="text-[11px] text-slate-500 font-mono">Updates live</span>
+              <span className="text-[11px] text-slate-500 font-mono">
+                Updates live
+              </span>
             </div>
 
             {/* Live Paper Letterhead Box */}
@@ -365,12 +414,14 @@ export default function SettingsPage() {
               <div className="border-b border-slate-200 pb-4 flex justify-between items-start">
                 <div>
                   <h2 className="font-serif text-xl font-black text-[#E11D48]">
-                    {formData.name || "CREATIVE LINE GRAPHICS"}
+                    {formData.name || "Creative Line Graphics"}
                   </h2>
                   <p className="text-xs font-semibold text-[#0F172A] uppercase tracking-wider mt-0.5">
-                    {formData.tagline || "OFFSET & DIGITAL PRINTING PRESS"}
+                    {formData.tagline || "OFFSET PRINTING PRESS"}
                   </p>
-                  <p className="text-xs text-slate-600 mt-1 max-w-xs">{formData.address}</p>
+                  <p className="text-xs text-slate-600 mt-1 max-w-xs">
+                    {formData.address}
+                  </p>
                   <p className="text-xs text-slate-600 font-mono mt-0.5">
                     Ph: {formData.phone} | {formData.email}
                   </p>
@@ -378,10 +429,16 @@ export default function SettingsPage() {
 
                 <div className="bg-slate-100 p-2.5 rounded-lg border border-slate-300 text-right text-[10px]">
                   <p className="font-bold text-slate-700">
-                    GSTIN: <span className="font-mono text-xs text-[#0F172A]">{formData.gstin || "N/A"}</span>
+                    GSTIN:{" "}
+                    <span className="font-mono text-xs text-[#0F172A]">
+                      {formData.gstin || "N/A"}
+                    </span>
                   </p>
                   <p className="font-bold text-slate-700 mt-1">
-                    State Code: <span className="font-mono text-xs text-[#0F172A]">{formData.stateCode} ({formData.state})</span>
+                    State Code:{" "}
+                    <span className="font-mono text-xs text-[#0F172A]">
+                      {formData.stateCode} ({formData.state})
+                    </span>
                   </p>
                 </div>
               </div>
@@ -391,10 +448,18 @@ export default function SettingsPage() {
                 <h4 className="font-bold text-[10px] uppercase tracking-wider text-[#0F172A] mb-1">
                   Bank Details Preview (Tax Invoice Footer):
                 </h4>
-                <p className="font-semibold text-slate-800">{formData.bankName || "Bank Name"}</p>
-                <p className="font-mono text-slate-600">A/C No: {formData.accountNo || "XXXXXXXXXXXX"}</p>
-                <p className="font-mono text-slate-600">IFSC: {formData.ifscCode || "XXXX000000"}</p>
-                <p className="text-slate-600">Branch: {formData.branchName || "Branch"}</p>
+                <p className="font-semibold text-slate-800">
+                  {formData.bankName || "Bank Name"}
+                </p>
+                <p className="font-mono text-slate-600">
+                  A/C No: {formData.accountNo || "XXXXXXXXXXXX"}
+                </p>
+                <p className="font-mono text-slate-600">
+                  IFSC: {formData.ifscCode || "XXXX000000"}
+                </p>
+                <p className="text-slate-600">
+                  Branch: {formData.branchName || "Branch"}
+                </p>
               </div>
             </div>
           </div>

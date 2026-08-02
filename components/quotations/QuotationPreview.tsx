@@ -44,12 +44,13 @@ export function QuotationPreview({
   const [pressProfile, setPressProfile] = useState<any>(
     initialPressProfile || {
       name: "Creative Line Graphics",
-      tagline: "OFFSET & DIGITAL PRINTING PRESS",
-      address: "No,28412, Thirumalai Nagar, Ganapathypalayam, Veerapandi PO, TIRUPUR - 641 605.",
+      tagline: "OFFSET PRINTING PRESS",
+      address:
+        "No,28412, Thirumalai Nagar, Ganapathypalayam, Veerapandi PO, TIRUPUR - 641 605.",
       phone: "8489 902 902, 93442 16902",
-      email: "creativeline.tpr@gmail.com",
+      email: "creativetpr@gmail.com",
       gstin: "33DDIPG2441F1Z0",
-    }
+    },
   );
 
   useEffect(() => {
@@ -105,11 +106,17 @@ export function QuotationPreview({
           <p className="font-semibold text-slate-800">{recipientTitle}</p>
           {company ? (
             <div>
-              <p className="font-bold text-base text-slate-900">{company.name}</p>
-              <p className="text-slate-700 whitespace-pre-line leading-relaxed">{company.address}</p>
+              <p className="font-bold text-base text-slate-900">
+                {company.name}
+              </p>
+              <p className="text-slate-700 whitespace-pre-line leading-relaxed">
+                {company.address}
+              </p>
             </div>
           ) : (
-            <p className="text-slate-400 italic">Select or create a company to populate recipient details...</p>
+            <p className="text-slate-400 italic">
+              Select or create a company to populate recipient details...
+            </p>
           )}
         </div>
 
@@ -126,15 +133,22 @@ export function QuotationPreview({
           <thead className="border-b-2 border-slate-900 font-bold uppercase text-slate-900 bg-slate-50">
             <tr>
               <th className="p-3 border-r-2 border-slate-900">Particulars</th>
-              <th className="p-3 border-r-2 border-slate-900 text-center w-24 sm:w-28">Quantity</th>
-              <th className="p-3 border-r-2 border-slate-900 text-right w-28 sm:w-32">Rate Per Pcs</th>
+              <th className="p-3 border-r-2 border-slate-900 text-center w-24 sm:w-28">
+                Quantity
+              </th>
+              <th className="p-3 border-r-2 border-slate-900 text-right w-28 sm:w-32">
+                Rate Per Pcs
+              </th>
               <th className="p-3 text-right w-28 sm:w-36">Amount Rs.</th>
             </tr>
           </thead>
           <tbody className="divide-y border-slate-900">
             {items.length === 0 ? (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-slate-400 italic">
+                <td
+                  colSpan={4}
+                  className="p-8 text-center text-slate-400 italic"
+                >
                   No quotation item rows added yet.
                 </td>
               </tr>
@@ -176,7 +190,10 @@ export function QuotationPreview({
           <div className="font-mono text-sm font-bold text-slate-900 flex items-center gap-2">
             <span>Total Amount:</span>
             <span className="text-base bg-white px-2 py-0.5 border border-slate-400 rounded">
-              ₹{safeGrandTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+              ₹
+              {safeGrandTotal.toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+              })}
             </span>
           </div>
         </div>
@@ -184,7 +201,9 @@ export function QuotationPreview({
 
       {notes && (
         <div className="p-3 bg-slate-50 border border-slate-300 rounded text-xs text-slate-700">
-          <span className="font-bold block text-slate-900">Additional Terms / Instructions:</span>
+          <span className="font-bold block text-slate-900">
+            Additional Terms / Instructions:
+          </span>
           <p className="mt-0.5 whitespace-pre-line">{notes}</p>
         </div>
       )}
@@ -193,9 +212,13 @@ export function QuotationPreview({
       <div className="pt-8 flex justify-between items-end text-xs sm:text-sm">
         <div></div>
         <div className="text-right">
-          <p className="font-serif font-bold text-slate-900">For Creative Line Graphics</p>
+          <p className="font-serif font-bold text-slate-900">
+            For Creative Line Graphics
+          </p>
           <div className="h-12 border-b border-slate-400 w-40 ml-auto mt-2"></div>
-          <p className="text-[10px] text-slate-600 uppercase font-semibold mt-1">Authorized Signatory</p>
+          <p className="text-[10px] text-slate-600 uppercase font-semibold mt-1">
+            Authorized Signatory
+          </p>
         </div>
       </div>
     </div>

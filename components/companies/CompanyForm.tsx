@@ -11,7 +11,11 @@ interface CompanyFormProps {
   onCancel?: () => void;
 }
 
-export function CompanyForm({ initialValues, onSuccess, onCancel }: CompanyFormProps) {
+export function CompanyForm({
+  initialValues,
+  onSuccess,
+  onCancel,
+}: CompanyFormProps) {
   const [formData, setFormData] = useState<CompanyInput>({
     name: initialValues?.name || "",
     address: initialValues?.address || "",
@@ -20,7 +24,8 @@ export function CompanyForm({ initialValues, onSuccess, onCancel }: CompanyFormP
     gstin: initialValues?.gstin || "",
     state: initialValues?.state || "Tamil Nadu",
     stateCode: initialValues?.stateCode || "33",
-    gstRegistered: initialValues?.gstRegistered ?? Boolean(initialValues?.gstin),
+    gstRegistered:
+      initialValues?.gstRegistered ?? Boolean(initialValues?.gstin),
   });
 
   const [loading, setLoading] = useState(false);
@@ -51,7 +56,11 @@ export function CompanyForm({ initialValues, onSuccess, onCancel }: CompanyFormP
         throw new Error(result.error || "Failed to save company");
       }
 
-      toast.success(isEditing ? "Company details updated!" : "Company created successfully!");
+      toast.success(
+        isEditing
+          ? "Company details updated!"
+          : "Company created successfully!",
+      );
       onSuccess(result);
     } catch (err: any) {
       let msg = err.message || "Failed to save company";
@@ -101,13 +110,16 @@ export function CompanyForm({ initialValues, onSuccess, onCancel }: CompanyFormP
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
-            GSTIN <span className="text-slate-400 font-normal">(Optional for Labour Bill)</span>
+            GSTIN{" "}
+            <span className="text-slate-400 font-normal">
+              (Optional for Labour Bill)
+            </span>
           </label>
           <input
             type="text"
             value={formData.gstin || ""}
             onChange={(e) => handleGstinChange(e.target.value)}
-            placeholder="e.g. 33AAAAA0000A1Z5"
+            placeholder="e.g. 33DDIPG2441F1Z0"
             maxLength={15}
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none bg-white text-[#0F172A] uppercase"
           />
@@ -121,7 +133,9 @@ export function CompanyForm({ initialValues, onSuccess, onCancel }: CompanyFormP
             type="text"
             required
             value={formData.phone}
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, phone: e.target.value })
+            }
             placeholder="e.g. 9842100000"
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white text-[#0F172A]"
           />
@@ -136,7 +150,9 @@ export function CompanyForm({ initialValues, onSuccess, onCancel }: CompanyFormP
           required
           rows={2}
           value={formData.address}
-          onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, address: e.target.value })
+          }
           placeholder="Street, City, Postal Code"
           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white text-[#0F172A]"
         />
@@ -150,7 +166,9 @@ export function CompanyForm({ initialValues, onSuccess, onCancel }: CompanyFormP
           <input
             type="email"
             value={formData.email || ""}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, email: e.target.value })
+            }
             placeholder="billing@company.com"
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white text-[#0F172A]"
           />
@@ -163,7 +181,9 @@ export function CompanyForm({ initialValues, onSuccess, onCancel }: CompanyFormP
           <input
             type="text"
             value={formData.state}
-            onChange={(e) => setFormData({ ...formData, state: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, state: e.target.value })
+            }
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white text-[#0F172A]"
           />
         </div>
@@ -175,7 +195,9 @@ export function CompanyForm({ initialValues, onSuccess, onCancel }: CompanyFormP
           <input
             type="text"
             value={formData.stateCode}
-            onChange={(e) => setFormData({ ...formData, stateCode: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, stateCode: e.target.value })
+            }
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white text-[#0F172A]"
           />
         </div>
@@ -184,11 +206,17 @@ export function CompanyForm({ initialValues, onSuccess, onCancel }: CompanyFormP
       {formData.gstin ? (
         <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-md text-xs text-emerald-900 font-medium flex items-center gap-2">
           <Check className="w-4 h-4 text-emerald-600" />
-          <span>GSTIN detected: Default bill type will be <strong>Tax Invoice</strong>.</span>
+          <span>
+            GSTIN detected: Default bill type will be{" "}
+            <strong>Tax Invoice</strong>.
+          </span>
         </div>
       ) : (
         <div className="p-2.5 bg-amber-50 border border-amber-200 rounded-md text-xs text-amber-900 font-medium">
-          <span>No GSTIN provided: Default bill type will be <strong>Labour Bill</strong>.</span>
+          <span>
+            No GSTIN provided: Default bill type will be{" "}
+            <strong>Labour Bill</strong>.
+          </span>
         </div>
       )}
 

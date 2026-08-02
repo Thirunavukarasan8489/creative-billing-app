@@ -5,16 +5,17 @@ import PressProfile from "@/lib/models/PressProfile";
 
 const DEFAULT_PRESS = {
   name: "Creative Line Graphics",
-  tagline: "OFFSET & DIGITAL PRINTING PRESS",
-  address: "No,28412, Thirumalai Nagar, Ganapathypalayam, Veerapandi PO, TIRUPUR - 641 605.",
+  tagline: "OFFSET PRINTING PRESS",
+  address:
+    "No,28412, Thirumalai Nagar, Ganapathypalayam, Veerapandi PO, TIRUPUR - 641 605.",
   phone: "8489 902 902, 93442 16902",
-  email: "creativeline.tpr@gmail.com",
+  email: "creativetpr@gmail.com",
   gstin: "33DDIPG2441F1Z0",
 };
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await dbConnect();

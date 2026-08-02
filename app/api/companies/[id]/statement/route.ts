@@ -6,23 +6,24 @@ import Payment from "@/lib/models/Payment";
 import PressProfile from "@/lib/models/PressProfile";
 
 const DEFAULT_PRESS = {
-  name: "CREATIVE LINE GRAPHICS",
-  tagline: "OFFSET & DIGITAL PRINTING PRESS",
-  address: "12, Printing Press Colony, Main Road, Tiruppur - 641601, Tamil Nadu.",
-  phone: "+91 98421 00000",
-  email: "creativeline.tpr@gmail.com",
-  gstin: "33AAAAA0000A1Z5",
+  name: "Creative Line Graphics",
+  tagline: "OFFSET PRINTING PRESS",
+  address:
+    "2/412 72, Thirumalai Nagar, Ganapathypalayam, Veerapandi (P.O), Palladam (T.K), Tiruppur - 641 605, Tamil Nadu.",
+  phone: "+91 90479 02902",
+  email: "creativetpr@gmail.com",
+  gstin: "33DDIPG2441F1Z0",
   state: "Tamil Nadu",
   stateCode: "33",
-  bankName: "Union Bank of India",
-  accountNo: "510101001234567",
-  ifscCode: "UBIN0551015",
-  branchName: "Main Branch, Tiruppur",
+  bankName: "Federal Bank",
+  accountNo: "13590200065469",
+  ifscCode: "FDRL0001359",
+  branchName: "Industrial Branch, Tiruppur",
 };
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await dbConnect();
@@ -74,13 +75,17 @@ export async function GET(
 
     invoices.forEach((inv) => {
       // Create a statement line for each invoice
-      const itemsDescription = inv.items.map((i: any) => i.description).join(" / ");
+      const itemsDescription = inv.items
+        .map((i: any) => i.description)
+        .join(" / ");
 
       statementRows.push({
         type: "invoice",
         date: inv.date,
         billNo: inv.number,
-        particulars: itemsDescription || (inv.type === "tax_invoice" ? "Tax Invoice" : "Labour Bill"),
+        particulars:
+          itemsDescription ||
+          (inv.type === "tax_invoice" ? "Tax Invoice" : "Labour Bill"),
         subtotal: inv.subtotal,
         cgstPercent: inv.cgstPercent || 0,
         cgstAmount: inv.cgstAmount || 0,
@@ -93,7 +98,9 @@ export async function GET(
 
     // Map payments to rows
     payments.forEach((pmt) => {
-      const parentInvoice = invoices.find((i) => i._id.toString() === pmt.invoiceId.toString());
+      const parentInvoice = invoices.find(
+        (i) => i._id.toString() === pmt.invoiceId.toString(),
+      );
       const modeLabel = pmt.mode ? pmt.mode.toUpperCase() : "PAYMENT";
       const refText = pmt.referenceNo ? ` (${pmt.referenceNo})` : "";
       const billRef = parentInvoice ? ` [Bill #${parentInvoice.number}]` : "";
@@ -114,11 +121,19 @@ export async function GET(
     });
 
     // Sort combined rows chronologically by date
-    statementRows.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    statementRows.sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    );
 
     // Calculate totals
-    const totalBilled = statementRows.reduce((sum, r) => sum + r.totalAmount, 0);
-    const totalReceived = statementRows.reduce((sum, r) => sum + r.paymentReceived, 0);
+    const totalBilled = statementRows.reduce(
+      (sum, r) => sum + r.totalAmount,
+      0,
+    );
+    const totalReceived = statementRows.reduce(
+      (sum, r) => sum + r.paymentReceived,
+      0,
+    );
     const balance = Math.round((totalBilled - totalReceived) * 100) / 100;
 
     return NextResponse.json({
@@ -137,7 +152,7 @@ export async function GET(
     console.error("Error fetching company statement:", error);
     return NextResponse.json(
       { error: "Failed to generate company account statement" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

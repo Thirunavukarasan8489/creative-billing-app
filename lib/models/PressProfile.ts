@@ -20,28 +20,30 @@ export interface IPressProfile extends Document {
 
 const PressProfileSchema: Schema = new Schema(
   {
-    name: { type: String, required: true, default: "CREATIVE LINE GRAPHICS" },
-    tagline: { type: String, default: "OFFSET & DIGITAL PRINTING PRESS" },
+    name: { type: String, required: true, default: "Creative Line Graphics" },
+    tagline: { type: String, default: "OFFSET PRINTING PRESS" },
     address: {
       type: String,
       required: true,
-      default: "12, Printing Press Colony, Main Road, Tiruppur - 641601, Tamil Nadu.",
+      default:
+        "2/412 72, Thirumalai Nagar, Ganapathypalayam, Veerapandi (P.O), Palladam (T.K), Tiruppur - 641 605, Tamil Nadu.",
     },
-    phone: { type: String, required: true, default: "+91 98421 00000" },
-    email: { type: String, default: "creativeline.tpr@gmail.com" },
-    gstin: { type: String, default: "33AAAAA0000A1Z5" },
+    phone: { type: String, required: true, default: "+91 90479 02902" },
+    email: { type: String, default: "creativetpr@gmail.com" },
+    gstin: { type: String, default: "33DDIPG2441F1Z0" },
     state: { type: String, default: "Tamil Nadu" },
     stateCode: { type: String, default: "33" },
-    bankName: { type: String, default: "Union Bank of India" },
-    accountNo: { type: String, default: "510101001234567" },
-    ifscCode: { type: String, default: "UBIN0551015" },
-    branchName: { type: String, default: "Main Branch, Tiruppur" },
+    bankName: { type: String, default: "Federal Bank" },
+    accountNo: { type: String, default: "13590200065469" },
+    ifscCode: { type: String, default: "FDRL0001359" },
+    branchName: { type: String, default: "Industrial Branch, Tiruppur" },
     terms: {
       type: String,
-      default: "Labour bill for printing work rendered. Payment due within 15 days of invoice date.",
+      default:
+        "Labour bill for printing work rendered. Payment due within 15 days of invoice date.",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const PressProfile: Model<IPressProfile> =
