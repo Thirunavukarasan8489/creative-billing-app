@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FileText, Plus, Search, Filter, CheckCircle2, AlertCircle, Eye, Printer } from "lucide-react";
+import { FileText, Plus, Search, Filter, CheckCircle2, AlertCircle, Eye, Printer, Pencil } from "lucide-react";
 
 export default function InvoicesPage() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -175,13 +175,24 @@ export default function InvoicesPage() {
                         </span>
                       )}
                     </td>
-                    <td className="p-3 text-center space-x-2">
-                      <Link
-                        href={`/invoices/${inv._id}`}
-                        className="text-blue-600 hover:text-blue-800 font-semibold hover:underline"
-                      >
-                        View & Print
-                      </Link>
+                    <td className="p-3 text-center">
+                      <div className="flex items-center justify-center gap-2">
+                        <Link
+                          href={`/invoices/${inv._id}/edit`}
+                          className="px-2 py-1 bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 rounded font-semibold flex items-center gap-1 transition-colors"
+                          title="Edit Bill Items"
+                        >
+                          <Pencil className="w-3 h-3" />
+                          <span>Edit</span>
+                        </Link>
+                        <Link
+                          href={`/invoices/${inv._id}`}
+                          className="px-2 py-1 bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 rounded font-semibold flex items-center gap-1 transition-colors"
+                        >
+                          <Eye className="w-3 h-3 text-blue-600" />
+                          <span>View & Print</span>
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ))}

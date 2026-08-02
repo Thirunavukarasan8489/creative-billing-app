@@ -74,7 +74,7 @@ export default async function DashboardPage() {
             <span>Creative Line Graphics • Billing Management</span>
           </div>
           <h1 className="font-serif text-2xl sm:text-3xl font-black tracking-tight text-white">
-            Printing Press Dashboard
+             Dashboard
           </h1>
           <p className="text-sm text-slate-300 max-w-xl">
             Company-first billing workflow, live paper bill replica preview, automatic GST CGST/SGST calculation, and company ledger balances.

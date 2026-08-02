@@ -58,7 +58,8 @@ export function InvoicePreview({
     initialPressProfile || {
       name: "CREATIVE LINE GRAPHICS",
       tagline: "OFFSET & DIGITAL PRINTING PRESS",
-      address: "12, Printing Press Colony, Main Road, Tiruppur - 641601, Tamil Nadu.",
+      address:
+        "12, Printing Press Colony, Main Road, Tiruppur - 641601, Tamil Nadu.",
       phone: "+91 98421 00000",
       email: "creativeline.tpr@gmail.com",
       gstin: "33AAAAA0000A1Z5",
@@ -68,8 +69,9 @@ export function InvoicePreview({
       accountNo: "510101001234567",
       ifscCode: "UBIN0551015",
       branchName: "Main Branch, Tiruppur",
-      terms: "Labour bill for printing work rendered. Payment due within 15 days of invoice date.",
-    }
+      terms:
+        "Labour bill for printing work rendered. Payment due within 15 days of invoice date.",
+    },
   );
 
   useEffect(() => {
@@ -106,7 +108,9 @@ export function InvoicePreview({
           </p>
         </div>
         <div className="text-right">
-          <p className="text-[10px] uppercase tracking-widest opacity-80">Date</p>
+          <p className="text-[10px] uppercase tracking-widest opacity-80">
+            Date
+          </p>
           <p className="font-mono font-bold text-sm">
             {date ? new Date(date).toLocaleDateString("en-IN") : "DD/MM/YYYY"}
           </p>
@@ -135,10 +139,16 @@ export function InvoicePreview({
           {isTaxInvoice && (
             <div className="text-right bg-slate-100 p-3 rounded-lg border border-slate-300">
               <p className="text-[10px] uppercase font-bold text-slate-700">
-                GSTIN: <span className="font-mono text-xs text-[#0F172A]">{pressProfile.gstin}</span>
+                GSTIN:{" "}
+                <span className="font-mono text-xs text-[#0F172A]">
+                  {pressProfile.gstin}
+                </span>
               </p>
               <p className="text-[10px] uppercase font-bold text-slate-700 mt-1">
-                State Code: <span className="font-mono text-xs text-[#0F172A]">{pressProfile.stateCode} ({pressProfile.state})</span>
+                State Code:{" "}
+                <span className="font-mono text-xs text-[#0F172A]">
+                  {pressProfile.stateCode} ({pressProfile.state})
+                </span>
               </p>
             </div>
           )}
@@ -152,24 +162,32 @@ export function InvoicePreview({
             </span>
             {company ? (
               <div>
-                <h3 className="font-bold text-base text-[#0F172A]">{company.name}</h3>
+                <h3 className="font-bold text-base text-[#0F172A]">
+                  {company.name}
+                </h3>
                 <p className="text-xs text-slate-600 whitespace-pre-line mt-0.5">
                   {company.address}
                 </p>
-                <p className="text-xs text-slate-600 font-mono mt-1">Ph: {company.phone}</p>
+                <p className="text-xs text-slate-600 font-mono mt-1">
+                  Ph: {company.phone}
+                </p>
               </div>
             ) : (
-              <p className="text-xs text-slate-400 italic">Select or create a company to populate billing details...</p>
+              <p className="text-xs text-slate-400 italic">
+                Select or create a company to populate billing details...
+              </p>
             )}
           </div>
 
           {isTaxInvoice && company && (
             <div className="sm:text-right flex flex-col justify-end">
               <p className="text-xs font-mono font-bold text-[#0F172A]">
-                Party GSTIN: <span className="text-[#E11D48]">{company.gstin || "N/A"}</span>
+                Party GSTIN:{" "}
+                <span className="text-[#E11D48]">{company.gstin || "N/A"}</span>
               </p>
               <p className="text-xs font-mono text-slate-600">
-                State: {company.state || "Tamil Nadu"} ({company.stateCode || "33"})
+                State: {company.state || "Tamil Nadu"} (
+                {company.stateCode || "33"})
               </p>
             </div>
           )}
@@ -205,19 +223,29 @@ export function InvoicePreview({
               ) : (
                 items.map((item, idx) => (
                   <tr key={idx} className="hover:bg-slate-50">
-                    <td className="p-2.5 text-center font-mono text-slate-500">{idx + 1}</td>
-                    <td className="p-2.5 font-medium text-[#0F172A]">{item.description}</td>
+                    <td className="p-2.5 text-center font-mono text-slate-500">
+                      {idx + 1}
+                    </td>
+                    <td className="p-2.5 font-medium text-[#0F172A]">
+                      {item.description}
+                    </td>
                     {isTaxInvoice && (
                       <td className="p-2.5 text-center font-mono text-slate-600">
-                        {item.hsnSac || "9988"}
+                        {item.hsnSac || "9989"}
                       </td>
                     )}
-                    <td className="p-2.5 text-right font-mono font-semibold">{item.quantity}</td>
+                    <td className="p-2.5 text-right font-mono font-semibold">
+                      {item.quantity}
+                    </td>
                     <td className="p-2.5 text-right font-mono">
-                      {item.rate.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                      {item.rate.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                      })}
                     </td>
                     <td className="p-2.5 text-right font-mono font-bold text-[#0F172A]">
-                      {item.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                      {item.amount.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                      })}
                     </td>
                   </tr>
                 ))
@@ -240,7 +268,9 @@ export function InvoicePreview({
 
             {notes && (
               <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-600">
-                <span className="font-bold block text-slate-700">Notes / Instructions:</span>
+                <span className="font-bold block text-slate-700">
+                  Notes / Instructions:
+                </span>
                 <p className="mt-0.5">{notes}</p>
               </div>
             )}
@@ -250,7 +280,8 @@ export function InvoicePreview({
             <div className="flex justify-between font-medium text-slate-600">
               <span>Subtotal:</span>
               <span className="font-mono font-semibold">
-                ₹{subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                ₹
+                {subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
               </span>
             </div>
 
@@ -259,13 +290,19 @@ export function InvoicePreview({
                 <div className="flex justify-between text-slate-600">
                   <span>CGST ({cgstPercent}%):</span>
                   <span className="font-mono">
-                    ₹{cgstAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    ₹
+                    {cgstAmount.toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                    })}
                   </span>
                 </div>
                 <div className="flex justify-between text-slate-600">
                   <span>SGST ({sgstPercent}%):</span>
                   <span className="font-mono">
-                    ₹{sgstAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                    ₹
+                    {sgstAmount.toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                    })}
                   </span>
                 </div>
               </>
@@ -275,7 +312,9 @@ export function InvoicePreview({
               <div className="flex justify-between text-slate-500 italic">
                 <span>Round Off:</span>
                 <span className="font-mono">
-                  {roundOff > 0 ? `+₹${roundOff.toFixed(2)}` : `-₹${Math.abs(roundOff).toFixed(2)}`}
+                  {roundOff > 0
+                    ? `+₹${roundOff.toFixed(2)}`
+                    : `-₹${Math.abs(roundOff).toFixed(2)}`}
                 </span>
               </div>
             )}
@@ -283,7 +322,10 @@ export function InvoicePreview({
             <div className="border-t-2 border-dashed border-slate-300 pt-2 flex justify-between items-center text-sm font-bold text-[#0F172A]">
               <span className="font-serif text-base">GRAND TOTAL:</span>
               <span className="font-mono text-lg bg-slate-100 px-2 py-0.5 rounded border border-slate-300">
-                ₹{grandTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                ₹
+                {grandTotal.toLocaleString("en-IN", {
+                  minimumFractionDigits: 2,
+                })}
               </span>
             </div>
           </div>
@@ -296,17 +338,25 @@ export function InvoicePreview({
               <h4 className="font-bold text-[11px] uppercase tracking-wider text-[#0F172A] mb-1">
                 Bank Details for Payment:
               </h4>
-              <p className="font-semibold text-slate-800">{pressProfile.bankName}</p>
-              <p className="font-mono text-slate-600">A/C No: {pressProfile.accountNo}</p>
-              <p className="font-mono text-slate-600">IFSC Code: {pressProfile.ifscCode}</p>
-              <p className="text-slate-600">Branch: {pressProfile.branchName}</p>
+              <p className="font-semibold text-slate-800">
+                {pressProfile.bankName}
+              </p>
+              <p className="font-mono text-slate-600">
+                A/C No: {pressProfile.accountNo}
+              </p>
+              <p className="font-mono text-slate-600">
+                IFSC Code: {pressProfile.ifscCode}
+              </p>
+              <p className="text-slate-600">
+                Branch: {pressProfile.branchName}
+              </p>
             </div>
           ) : (
             <div className="p-3 bg-rose-50 rounded-lg border border-rose-200 text-rose-800">
-              <h4 className="font-bold text-[11px] uppercase tracking-wider mb-1">Terms:</h4>
-              <p className="text-[11px]">
-                {pressProfile.terms}
-              </p>
+              <h4 className="font-bold text-[11px] uppercase tracking-wider mb-1">
+                Terms:
+              </h4>
+              <p className="text-[11px]">{pressProfile.terms}</p>
             </div>
           )}
 

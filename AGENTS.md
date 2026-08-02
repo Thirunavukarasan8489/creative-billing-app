@@ -48,6 +48,8 @@ app/
       new/page.tsx              # Company-first invoice creation (/invoices/new)
       [id]/
         page.tsx                # Invoice view, status update, record payment (/invoices/[id])
+        edit/
+          page.tsx              # Interactive invoice editor to add/modify items (/invoices/[id]/edit)
         pdf/
           route.ts              # Printable HTML/PDF letterhead stream (/invoices/[id]/pdf)
     reports/
@@ -98,9 +100,10 @@ All routes verified active and functional:
 | Route Path | File Location | Purpose & Status |
 | :--- | :--- | :--- |
 | `/` | `app/(dashboard)/page.tsx` | **Verified**: Dashboard overview, metrics & recent ledger |
-| `/invoices` | `app/(dashboard)/invoices/page.tsx` | **Verified**: Searchable & filterable invoice list |
+| `/invoices` | `app/(dashboard)/invoices/page.tsx` | **Verified**: Searchable & filterable invoice list with Edit buttons |
 | `/invoices/new` | `app/(dashboard)/invoices/new/page.tsx` | **Verified**: New bill creation with live paper preview |
-| `/invoices/[id]` | `app/(dashboard)/invoices/[id]/page.tsx` | **Verified**: Invoice details & payment modal |
+| `/invoices/[id]` | `app/(dashboard)/invoices/[id]/page.tsx` | **Verified**: Invoice details, Edit button, & payment modal |
+| `/invoices/[id]/edit` | `app/(dashboard)/invoices/[id]/edit/page.tsx` | **Verified**: Invoice editing to add/modify items |
 | `/invoices/[id]/pdf` | `app/(dashboard)/invoices/[id]/pdf/route.ts` | **Verified**: Printable HTML/PDF stream with dynamic press info |
 | `/companies` | `app/(dashboard)/companies/page.tsx` | **Verified**: Client company directory |
 | `/companies/[id]` | `app/(dashboard)/companies/[id]/page.tsx` | **Verified**: Company profile & lifetime bill ledger |
@@ -111,24 +114,14 @@ All routes verified active and functional:
 
 ## Completed Works & Implementation Log
 
-### 1. Database & Models (`lib/`)
-- **[lib/db.ts](file:///d:/projects/creative-billing-app/lib/db.ts)**: Mongoose singleton connection manager with global caching.
-- **[lib/models/Company.ts](file:///d:/projects/creative-billing-app/lib/models/Company.ts)**: Company schema (`name`, `address`, `phone`, `email`, `gstin`, `state`, `stateCode`, `gstRegistered`).
-- **[lib/models/Invoice.ts](file:///d:/projects/creative-billing-app/lib/models/Invoice.ts)**: Invoice schema for `tax_invoice` and `labour_bill`.
-- **[lib/models/Payment.ts](file:///d:/projects/creative-billing-app/lib/models/Payment.ts)**: Payment schema for recording transactions.
-- **[lib/models/PressProfile.ts](file:///d:/projects/creative-billing-app/lib/models/PressProfile.ts)**: Press company settings schema (`name`, `tagline`, `address`, `phone`, `email`, `gstin`, `state`, `stateCode`, `bankName`, `accountNo`, `ifscCode`, `branchName`, `terms`).
-
-### 2. Press Settings & Navigation
-- **[app/(dashboard)/settings/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/settings/page.tsx)**: Dedicated, responsive Settings page for updating Creative Line Graphics company info, GSTIN, bank details, and footer terms with live side-by-side letterhead preview.
-- **[app/api/settings/route.ts](file:///d:/projects/creative-billing-app/app/api/settings/route.ts)**: API endpoint for retrieving and updating press profile settings.
-- **[components/layout/Sidebar.tsx](file:///d:/projects/creative-billing-app/components/layout/Sidebar.tsx)**: Updated Left Sidebar navigation with a dedicated **"Press Settings"** menu item.
-
-### 3. Dynamic Letterhead Integration
-- **[components/invoices/InvoicePreview.tsx](file:///d:/projects/creative-billing-app/components/invoices/InvoicePreview.tsx)** & **[app/(dashboard)/invoices/[id]/pdf/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/[id]/pdf/route.ts)**: Dynamically loads the saved PressProfile to populate company letterhead headers, GSTIN, and bank account footers in real time across invoice previews and printable PDFs.
+### 1. Invoice Editing Feature
+- **[app/(dashboard)/invoices/[id]/edit/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/edit/page.tsx)**: Dedicated invoice editor page for editing existing Tax Invoices and Labour Bills, allowing users to add/delete line items, update quantities and rates, and automatically recalculate GST and grand totals.
+- **[app/(dashboard)/invoices/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/page.tsx)**: Added an **"Edit"** action button in the Invoice Ledger table row actions.
+- **[app/(dashboard)/invoices/[id]/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/page.tsx)**: Added a prominent **"Edit Bill"** button in the header actions.
 
 ---
 
 ## Verification & Build Status
 
 - TypeScript compilation and Next.js route validation verified via `npm run build`.
-- All routes and components adhere to the non-negotiables: mobile-responsive counter billing with persistent left sidebar, overridable bill types, GST field scoping, physical bill replica styling, and dynamic press settings.
+- All routes and components adhere to the non-negotiables: mobile-responsive counter billing with persistent left sidebar, overridable bill types, GST field scoping, physical bill replica styling, dynamic press settings, and full invoice editing capability.

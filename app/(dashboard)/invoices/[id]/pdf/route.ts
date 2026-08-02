@@ -6,7 +6,8 @@ import PressProfile from "@/lib/models/PressProfile";
 const DEFAULT_PROFILE = {
   name: "CREATIVE LINE GRAPHICS",
   tagline: "OFFSET & DIGITAL PRINTING PRESS",
-  address: "12, Printing Press Colony, Main Road, Tiruppur - 641601, Tamil Nadu.",
+  address:
+    "12, Printing Press Colony, Main Road, Tiruppur - 641601, Tamil Nadu.",
   phone: "+91 98421 00000",
   email: "creativeline.tpr@gmail.com",
   gstin: "33AAAAA0000A1Z5",
@@ -16,12 +17,13 @@ const DEFAULT_PROFILE = {
   accountNo: "510101001234567",
   ifscCode: "UBIN0551015",
   branchName: "Main Branch, Tiruppur",
-  terms: "Labour bill for printing work rendered. Payment due within 15 days of invoice date.",
+  terms:
+    "Labour bill for printing work rendered. Payment due within 15 days of invoice date.",
 };
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     await dbConnect();
@@ -43,12 +45,12 @@ export async function GET(
         <tr>
           <td style="padding: 8px; text-align: center; border-bottom: 1px solid #E2E8F0; font-family: monospace;">${idx + 1}</td>
           <td style="padding: 8px; border-bottom: 1px solid #E2E8F0; font-weight: 500;">${item.description}</td>
-          ${isTaxInvoice ? `<td style="padding: 8px; text-align: center; border-bottom: 1px solid #E2E8F0; font-family: monospace;">${item.hsnSac || "9988"}</td>` : ""}
+          ${isTaxInvoice ? `<td style="padding: 8px; text-align: center; border-bottom: 1px solid #E2E8F0; font-family: monospace;">${item.hsnSac || "9989"}</td>` : ""}
           <td style="padding: 8px; text-align: right; border-bottom: 1px solid #E2E8F0; font-family: monospace;">${item.quantity}</td>
           <td style="padding: 8px; text-align: right; border-bottom: 1px solid #E2E8F0; font-family: monospace;">${item.rate.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
           <td style="padding: 8px; text-align: right; border-bottom: 1px solid #E2E8F0; font-family: monospace; font-weight: bold; color: #0F172A;">${item.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</td>
         </tr>
-      `
+      `,
       )
       .join("");
 

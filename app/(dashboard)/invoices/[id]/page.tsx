@@ -12,6 +12,7 @@ import {
   AlertCircle,
   Download,
   Trash2,
+  Pencil,
 } from "lucide-react";
 import { InvoicePreview } from "@/components/invoices/InvoicePreview";
 import { PaymentModal } from "@/components/invoices/PaymentModal";
@@ -67,12 +68,12 @@ export default function InvoiceDetailPage({
   };
 
   if (loading) {
-    return <div className="p-12 text-center text-xs text-gray-500">Loading invoice...</div>;
+    return <div className="p-12 text-center text-xs text-[#0F172A]">Loading invoice...</div>;
   }
 
   if (error || !invoice) {
     return (
-      <div className="p-8 text-center space-y-3 bg-red-50 rounded-xl border border-red-200 text-red-700">
+      <div className="p-8 text-center space-y-3 bg-rose-50 rounded-xl border border-rose-200 text-rose-700">
         <AlertCircle className="w-8 h-8 mx-auto" />
         <p className="font-bold">{error || "Invoice not found"}</p>
         <Link href="/invoices" className="underline text-xs">
@@ -87,30 +88,30 @@ export default function InvoiceDetailPage({
   return (
     <div className="space-y-6">
       {/* Top Header & Actions Bar */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-4">
         <div className="flex items-center gap-3">
           <Link
             href="/invoices"
-            className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700"
+            className="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-slate-700 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-serif text-2xl font-bold text-[#1F4D3D]">
+              <h1 className="font-serif text-2xl font-bold text-[#0F172A]">
                 {invoice.number}
               </h1>
               {invoice.type === "tax_invoice" ? (
-                <span className="bg-[#1F4D3D] text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded">
+                <span className="bg-[#0F172A] text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded">
                   Tax Invoice
                 </span>
               ) : (
-                <span className="bg-[#C2196B] text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded">
+                <span className="bg-[#E11D48] text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded">
                   Labour Bill
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-500 font-mono">
+            <p className="text-xs text-slate-600 font-mono">
               Issued To: <strong>{invoice.companySnapshot.name}</strong> | Date:{" "}
               {new Date(invoice.date).toLocaleDateString("en-IN")}
             </p>
@@ -118,19 +119,28 @@ export default function InvoiceDetailPage({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          {/* Edit Bill Button */}
+          <Link
+            href={`/invoices/${id}/edit`}
+            className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5 transition-colors"
+          >
+            <Pencil className="w-4 h-4" />
+            <span>Edit Bill</span>
+          </Link>
+
           {!isPaid && (
             <button
               onClick={() => setShowPaymentModal(true)}
-              className="px-4 py-2 bg-[#1F4D3D] hover:bg-[#16382C] text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5"
+              className="px-4 py-2 bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5"
             >
-              <CreditCard className="w-4 h-4 text-emerald-300" />
+              <CreditCard className="w-4 h-4 text-emerald-400" />
               <span>Record Payment</span>
             </button>
           )}
 
           <button
             onClick={handlePrint}
-            className="px-4 py-2 bg-[#C2196B] hover:bg-[#9E1356] text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5"
+            className="px-4 py-2 bg-[#E11D48] hover:bg-[#BE123C] text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5"
           >
             <Printer className="w-4 h-4" />
             <span>Print / Export PDF</span>
@@ -138,7 +148,7 @@ export default function InvoiceDetailPage({
 
           <button
             onClick={handleDelete}
-            className="p-2 text-red-600 hover:bg-red-50 rounded-lg border border-red-200"
+            className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200"
             title="Delete Invoice"
           >
             <Trash2 className="w-4 h-4" />
@@ -148,17 +158,17 @@ export default function InvoiceDetailPage({
 
       {/* Payment & Balance Status Banner */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase text-gray-500 block">
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-1">
+          <span className="text-[10px] font-bold uppercase text-slate-500 block">
             Grand Total
           </span>
-          <p className="font-mono text-xl font-bold text-[#1F4D3D]">
+          <p className="font-mono text-xl font-bold text-[#0F172A]">
             ₹{invoice.grandTotal.toLocaleString("en-IN")}
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase text-gray-500 block">
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-1">
+          <span className="text-[10px] font-bold uppercase text-slate-500 block">
             Amount Paid
           </span>
           <p className="font-mono text-xl font-bold text-emerald-700">
@@ -166,11 +176,11 @@ export default function InvoiceDetailPage({
           </p>
         </div>
 
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-2xs space-y-1">
-          <span className="text-[10px] font-bold uppercase text-gray-500 block">
+        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-1">
+          <span className="text-[10px] font-bold uppercase text-slate-500 block">
             Outstanding Balance
           </span>
-          <p className="font-mono text-xl font-bold text-[#C2196B]">
+          <p className="font-mono text-xl font-bold text-[#E11D48]">
             ₹{(invoice.balanceAmount || 0).toLocaleString("en-IN")}
           </p>
         </div>
@@ -196,22 +206,22 @@ export default function InvoiceDetailPage({
 
       {/* Payment Transaction Ledger */}
       {payments.length > 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 shadow-2xs overflow-hidden p-5 space-y-3">
-          <h3 className="font-serif font-bold text-base text-[#1F4D3D]">
+        <div className="bg-white rounded-xl border border-slate-200 shadow-2xs overflow-hidden p-5 space-y-3">
+          <h3 className="font-serif font-bold text-base text-[#0F172A]">
             Recorded Payment Transactions
           </h3>
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-slate-100">
             {payments.map((p) => (
               <div key={p._id} className="py-2.5 flex items-center justify-between text-xs">
                 <div>
-                  <span className="font-bold text-[#2A2A28]">
+                  <span className="font-bold text-[#0F172A]">
                     ₹{p.amountPaid.toLocaleString("en-IN")}
                   </span>{" "}
-                  <span className="text-gray-500 font-mono">
+                  <span className="text-slate-500 font-mono">
                     via {p.mode.toUpperCase()} ({new Date(p.date).toLocaleDateString("en-IN")})
                   </span>
                   {p.referenceNo && (
-                    <p className="text-[11px] font-mono text-gray-500">
+                    <p className="text-[11px] font-mono text-slate-500">
                       Ref: {p.referenceNo}
                     </p>
                   )}

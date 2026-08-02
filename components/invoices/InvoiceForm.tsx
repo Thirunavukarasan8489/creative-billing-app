@@ -3,7 +3,15 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Plus, Trash2, Save, FileText, Check, AlertCircle, Eye } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Save,
+  FileText,
+  Check,
+  AlertCircle,
+  Eye,
+} from "lucide-react";
 import { CompanyPicker } from "@/components/companies/CompanyPicker";
 import { BillTypeToggle } from "./BillTypeToggle";
 import { InvoicePreview } from "./InvoicePreview";
@@ -27,32 +35,44 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
   const [selectedCompany, setSelectedCompany] = useState<any | null>(
     initialValues?.companySnapshot
       ? { ...initialValues.companySnapshot, _id: initialValues.companyId }
-      : null
+      : null,
   );
 
   const [type, setType] = useState<"tax_invoice" | "labour_bill">(
-    initialValues?.type || "tax_invoice"
+    initialValues?.type || "tax_invoice",
   );
   const [autoSuggested, setAutoSuggested] = useState(false);
 
-  const [invoiceNumber, setInvoiceNumber] = useState(initialValues?.number || "");
+  const [invoiceNumber, setInvoiceNumber] = useState(
+    initialValues?.number || "",
+  );
   const [date, setDate] = useState(
     initialValues?.date
       ? new Date(initialValues.date).toISOString().split("T")[0]
-      : new Date().toISOString().split("T")[0]
+      : new Date().toISOString().split("T")[0],
   );
 
   const [items, setItems] = useState<LineItem[]>(
     initialValues?.items || [
-      { description: "Offset Printing - Flex / Banner", hsnSac: "9988", quantity: 100, rate: 15, amount: 1500 },
-    ]
+      {
+        description: "",
+        hsnSac: "9989",
+        quantity: 0,
+        rate: 0,
+        amount: 0,
+      },
+    ],
   );
 
-  const [cgstPercent, setCgstPercent] = useState<number>(initialValues?.cgstPercent ?? 9);
-  const [sgstPercent, setSgstPercent] = useState<number>(initialValues?.sgstPercent ?? 9);
+  const [cgstPercent, setCgstPercent] = useState<number>(
+    initialValues?.cgstPercent ?? 9,
+  );
+  const [sgstPercent, setSgstPercent] = useState<number>(
+    initialValues?.sgstPercent ?? 9,
+  );
   const [notes, setNotes] = useState(initialValues?.notes || "");
   const [status, setStatus] = useState<"draft" | "sent" | "paid">(
-    initialValues?.status || "draft"
+    initialValues?.status || "draft",
   );
 
   const [showPreviewMobile, setShowPreviewMobile] = useState(false);
@@ -78,7 +98,9 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
     if (!initialValues?._id) {
       const fetchNextNumber = async () => {
         try {
-          const res = await fetch(`/api/invoices/next-number?type=${type}&date=${date}`);
+          const res = await fetch(
+            `/api/invoices/next-number?type=${type}&date=${date}`,
+          );
           const data = await res.json();
           if (res.ok && data.number) {
             setInvoiceNumber(data.number);
@@ -92,16 +114,21 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
   }, [type, date, initialValues]);
 
   // Handle line item updates with numeric coercion
-  const handleItemChange = (index: number, field: keyof LineItem, value: any) => {
+  const handleItemChange = (
+    index: number,
+    field: keyof LineItem,
+    value: any,
+  ) => {
     const updated = [...items];
-    const isNumeric = field === "quantity" || field === "rate" || field === "amount";
+    const isNumeric =
+      field === "quantity" || field === "rate" || field === "amount";
     const val = isNumeric ? parseFloat(value) || 0 : value;
 
     const item = { ...updated[index], [field]: val };
 
     if (field === "quantity" || field === "rate") {
-      const q = field === "quantity" ? (parseFloat(value) || 0) : item.quantity;
-      const r = field === "rate" ? (parseFloat(value) || 0) : item.rate;
+      const q = field === "quantity" ? parseFloat(value) || 0 : item.quantity;
+      const r = field === "rate" ? parseFloat(value) || 0 : item.rate;
       item.amount = Math.round(q * r * 100) / 100;
     }
 
@@ -112,7 +139,13 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
   const handleAddItem = () => {
     setItems([
       ...items,
-      { description: "", hsnSac: type === "tax_invoice" ? "9988" : "", quantity: 1, rate: 0, amount: 0 },
+      {
+        description: "",
+        hsnSac: type === "tax_invoice" ? "9989" : "",
+        quantity: 1,
+        rate: 0,
+        amount: 0,
+      },
     ]);
   };
 
@@ -125,8 +158,12 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
   const subtotal = items.reduce((sum, i) => sum + (Number(i.amount) || 0), 0);
   const isTaxInvoice = type === "tax_invoice";
 
-  const cgstAmount = isTaxInvoice ? Math.round(((subtotal * Number(cgstPercent)) / 100) * 100) / 100 : 0;
-  const sgstAmount = isTaxInvoice ? Math.round(((subtotal * Number(sgstPercent)) / 100) * 100) / 100 : 0;
+  const cgstAmount = isTaxInvoice
+    ? Math.round(((subtotal * Number(cgstPercent)) / 100) * 100) / 100
+    : 0;
+  const sgstAmount = isTaxInvoice
+    ? Math.round(((subtotal * Number(sgstPercent)) / 100) * 100) / 100
+    : 0;
 
   const rawTotal = subtotal + cgstAmount + sgstAmount;
   const grandTotal = Math.round(rawTotal);
@@ -176,7 +213,9 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
       };
 
       const isEditing = Boolean(initialValues?._id);
-      const url = isEditing ? `/api/invoices/${initialValues._id}` : "/api/invoices";
+      const url = isEditing
+        ? `/api/invoices/${initialValues._id}`
+        : "/api/invoices";
       const method = isEditing ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -189,14 +228,20 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
       if (!res.ok) {
         if (result.details && result.details.fieldErrors) {
           const fieldMsgs = Object.entries(result.details.fieldErrors)
-            .map(([field, msgs]: [string, any]) => `${field}: ${msgs.join(", ")}`)
+            .map(
+              ([field, msgs]: [string, any]) => `${field}: ${msgs.join(", ")}`,
+            )
             .join(" | ");
           throw new Error(`Validation failed — ${fieldMsgs}`);
         }
         throw new Error(result.error || "Failed to save invoice");
       }
 
-      toast.success(isEditing ? "Bill updated successfully!" : "Bill saved & issued successfully!");
+      toast.success(
+        isEditing
+          ? "Bill updated successfully!"
+          : "Bill saved & issued successfully!",
+      );
       router.push(`/invoices/${result._id}`);
       router.refresh();
     } catch (err: any) {
@@ -335,7 +380,9 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
                       type="text"
                       placeholder="Particulars / Printing job description..."
                       value={item.description}
-                      onChange={(e) => handleItemChange(index, "description", e.target.value)}
+                      onChange={(e) =>
+                        handleItemChange(index, "description", e.target.value)
+                      }
                       className="w-full px-3 py-1.5 border border-slate-300 rounded text-sm bg-white focus:ring-2 focus:ring-blue-500 outline-none"
                     />
                   </div>
@@ -349,8 +396,10 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
                         <input
                           type="text"
                           value={item.hsnSac || ""}
-                          onChange={(e) => handleItemChange(index, "hsnSac", e.target.value)}
-                          placeholder="9988"
+                          onChange={(e) =>
+                            handleItemChange(index, "hsnSac", e.target.value)
+                          }
+                          placeholder="9989"
                           className="w-full px-2 py-1 border border-slate-300 rounded font-mono bg-white"
                         />
                       </div>
@@ -364,7 +413,9 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
                         min="0"
                         step="any"
                         value={item.quantity}
-                        onChange={(e) => handleItemChange(index, "quantity", e.target.value)}
+                        onChange={(e) =>
+                          handleItemChange(index, "quantity", e.target.value)
+                        }
                         className="w-full px-2 py-1 border border-slate-300 rounded font-mono bg-white text-right"
                       />
                     </div>
@@ -377,14 +428,27 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
                         min="0"
                         step="any"
                         value={item.rate}
-                        onChange={(e) => handleItemChange(index, "rate", e.target.value)}
+                        onChange={(e) =>
+                          handleItemChange(index, "rate", e.target.value)
+                        }
                         className="w-full px-2 py-1 border border-slate-300 rounded font-mono bg-white text-right"
                       />
                     </div>
-                    <div className={isTaxInvoice ? "col-span-3 font-semibold text-right pt-1" : "col-span-1 font-semibold text-right pt-1"}>
-                      <span className="text-[10px] text-slate-500 block">Amount:</span>
+                    <div
+                      className={
+                        isTaxInvoice
+                          ? "col-span-3 font-semibold text-right pt-1"
+                          : "col-span-1 font-semibold text-right pt-1"
+                      }
+                    >
+                      <span className="text-[10px] text-slate-500 block">
+                        Amount:
+                      </span>
                       <span className="font-mono text-sm text-[#0F172A]">
-                        ₹{item.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                        ₹
+                        {item.amount.toLocaleString("en-IN", {
+                          minimumFractionDigits: 2,
+                        })}
                       </span>
                     </div>
                   </div>
@@ -417,7 +481,9 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
                   <input
                     type="number"
                     value={cgstPercent}
-                    onChange={(e) => setCgstPercent(parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      setCgstPercent(parseFloat(e.target.value) || 0)
+                    }
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono bg-white"
                   />
                 </div>
@@ -428,14 +494,17 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
                   <input
                     type="number"
                     value={sgstPercent}
-                    onChange={(e) => setSgstPercent(parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      setSgstPercent(parseFloat(e.target.value) || 0)
+                    }
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono bg-white"
                   />
                 </div>
               </div>
             ) : (
               <p className="text-xs text-slate-500 italic bg-slate-50 p-2.5 rounded border border-slate-200">
-                Labour Bills are non-GST documents. CGST & SGST are omitted automatically.
+                Labour Bills are non-GST documents. CGST & SGST are omitted
+                automatically.
               </p>
             )}
 
@@ -487,7 +556,9 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
               ) : (
                 <>
                   <Save className="w-4 h-4 text-blue-400" />
-                  <span>{initialValues?._id ? "Update Bill" : "Save & Issue Bill"}</span>
+                  <span>
+                    {initialValues?._id ? "Update Bill" : "Save & Issue Bill"}
+                  </span>
                 </>
               )}
             </button>
