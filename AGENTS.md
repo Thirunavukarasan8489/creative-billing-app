@@ -58,7 +58,7 @@ app/
         edit/
           page.tsx              # Interactive invoice editor with optional PO fields (/invoices/[id]/edit)
         pdf/
-          route.ts              # Printable HTML/PDF letterhead stream (/invoices/[id]/pdf)
+          route.ts              # Printable HTML/PDF letterhead stream (/invoices/[id]/pdf) with B&W print layout
     quotations/
       page.tsx                  # Rate quotations ledger & 1-click invoice converter (/quotations)
       new/page.tsx              # Create new rate quotation (/quotations/new)
@@ -112,7 +112,7 @@ components/
     Sidebar.tsx                 # Persistent Left Sidebar navigation (mobile & desktop)
   invoices/
     InvoiceForm.tsx             # Interactive billing form with optional PO fields, live GST math & empty numeric inputs
-    InvoicePreview.tsx          # Real-time paper bill letterhead replica with optional PO No & PO Date
+    InvoicePreview.tsx          # Real-time paper bill letterhead replica with B&W print layout & optional PO fields
     BillTypeToggle.tsx          # Tax Invoice vs Labour Bill selector
     PaymentModal.tsx            # Payment recording dialog
   quotations/
@@ -136,7 +136,7 @@ All routes verified active and functional:
 | `/invoices/new` | `app/(dashboard)/invoices/new/page.tsx` | **Verified**: New bill creation with optional PO fields & live paper preview |
 | `/invoices/[id]` | `app/(dashboard)/invoices/[id]/page.tsx` | **Verified**: Invoice details with optional PO fields, Edit, Payment modal, & Cancel/Delete actions |
 | `/invoices/[id]/edit` | `app/(dashboard)/invoices/[id]/edit/page.tsx` | **Verified**: Invoice editing with optional PO fields & object-safe companyId validation |
-| `/invoices/[id]/pdf` | `app/(dashboard)/invoices/[id]/pdf/route.ts` | **Verified**: Printable HTML/PDF stream with ParkAvenue rose header & PO fields |
+| `/invoices/[id]/pdf` | `app/(dashboard)/invoices/[id]/pdf/route.ts` | **Verified**: Printable HTML/PDF stream with B&W print layout & PO fields |
 | `/quotations` | `app/(dashboard)/quotations/page.tsx` | **Verified**: Rate Quotation ledger with 1-click invoice converter |
 | `/quotations/new` | `app/(dashboard)/quotations/new/page.tsx` | **Verified**: Create rate quotation with live preview |
 | `/quotations/[id]` | `app/(dashboard)/quotations/[id]/page.tsx` | **Verified**: Quotation detail view, Edit & Convert buttons |
@@ -154,19 +154,18 @@ All routes verified active and functional:
 
 ## Completed Works & Implementation Log
 
-### 1. Optional Purchase Order Fields (`poNumber` & `poDate`)
-- **[lib/models/Invoice.ts](file:///d:/projects/creative-billing-app/lib/models/Invoice.ts)** & **[lib/validation/invoice.ts](file:///d:/projects/creative-billing-app/lib/validation/invoice.ts)**: Added optional `poNumber` and `poDate` fields to schema definitions.
-- **[components/invoices/InvoiceForm.tsx](file:///d:/projects/creative-billing-app/components/invoices/InvoiceForm.tsx)**: Added responsive input fields in Section 2 ("Invoice Details & Type") for **P.O. Number** and **P.O. Issue Date**.
-- **[components/invoices/InvoicePreview.tsx](file:///d:/projects/creative-billing-app/components/invoices/InvoicePreview.tsx)** & **[pdf/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/pdf/route.ts)**: Displays `P.O. NO:` and `P.O. Date:` on letterhead banners and printable A4 PDF streams when present.
+### 1. B&W Print Layout Redesign
+- **[app/(dashboard)/invoices/[id]/pdf/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/pdf/route.ts)** & **[components/invoices/InvoicePreview.tsx](file:///d:/projects/creative-billing-app/components/invoices/InvoicePreview.tsx)**: Removed solid dark background fills, centered header title, placed `BILL NO` & `DATE` on left, moved Press GSTIN under phone details on left, and added crisp black borders (`border: 1px solid #000`) around all table cells for crisp Black & White printing.
 
-### 2. Financial Year (A.Y.) & Custom Date Range Statement Feature
-- **[app/api/reports/annual-statement/route.ts](file:///d:/projects/creative-billing-app/app/api/reports/annual-statement/route.ts)**: API returning annual bill items, subtotal, CGST, SGST, and grand total sums.
-- **[app/(dashboard)/reports/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/reports/page.tsx)**: Replaced "Client Company Ledgers" tab with **Financial Year (A.Y.) Statement** tab supporting FY pickers (`A.Y. 2024-2025` to `2027-2028`), custom `From:` / `To:` date range pickers, live landscape paper preview, and PDF download.
-- **[app/(dashboard)/reports/annual-statement/print/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/reports/annual-statement/print/route.ts)**: Printable A4 Landscape HTML/PDF route with ParkAvenue header and 10-column ledger grid.
+### 2. Optional Purchase Order Fields (`poNumber` & `poDate`)
+- **[lib/models/Invoice.ts](file:///d:/projects/creative-billing-app/lib/models/Invoice.ts)** & **[lib/validation/invoice.ts](file:///d:/projects/creative-billing-app/lib/validation/invoice.ts)**: Added optional `poNumber` and `poDate` fields.
+
+### 3. Financial Year (A.Y.) & Custom Date Range Statement Feature
+- **[app/api/reports/annual-statement/route.ts](file:///d:/projects/creative-billing-app/app/api/reports/annual-statement/route.ts)** & **[page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/reports/page.tsx)**: Assessment Year & custom date range sales statements in A4 Landscape format.
 
 ---
 
 ## Verification & Build Status
 
 - TypeScript compilation and Next.js route validation verified via `npm run build`.
-- All routes and components adhere to the non-negotiables: mobile-responsive counter billing with persistent left sidebar, overridable bill types, GST field scoping, physical bill replica styling, dynamic press settings, full invoice editing capability with optional PO fields, paper-replica company account statements, rate quotations with 1-click invoice conversion, monthly sales bill statement ledgers, financial year statement exports, and invoice cancellation/deletion workflows.
+- All routes and components adhere to the non-negotiables: mobile-responsive counter billing with persistent left sidebar, overridable bill types, GST field scoping, physical bill replica styling, dynamic press settings, full invoice editing capability with optional PO fields, B&W print layout redesign, paper-replica company account statements, rate quotations with 1-click invoice conversion, monthly sales bill statement ledgers, financial year statement exports, and invoice cancellation/deletion workflows.
