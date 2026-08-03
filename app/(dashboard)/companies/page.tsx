@@ -132,16 +132,16 @@ export default function CompaniesPage() {
             </button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left min-w-[640px]">
-              <thead className="bg-slate-100 text-[#0F172A] font-bold uppercase tracking-wider border-b border-slate-200">
+          <div className="overflow-auto max-h-[calc(100vh-280px)] min-h-[350px]">
+            <table className="w-full text-xs text-left min-w-[640px] border-separate border-spacing-0">
+              <thead className="sticky top-0 z-10 bg-slate-100 text-[#0F172A] font-bold uppercase tracking-wider shadow-xs">
                 <tr>
-                  <th className="p-3">Company Name</th>
-                  <th className="p-3">GSTIN</th>
-                  <th className="p-3">Phone</th>
-                  <th className="p-3">State</th>
-                  <th className="p-3">Default Bill Type</th>
-                  <th className="p-3 text-center">Actions</th>
+                  <th className="p-3 bg-slate-100 border-b border-slate-200 sticky top-0 z-10">Company Name</th>
+                  <th className="p-3 bg-slate-100 border-b border-slate-200 sticky top-0 z-10">GSTIN</th>
+                  <th className="p-3 bg-slate-100 border-b border-slate-200 sticky top-0 z-10">Phone</th>
+                  <th className="p-3 bg-slate-100 border-b border-slate-200 sticky top-0 z-10">State</th>
+                  <th className="p-3 bg-slate-100 border-b border-slate-200 sticky top-0 z-10">Default Bill Type</th>
+                  <th className="p-3 text-center bg-slate-100 border-b border-slate-200 sticky top-0 z-10">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">

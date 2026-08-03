@@ -398,7 +398,7 @@ export default function SettingsPage() {
           </form>
 
           {/* Right Column: Live Letterhead Header Preview */}
-          <div className="lg:col-span-5 lg:sticky lg:top-8 space-y-4">
+          <div className="lg:col-span-5 lg:sticky lg:top-6 lg:self-start space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-xs font-serif font-bold text-[#0F172A] uppercase tracking-wider flex items-center gap-1.5">
                 <Eye className="w-4 h-4 text-blue-600" />
