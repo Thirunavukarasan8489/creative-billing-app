@@ -16,6 +16,8 @@ interface InvoicePreviewProps {
   date: string;
   poNumber?: string;
   poDate?: string;
+  quoteNumber?: string;
+  quoteDate?: string;
   company?: {
     name: string;
     address: string;
@@ -43,6 +45,8 @@ export function InvoicePreview({
   date,
   poNumber,
   poDate,
+  quoteNumber,
+  quoteDate,
   company,
   items,
   subtotal,
@@ -104,21 +108,21 @@ export function InvoicePreview({
           <p className="text-xs font-semibold text-[#0F172A] uppercase tracking-wider">
             {pressProfile.tagline}
           </p>
-          <p className="text-xs text-slate-600 mt-0.5 whitespace-pre-line">
+          <p className="text-xs text-slate-600 mt-0.5 tracking-wide whitespace-pre-line">
             {pressProfile.address}
           </p>
-          <p className="text-xs text-slate-600 font-mono">
+          <p className="text-xs text-slate-600 font-serif tracking-wide">
             Ph: {pressProfile.phone} | Email: {pressProfile.email}
           </p>
           {isTaxInvoice && (
-            <p className="text-xs font-bold text-[#0F172A] font-mono mt-0.5">
+            <p className="text-xs font-semibold text-[#0F172A] font-serif tracking-wide mt-0.5">
               GSTIN: {pressProfile.gstin} | State:{" "}
               {pressProfile.state || "Tamil Nadu"} (
               {pressProfile.stateCode || "33"})
             </p>
           )}
         </div>
-        <div className="flex-2 text-right text-xs font-mono font-bold text-slate-900 leading-tight">
+        {/* <div className="flex-2 text-right text-xs font-mono font-bold text-slate-900 leading-tight">
           <div>BILL NO: {number || "TI/26-27/XXXX"}</div>
           <div>
             DATE:{" "}
@@ -126,6 +130,13 @@ export function InvoicePreview({
               ? new Date(date).toLocaleDateString("en-GB").replace(/\//g, ".")
               : "DD.MM.YYYY"}
           </div>
+          {quoteNumber && <div>QUOTE NO: {quoteNumber}</div>}
+          {quoteDate && (
+            <div>
+              QUOTE DATE:{" "}
+              {new Date(quoteDate).toLocaleDateString("en-GB").replace(/\//g, ".")}
+            </div>
+          )}
           {poNumber && <div>P.O. NO: {poNumber}</div>}
           {poDate && (
             <div>
@@ -133,11 +144,46 @@ export function InvoicePreview({
               {new Date(poDate).toLocaleDateString("en-GB").replace(/\//g, ".")}
             </div>
           )}
+        </div> */}
+        <div>
+          <table className="w-full text-xs text-left border-collapse border border-slate-900">
+            <thead>
+              <tr>
+                <th className="border py-1 w-24 pl-1.5">BILL NO</th>
+                <td className="border py-1 w-24 pl-1.5">{number}</td>
+              </tr>
+              <tr>
+                <th className="border py-1 w-24 pl-1.5">DATE</th>
+                <td className="border py-1 w-24 pl-1.5">
+                  {date
+                    ? new Date(date).toLocaleDateString("en-GB").replace(/\//g, ".")
+                    : "DD.MM.YYYY"}
+                </td>
+              </tr>
+              {quoteNumber && <tr>
+                <th className="border py-1 w-24 pl-1.5">QUOTE NO</th>
+                <td className="border py-1 w-24 pl-1.5">{quoteNumber}</td>
+              </tr>}
+              {quoteDate && <tr>
+                <th className="border py-1 w-24 pl-1.5">QUOTE DATE</th>
+                <td className="border py-1 w-24 pl-1.5">{new Date(quoteDate).toLocaleDateString("en-GB").replace(/\//g, ".")}</td>
+              </tr>}
+              {poNumber && <tr>
+                <th className="border py-1 w-24 pl-1.5">P.O. NO</th>
+                <td className="border w-24 pl-1.5">{poNumber}</td>
+              </tr>}
+              {poDate && <tr>
+                <th className="border py-1 w-24 pl-1.5">P.O. DATE</th>
+                <td className="border py-1 w-24 pl-1.5">{new Date(poDate).toLocaleDateString("en-GB").replace(/\//g, ".")}
+                </td>
+              </tr>}
+            </thead>
+          </table>
         </div>
       </div>
 
       {/* Billed To Section (Optimized without empty whitespace) */}
-      <div className="flex justify-between items-start bg-white p-3 rounded-lg border border-slate-900 gap-4">
+      <div className="flex justify-between items-start bg-white p-3 border border-slate-900 gap-4">
         <div>
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1">
             BILLED TO:
@@ -147,13 +193,17 @@ export function InvoicePreview({
               <h3 className="font-bold text-base text-[#0F172A]">
                 {company.name}
               </h3>
-              <p className="text-xs text-slate-600 whitespace-pre-line mt-0.5">
+              <p className="text-xs text-slate-600 whitespace-pre-line tracking-wide mt-0.5">
                 {company.address}
               </p>
-              <p className="text-xs text-slate-600 font-mono mt-1">
+              <p className="text-xs text-slate-600 font-serif mt-0.5 tracking-wide">
                 Ph: {company.phone}
               </p>
+              <p className="text-xs font-semibold text-[#0F172A] font-serif mt-0.5 tracking-wide">
+                GSTIN: {company.gstin} | State: {company.state} ({company.stateCode})
+              </p>
             </div>
+
           ) : (
             <p className="text-xs text-slate-400 italic">
               Select or create a company to populate billing details...
@@ -161,7 +211,7 @@ export function InvoicePreview({
           )}
         </div>
 
-        {company && (
+        {/* {company && (
           <div className="text-right font-mono text-xs text-slate-800 shrink-0">
             {company.gstin && (
               <p className="font-bold text-[#0F172A]">
@@ -174,7 +224,7 @@ export function InvoicePreview({
               {company.stateCode || "33"})
             </p>
           </div>
-        )}
+        )} */}
       </div>
 
       {/* Line Items Table with Black Borders */}
@@ -215,21 +265,21 @@ export function InvoicePreview({
             ) : (
               items.map((item, idx) => (
                 <tr key={idx} className="hover:bg-slate-50">
-                  <td className="p-2 text-center font-mono text-slate-700 border border-slate-900">
+                  <td className="p-2 text-center font-mono text-slate-900 border border-slate-900">
                     {idx + 1}
                   </td>
                   <td className="p-2 font-medium text-[#0F172A] border border-slate-900">
                     {item.description}
                   </td>
                   {isTaxInvoice && (
-                    <td className="p-2 text-center font-mono text-slate-600 border border-slate-900">
+                    <td className="p-2 text-center font-mono text-slate-950 border border-slate-900">
                       {item.hsnSac || "4820"}
                     </td>
                   )}
                   <td className="p-2 text-right font-mono font-semibold border border-slate-900">
                     {item.quantity}
                   </td>
-                  <td className="p-2 text-right font-mono border border-slate-900">
+                  <td className="p-2 text-right font-mono font-semibold border border-slate-900">
                     {item.rate.toLocaleString("en-IN", {
                       minimumFractionDigits: 2,
                     })}
@@ -251,36 +301,30 @@ export function InvoicePreview({
         {/* Left Side: Bank Details & Amount in Words */}
         <div className="md:col-span-7 space-y-4">
           {isTaxInvoice && (
-            <div className="bg-white p-3 rounded-lg border border-slate-900 space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+            <div className="bg-white space-y-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-900 block">
                 Bank Account Details:
               </span>
-              <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                <div>
-                  <span className="text-slate-500 block">Bank Name:</span>
-                  <span className="font-bold text-[#0F172A]">
-                    {pressProfile.bankName}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block">Account No:</span>
-                  <span className="font-bold text-[#0F172A]">
-                    {pressProfile.accountNo}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block">IFSC Code:</span>
-                  <span className="font-bold text-[#0F172A]">
-                    {pressProfile.ifscCode}
-                  </span>
-                </div>
-                <div>
-                  <span className="text-slate-500 block">Branch:</span>
-                  <span className="font-bold text-[#0F172A]">
-                    {pressProfile.branchName}
-                  </span>
-                </div>
-              </div>
+              <table className="w-full text-xs text-left border-collapse border border-slate-900">
+                <tbody>
+                  <tr className="border border-slate-900">
+                    <th className="border border-slate-900 p-2">Bank Name:</th>
+                    <td className="border border-slate-900 p-2">{pressProfile.bankName}</td>
+                  </tr>
+                  <tr className="border border-slate-900">
+                    <th className="border border-slate-900 p-2">Account No:</th>
+                    <td className="border border-slate-900 p-2">{pressProfile.accountNo}</td>
+                  </tr>
+                  <tr className="border border-slate-900">
+                    <th className="border border-slate-900 p-2">IFSC Code:</th>
+                    <td className="border border-slate-900 p-2">{pressProfile.ifscCode}</td>
+                  </tr>
+                  <tr className="border border-slate-900">
+                    <th className="border border-slate-900 p-2">Branch:</th>
+                    <td className="border border-slate-900 p-2">{pressProfile.branchName}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           )}
 
@@ -294,7 +338,7 @@ export function InvoicePreview({
           </div>
 
           {notes && (
-            <div className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded border border-slate-200">
+            <div className="text-xs text-slate-600 bg-slate-50 p-2.5 border border-slate-200">
               <span className="font-bold block text-slate-700">Notes:</span>
               {notes}
             </div>
@@ -302,9 +346,9 @@ export function InvoicePreview({
         </div>
 
         {/* Right Side: Math Calculations */}
-        <div className="md:col-span-5 space-y-2 text-xs font-mono">
-          <div className="flex justify-between py-1 border-b border-slate-200">
-            <span className="text-slate-600">Subtotal:</span>
+        <div className="md:col-span-5 space-y-2 text-xs font-mono pt-3">
+          <div className="flex justify-between py-1 border-b border-slate-300">
+            <span className="text-slate-900">Subtotal:</span>
             <span className="font-bold text-[#0F172A]">
               ₹{subtotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
             </span>
@@ -312,7 +356,7 @@ export function InvoicePreview({
 
           {isTaxInvoice && (
             <>
-              <div className="flex justify-between py-1 border-b border-slate-100 text-slate-600">
+              <div className="flex justify-between py-1 border-b border-slate-300 text-slate-900">
                 <span>CGST ({cgstPercent}%):</span>
                 <span>
                   ₹
@@ -321,7 +365,7 @@ export function InvoicePreview({
                   })}
                 </span>
               </div>
-              <div className="flex justify-between py-1 border-b border-slate-100 text-slate-600">
+              <div className="flex justify-between py-1 border-b border-slate-300 text-slate-900">
                 <span>SGST ({sgstPercent}%):</span>
                 <span>
                   ₹
@@ -343,7 +387,7 @@ export function InvoicePreview({
             </div>
           )}
 
-          <div className="flex justify-between py-2 border-t-2 border-b-2 border-slate-900 font-bold text-sm text-[#0F172A] bg-slate-50 px-2 rounded">
+          <div className="flex justify-between py-2 border-t-2 border-b-2 border-slate-900 font-bold text-sm text-[#0F172A] bg-slate-50 px-2">
             <span>Grand Total:</span>
             <span>
               ₹

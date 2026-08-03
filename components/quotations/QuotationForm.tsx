@@ -101,7 +101,7 @@ export function QuotationForm({ initialValues }: QuotationFormProps) {
   const handleAddItem = () => {
     setItems([
       ...items,
-      { description: "", quantity: "1 PAD", rate: 0, amount: 0 },
+      { description: "", quantity: "", rate: 0, amount: 0 },
     ]);
   };
 

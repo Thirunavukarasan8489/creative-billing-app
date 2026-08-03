@@ -26,6 +26,8 @@ export interface IInvoice extends Document {
   date: Date;
   poNumber?: string;
   poDate?: Date;
+  quoteNumber?: string;
+  quoteDate?: Date;
   companyId: mongoose.Types.ObjectId;
   companySnapshot: IInvoiceCompanySnapshot;
   items: IInvoiceItem[];
@@ -76,6 +78,8 @@ const InvoiceSchema: Schema = new Schema(
     date: { type: Date, required: true, default: Date.now },
     poNumber: { type: String, trim: true, default: "" },
     poDate: { type: Date, default: null },
+    quoteNumber: { type: String, trim: true, default: "" },
+    quoteDate: { type: Date, default: null },
     companyId: { type: Schema.Types.ObjectId, ref: "Company", required: true },
     companySnapshot: { type: CompanySnapshotSchema, required: true },
     items: { type: [InvoiceItemSchema], required: true },

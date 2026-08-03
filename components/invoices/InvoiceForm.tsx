@@ -71,6 +71,14 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
       ? new Date(initialValues.poDate).toISOString().split("T")[0]
       : "",
   );
+  const [quoteNumber, setQuoteNumber] = useState<string>(
+    initialValues?.quoteNumber || "",
+  );
+  const [quoteDate, setQuoteDate] = useState<string>(
+    initialValues?.quoteDate
+      ? new Date(initialValues.quoteDate).toISOString().split("T")[0]
+      : "",
+  );
 
   const [items, setItems] = useState<LineItem[]>(
     initialValues?.items || [
@@ -215,6 +223,8 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
         date,
         poNumber: poNumber.trim(),
         poDate: poDate || null,
+        quoteNumber: quoteNumber.trim(),
+        quoteDate: quoteDate || null,
         companyId: getCompanyIdString(
           selectedCompany?._id ||
             selectedCompany?.id ||
@@ -358,6 +368,33 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
                   className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-100">
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
+                  Quote Number (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. QT/26-27/0001 (Optional)"
+                  value={quoteNumber}
+                  onChange={(e) => setQuoteNumber(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono text-[#0F172A] bg-white focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
+                  Quote Date (Optional)
+                </label>
+                <input
+                  type="date"
+                  value={quoteDate}
+                  onChange={(e) => setQuoteDate(e.target.value)}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white font-mono"
                 />
               </div>
             </div>
@@ -642,6 +679,8 @@ export function InvoiceForm({ initialValues }: InvoiceFormProps) {
             date={date}
             poNumber={poNumber}
             poDate={poDate}
+            quoteNumber={quoteNumber}
+            quoteDate={quoteDate}
             company={selectedCompany}
             items={items}
             subtotal={subtotal}

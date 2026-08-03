@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import {
   FileSpreadsheet,
@@ -12,13 +13,16 @@ import {
   ArrowRightLeft,
   Trash2,
 } from "lucide-react";
+import { ConvertModal } from "@/components/quotations/ConvertModal";
 
 export default function QuotationsPage() {
+  const router = useRouter();
   const [quotations, setQuotations] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [loading, setLoading] = useState(true);
-  const [convertingId, setConvertingId] = useState<string | null>(null);
+  const [converting, setConverting] = useState(false);
+  const [targetQuotation, setTargetQuotation] = useState<any | null>(null);
 
   const fetchQuotations = async () => {
     setLoading(true);
@@ -43,23 +47,25 @@ export default function QuotationsPage() {
     fetchQuotations();
   }, [search, statusFilter]);
 
-  const handleConvert = async (id: string, qNumber: string) => {
-    if (!confirm(`Convert Quotation ${qNumber} into an official Tax Invoice / Labour Bill?`)) return;
-
-    setConvertingId(id);
+  const handleConfirmConvert = async (billType: "tax_invoice" | "labour_bill") => {
+    if (!targetQuotation) return;
+    setConverting(true);
     try {
-      const res = await fetch(`/api/quotations/${id}/convert`, {
+      const res = await fetch(`/api/quotations/${targetQuotation._id}/convert`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: billType }),
       });
       const invoice = await res.json();
       if (!res.ok) throw new Error(invoice.error || "Failed to convert quotation");
 
-      toast.success(`Quotation converted to Bill ${invoice.number}!`);
-      fetchQuotations();
+      toast.success(`Quotation converted to ${billType === "tax_invoice" ? "Tax Invoice" : "Labour Bill"} ${invoice.number}!`);
+      setTargetQuotation(null);
+      router.push(`/invoices/${invoice._id}`);
     } catch (err: any) {
       toast.error(err.message || "Failed to convert quotation");
     } finally {
-      setConvertingId(null);
+      setConverting(false);
     }
   };
 
@@ -191,13 +197,12 @@ export default function QuotationsPage() {
                       <div className="flex items-center justify-center gap-2">
                         {q.status !== "converted" && (
                           <button
-                            onClick={() => handleConvert(q._id, q.number)}
-                            disabled={convertingId === q._id}
-                            className="px-2 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded font-semibold flex items-center gap-1 transition-colors"
+                            onClick={() => setTargetQuotation(q)}
+                            className="px-2 py-1 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 rounded font-semibold flex items-center gap-1 transition-colors cursor-pointer"
                             title="Convert into Bill"
                           >
                             <ArrowRightLeft className="w-3 h-3" />
-                            <span>{convertingId === q._id ? "Converting..." : "Convert to Bill"}</span>
+                            <span>Convert to Bill</span>
                           </button>
                         )}
                         <Link
@@ -224,6 +229,20 @@ export default function QuotationsPage() {
           </div>
         )}
       </div>
+
+      {/* Convert Selection Modal */}
+      {targetQuotation && (
+        <ConvertModal
+          isOpen={Boolean(targetQuotation)}
+          onClose={() => setTargetQuotation(null)}
+          onConfirm={handleConfirmConvert}
+          quotationNumber={targetQuotation.number}
+          companyName={targetQuotation.companySnapshot?.name || "Client"}
+          hasGstin={Boolean(targetQuotation.companySnapshot?.gstin && targetQuotation.companySnapshot.gstin.trim().length > 0)}
+          subtotal={targetQuotation.subtotal}
+          converting={converting}
+        />
+      )}
     </div>
   );
 }

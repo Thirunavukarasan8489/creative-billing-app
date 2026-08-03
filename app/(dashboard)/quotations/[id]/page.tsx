@@ -14,6 +14,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { QuotationPreview } from "@/components/quotations/QuotationPreview";
+import { ConvertModal } from "@/components/quotations/ConvertModal";
 
 export default function QuotationDetailPage({
   params,
@@ -27,6 +28,7 @@ export default function QuotationDetailPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [converting, setConverting] = useState(false);
+  const [showConvertModal, setShowConvertModal] = useState(false);
 
   const fetchQuotationData = async () => {
     setLoading(true);
@@ -46,23 +48,19 @@ export default function QuotationDetailPage({
     fetchQuotationData();
   }, [id]);
 
-  const handleConvert = async () => {
-    if (
-      !confirm(
-        `Convert Quotation ${quotation.number} into an official Tax Invoice / Labour Bill?`
-      )
-    )
-      return;
-
+  const handleConfirmConvert = async (billType: "tax_invoice" | "labour_bill") => {
     setConverting(true);
     try {
       const res = await fetch(`/api/quotations/${id}/convert`, {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: billType }),
       });
       const invoice = await res.json();
       if (!res.ok) throw new Error(invoice.error || "Failed to convert quotation");
 
-      toast.success(`Quotation converted to Bill ${invoice.number}!`);
+      toast.success(`Quotation converted to ${billType === "tax_invoice" ? "Tax Invoice" : "Labour Bill"} ${invoice.number}!`);
+      setShowConvertModal(false);
       router.push(`/invoices/${invoice._id}`);
     } catch (err: any) {
       toast.error(err.message || "Failed to convert quotation");
@@ -110,6 +108,7 @@ export default function QuotationDetailPage({
   }
 
   const isConverted = quotation.status === "converted";
+  const hasGstin = Boolean(quotation.companySnapshot?.gstin && quotation.companySnapshot.gstin.trim().length > 0);
 
   return (
     <div className="space-y-6">
@@ -146,12 +145,11 @@ export default function QuotationDetailPage({
         <div className="flex flex-wrap items-center gap-2">
           {!isConverted && (
             <button
-              onClick={handleConvert}
-              disabled={converting}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5 transition-colors disabled:opacity-50"
+              onClick={() => setShowConvertModal(true)}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5 transition-colors cursor-pointer"
             >
               <ArrowRightLeft className="w-4 h-4" />
-              <span>{converting ? "Converting..." : "Convert to Invoice"}</span>
+              <span>Convert to Bill</span>
             </button>
           )}
 
@@ -165,7 +163,7 @@ export default function QuotationDetailPage({
 
           <button
             onClick={handlePrint}
-            className="px-4 py-2 bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5"
+            className="px-4 py-2 bg-[#0F172A] hover:bg-slate-800 text-white text-xs font-bold rounded-lg shadow flex items-center gap-1.5 cursor-pointer"
           >
             <Printer className="w-4 h-4 text-blue-400" />
             <span>Print / Export PDF</span>
@@ -173,7 +171,7 @@ export default function QuotationDetailPage({
 
           <button
             onClick={handleDelete}
-            className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200"
+            className="p-2 text-rose-600 hover:bg-rose-50 rounded-lg border border-rose-200 cursor-pointer"
             title="Delete Quotation"
           >
             <Trash2 className="w-4 h-4" />
@@ -193,6 +191,18 @@ export default function QuotationDetailPage({
         taxNote={quotation.taxNote}
         grandTotal={quotation.grandTotal}
         notes={quotation.notes}
+      />
+
+      {/* Convert Selection Modal */}
+      <ConvertModal
+        isOpen={showConvertModal}
+        onClose={() => setShowConvertModal(false)}
+        onConfirm={handleConfirmConvert}
+        quotationNumber={quotation.number}
+        companyName={quotation.companySnapshot?.name || "Client"}
+        hasGstin={hasGstin}
+        subtotal={quotation.subtotal}
+        converting={converting}
       />
     </div>
   );

@@ -14,6 +14,8 @@ export const invoiceSchema = z.object({
   date: z.string().or(z.date()),
   poNumber: z.string().optional().nullable(),
   poDate: z.string().or(z.date()).optional().nullable(),
+  quoteNumber: z.string().optional().nullable(),
+  quoteDate: z.string().or(z.date()).optional().nullable(),
   companyId: z
     .any()
     .transform((val) => {

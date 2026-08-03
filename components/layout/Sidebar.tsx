@@ -155,9 +155,9 @@ export function Sidebar() {
               </span>
             </div>
             <p className="text-[10px] text-slate-400 font-mono mt-0.5">Tiruppur • Tamil Nadu</p>
-            <p className="text-[9px] text-emerald-400 mt-1 flex items-center gap-1 font-mono">
+            {/* <p className="text-[9px] text-emerald-400 mt-1 flex items-center gap-1 font-mono">
               <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Protected Session
-            </p>
+            </p> */}
           </div>
 
           <button

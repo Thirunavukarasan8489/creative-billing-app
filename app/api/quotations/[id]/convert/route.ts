@@ -4,6 +4,7 @@ import Quotation from "@/lib/models/Quotation";
 import Invoice from "@/lib/models/Invoice";
 import Company from "@/lib/models/Company";
 import { numberToWords } from "@/lib/numberToWords";
+import { getNextInvoiceNumber } from "@/app/api/invoices/next-number/route";
 
 export async function POST(
   req: NextRequest,
@@ -12,6 +13,16 @@ export async function POST(
   try {
     await dbConnect();
     const { id } = await params;
+
+    let requestedType: "tax_invoice" | "labour_bill" | undefined;
+    try {
+      const body = await req.json();
+      if (body?.type === "tax_invoice" || body?.type === "labour_bill") {
+        requestedType = body.type;
+      }
+    } catch {
+      // Body may be empty if POST has no payload
+    }
 
     const quotation = await Quotation.findById(id);
     if (!quotation) {
@@ -23,22 +34,15 @@ export async function POST(
       return NextResponse.json({ error: "Client company not found" }, { status: 400 });
     }
 
-    const isTaxInvoice = Boolean(company.gstin && company.gstin.trim().length > 0);
-    const type = isTaxInvoice ? "tax_invoice" : "labour_bill";
+    // Determine bill type (Explicit user selection or GSTIN check fallback)
+    const isGstRegistered = Boolean(company.gstin && company.gstin.trim().length > 0);
+    const type: "tax_invoice" | "labour_bill" =
+      requestedType || (isGstRegistered ? "tax_invoice" : "labour_bill");
 
-    // Auto-generate invoice number
-    const dateObj = new Date();
-    const yr = dateObj.getFullYear();
-    const month = dateObj.getMonth() + 1;
-    const startYear = month >= 4 ? yr : yr - 1;
-    const fyStr = `${String(startYear).slice(-2)}-${String(startYear + 1).slice(-2)}`;
-    const prefix = isTaxInvoice ? "TI" : "LB";
+    const isTaxInvoice = type === "tax_invoice";
 
-    const count = await Invoice.countDocuments({
-      type,
-      number: { $regex: `^${prefix}/${fyStr}/` },
-    });
-    const number = `${prefix}/${fyStr}/${String(count + 1).padStart(4, "0")}`;
+    // Auto-generate invoice number, financial year & sequence number
+    const { number, financialYear, sequenceNumber } = await getNextInvoiceNumber(type);
 
     // Map quotation items to invoice items
     const invoiceItems = quotation.items.map((i: any) => {
@@ -67,12 +71,17 @@ export async function POST(
     const invoice = await Invoice.create({
       type,
       number,
+      financialYear,
+      sequenceNumber,
       date: new Date(),
+      quoteNumber: quotation.number,
+      quoteDate: quotation.date,
       companyId: company._id,
       companySnapshot: {
         name: company.name,
         address: company.address,
         phone: company.phone,
+        email: company.email || "",
         gstin: company.gstin || "",
         state: company.state || "Tamil Nadu",
         stateCode: company.stateCode || "33",
@@ -86,7 +95,9 @@ export async function POST(
       roundOff,
       grandTotal,
       amountInWords,
-      status: "sent",
+      status: "draft",
+      paidAmount: 0,
+      balanceAmount: grandTotal,
       notes: `Converted from Quotation ${quotation.number}`,
     });
 

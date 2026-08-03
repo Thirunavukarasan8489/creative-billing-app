@@ -99,45 +99,87 @@ export async function GET(
       <p style="margin: 2px 0 0 0; font-size: 11px; font-weight: bold; color: #0F172A; text-transform: uppercase;">${press.tagline || DEFAULT_PRESS.tagline}</p>
       <p style="margin: 4px 0 0 0; font-size: 11px; color: #334155; white-space: pre-line;">${press.address || DEFAULT_PRESS.address}</p>
       <p style="margin: 2px 0 0 0; font-size: 11px; color: #334155;">Phone: ${press.phone || DEFAULT_PRESS.phone} | Email: ${press.email || DEFAULT_PRESS.email}</p>
-      ${isTaxInvoice ? `<p style="margin: 2px 0 0 0; font-size: 11px; font-weight: bold; color: #0F172A; font-family: monospace;">GSTIN: ${press.gstin || DEFAULT_PRESS.gstin} | State: ${press.state || DEFAULT_PRESS.state} (${press.stateCode || DEFAULT_PRESS.stateCode})</p>` : ""}
+      ${isTaxInvoice ? `<p style="margin: 2px 0 0 0; font-size: 11px; font-weight: bold; color: #0F172A; font-family: monospace;">GSTIN: ${press.gstin || DEFAULT_PRESS.gstin}</p>` : ""}
+      ${isTaxInvoice ? `<p style="margin: 2px 0 0 0; font-size: 11px; font-weight: bold; color: #0F172A; font-family: monospace;">State: ${press.state || DEFAULT_PRESS.state} (${press.stateCode || DEFAULT_PRESS.stateCode})</p>` : ""}
       </div>
-      <div style="flex: 2; text-align: right; font-family: monospace; font-size: 12px; font-weight: bold; color: #000; line-height: 1.4;">
-        <div>BILL NO: ${invoice.number}</div>
-        <div>DATE: ${new Date(invoice.date).toLocaleDateString("en-GB").replace(/\//g, ".")}</div>
-        ${invoice.poNumber ? `<div>P.O. NO: ${invoice.poNumber}</div>` : ""}
-        ${invoice.poDate ? `<div>P.O. DATE: ${new Date(invoice.poDate).toLocaleDateString("en-GB").replace(/\//g, ".")}</div>` : ""}
+      <div>
+        <table style="border-collapse: collapse; border: 1px solid #000; font-family: monospace; font-size: 11px; font-weight: bold; margin-left: auto;">
+          <tbody>
+            <tr>
+              <th style="border: 1px solid #000; padding: 3px 8px; text-align: left; background: #fff; width: 85px;">BILL NO</th>
+              <td style="border: 1px solid #000; padding: 3px 8px; text-align: left;">${invoice.number}</td>
+            </tr>
+            <tr>
+              <th style="border: 1px solid #000; padding: 3px 8px; text-align: left; background: #fff;">DATE</th>
+              <td style="border: 1px solid #000; padding: 3px 8px; text-align: left;">${new Date(invoice.date).toLocaleDateString("en-GB").replace(/\//g, ".")}</td>
+            </tr>
+            ${
+              invoice.quoteNumber
+                ? `
+            <tr>
+              <th style="border: 1px solid #000; padding: 3px 8px; text-align: left; background: #fff;">QUOTE NO</th>
+              <td style="border: 1px solid #000; padding: 3px 8px; text-align: left;">${invoice.quoteNumber}</td>
+            </tr>`
+                : ""
+            }
+            ${
+              invoice.quoteDate
+                ? `
+            <tr>
+              <th style="border: 1px solid #000; padding: 3px 8px; text-align: left; background: #fff;">QUOTE DATE</th>
+              <td style="border: 1px solid #000; padding: 3px 8px; text-align: left;">${new Date(invoice.quoteDate).toLocaleDateString("en-GB").replace(/\//g, ".")}</td>
+            </tr>`
+                : ""
+            }
+            ${
+              invoice.poNumber
+                ? `
+            <tr>
+              <th style="border: 1px solid #000; padding: 3px 8px; text-align: left; background: #fff;">P.O. NO</th>
+              <td style="border: 1px solid #000; padding: 3px 8px; text-align: left;">${invoice.poNumber}</td>
+            </tr>`
+                : ""
+            }
+            ${
+              invoice.poDate
+                ? `
+            <tr>
+              <th style="border: 1px solid #000; padding: 3px 8px; text-align: left; background: #fff;">P.O. DATE</th>
+              <td style="border: 1px solid #000; padding: 3px 8px; text-align: left;">${new Date(invoice.poDate).toLocaleDateString("en-GB").replace(/\//g, ".")}</td>
+            </tr>`
+                : ""
+            }
+          </tbody>
+        </table>
       </div>
     </div>
 
     <!-- Client Info (Optimized without empty whitespace) -->
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 12px; border: 1px solid #000; border-radius: 4px; margin-bottom: 14px; background: #fff;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 10px 12px; border: 1px solid #000; margin-bottom: 14px; background: #fff;">
       <div>
         <p style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #475569; margin: 0;">Billed To</p>
         <h3 style="font-size: 15px; font-weight: bold; color: #0F172A; margin: 2px 0;">${invoice.companySnapshot.name}</h3>
         <p style="margin: 2px 0; color: #334155; white-space: pre-line;">${invoice.companySnapshot.address}</p>
         <p style="margin: 2px 0; color: #334155;">Phone: ${invoice.companySnapshot.phone}</p>
-      </div>
-      ${
-        invoice.companySnapshot.gstin
-          ? `
-        <div style="text-align: right; font-family: monospace; font-size: 12px; font-weight: bold; color: #000;">
-          <p style="margin: 0;">Party GSTIN: <span style="color: #E11D48;">${invoice.companySnapshot.gstin}</span></p>
-          <p style="margin: 2px 0 0 0; color: #475569; font-size: 11px;">State: ${invoice.companySnapshot.state || "Tamil Nadu"} (${invoice.companySnapshot.stateCode || "33"})</p>
-        </div>
-        `
-          : `
-        <div style="text-align: right; font-family: monospace; font-size: 11px; color: #475569;">
+        ${
+          invoice.companySnapshot.gstin
+            ? `
+          <p style="margin: 2px 0 0 0; font-size: 12px; font-weight: bold; color: #0F172A; font-family: monospace;">Party GSTIN: ${invoice.companySnapshot.gstin}</p>
+        <p style="margin: 2px 0 0 0; font-size: 12px; font-weight: bold; color: #0F172A; font-family: monospace;">State: ${invoice.companySnapshot.state || "Tamil Nadu"} (${invoice.companySnapshot.stateCode || "33"})</p>`
+            : `
+            <div style="text-align: right; font-family: monospace; font-size: 11px; color: #475569;">
           <p style="margin: 0;">State: ${invoice.companySnapshot.state || "Tamil Nadu"} (${invoice.companySnapshot.stateCode || "33"})</p>
-        </div>
-        `
-      }
+        </div>`
+        }
+        
+      </div>
     </div>
 
     <!-- Items Table with Black Borders -->
     <table style="width: 100%; border-collapse: collapse; margin-top: 8px;">
       <thead>
         <tr style="border: 1px solid #000; background: #fff; color: #000; text-transform: uppercase; font-size: 10px; font-weight: bold;">
-          <th style="padding: 8px; border: 1px solid #000; text-align: center; width: 40px;">#</th>
+          <th style="padding: 8px; border: 1px solid #000; text-align: center; width: 40px;">S.No</th>
           <th style="padding: 8px; border: 1px solid #000; text-align: left;">Particulars / Description</th>
           ${isTaxInvoice ? `<th style="padding: 8px; border: 1px solid #000; text-align: center; width: 80px;">HSN/SAC</th>` : ""}
           <th style="padding: 8px; border: 1px solid #000; text-align: center; width: 60px;">Qty</th>
@@ -156,11 +198,28 @@ export async function GET(
         ${
           isTaxInvoice
             ? `
-          <div style="background: #fff; border: 1px solid #000; padding: 10px; border-radius: 4px;">
-            <p style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #475569; margin: 0 0 4px 0;">Bank Account Details</p>
-            <p style="margin: 2px 0; font-weight: bold; color: #0F172A;">Bank: ${press.bankName || DEFAULT_PRESS.bankName}</p>
-            <p style="margin: 2px 0; font-family: monospace; font-weight: bold; color: #0F172A;">A/C No: ${press.accountNo || DEFAULT_PRESS.accountNo}</p>
-            <p style="margin: 2px 0; font-family: monospace; font-weight: bold; color: #0F172A;">IFSC: ${press.ifscCode || DEFAULT_PRESS.ifscCode}</p>
+          <div style="margin-bottom: 10px;">
+            <p style="font-size: 10px; font-weight: bold; text-transform: uppercase; color: #000; margin: 0 0 4px 0;">BANK ACCOUNT DETAILS:</p>
+            <table style="width: 100%; border-collapse: collapse; border: 1px solid #000; font-size: 11px;">
+              <tbody>
+                <tr>
+                  <th style="border: 1px solid #000; padding: 4px 8px; text-align: left; font-weight: bold; width: 110px; background: #fff;">Bank Name:</th>
+                  <td style="border: 1px solid #000; padding: 4px 8px; font-weight: 500;">${press.bankName || DEFAULT_PRESS.bankName}</td>
+                </tr>
+                <tr>
+                  <th style="border: 1px solid #000; padding: 4px 8px; text-align: left; font-weight: bold; background: #fff;">Account No:</th>
+                  <td style="border: 1px solid #000; padding: 4px 8px; font-family: monospace; font-weight: bold;">${press.accountNo || DEFAULT_PRESS.accountNo}</td>
+                </tr>
+                <tr>
+                  <th style="border: 1px solid #000; padding: 4px 8px; text-align: left; font-weight: bold; background: #fff;">IFSC Code:</th>
+                  <td style="border: 1px solid #000; padding: 4px 8px; font-family: monospace; font-weight: bold;">${press.ifscCode || DEFAULT_PRESS.ifscCode}</td>
+                </tr>
+                <tr>
+                  <th style="border: 1px solid #000; padding: 4px 8px; text-align: left; font-weight: bold; background: #fff;">Branch:</th>
+                  <td style="border: 1px solid #000; padding: 4px 8px; font-weight: 500;">${press.branchName || DEFAULT_PRESS.branchName}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         `
             : ""
