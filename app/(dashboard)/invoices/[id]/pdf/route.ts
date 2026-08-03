@@ -167,9 +167,7 @@ export async function GET(
           <p style="margin: 2px 0 0 0; font-size: 12px; font-weight: bold; color: #0F172A; font-family: monospace;">Party GSTIN: ${invoice.companySnapshot.gstin}</p>
         <p style="margin: 2px 0 0 0; font-size: 12px; font-weight: bold; color: #0F172A; font-family: monospace;">State: ${invoice.companySnapshot.state || "Tamil Nadu"} (${invoice.companySnapshot.stateCode || "33"})</p>`
             : `
-            <div style="text-align: right; font-family: monospace; font-size: 11px; color: #475569;">
-          <p style="margin: 0;">State: ${invoice.companySnapshot.state || "Tamil Nadu"} (${invoice.companySnapshot.stateCode || "33"})</p>
-        </div>`
+            `
         }
         
       </div>

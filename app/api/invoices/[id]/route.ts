@@ -19,27 +19,27 @@ export async function GET(
       return NextResponse.json({ error: "Invalid invoice ID" }, { status: 400 });
     }
 
-    // Ensure Company model schema is registered in serverless context
     if (!mongoose.models.Company) {
       mongoose.model("Company", Company.schema);
     }
 
-    const invoice = await Invoice.findById(id).populate("companyId").lean();
+    const invoice = await Invoice.findById(id)
+      .populate("companyId")
+      .lean();
 
     if (!invoice) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
-    const payments = await Payment.find({ invoiceId: id }).sort({ date: -1 }).lean();
+    const payments = await Payment.find({ invoiceId: id })
+      .sort({ date: -1 })
+      .lean();
 
-    return NextResponse.json({
-      invoice,
-      payments,
-    });
+    return NextResponse.json({ invoice, payments });
   } catch (error) {
-    console.error("Error fetching invoice:", error);
+    console.error("Error fetching invoice details:", error);
     return NextResponse.json(
-      { error: "Failed to fetch invoice" },
+      { error: "Failed to fetch invoice details" },
       { status: 500 }
     );
   }
@@ -57,15 +57,21 @@ export async function PUT(
       return NextResponse.json({ error: "Invalid invoice ID" }, { status: 400 });
     }
 
+    const existing = await Invoice.findById(id);
+    if (!existing) {
+      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+    }
+
     const body = await req.json();
 
-    if (body.status === "cancelled" && Object.keys(body).length === 1) {
-      const updated = await Invoice.findByIdAndUpdate(
-        id,
-        { status: "cancelled", balanceAmount: 0 },
-        { new: true }
-      );
-      return NextResponse.json(updated);
+    // Support quick status update (e.g. Cancel bill action from ledger)
+    if (body.status && !body.items) {
+      existing.status = body.status;
+      if (body.status === "cancelled") {
+        existing.balanceAmount = 0;
+      }
+      await existing.save();
+      return NextResponse.json({ invoice: existing, message: "Status updated" });
     }
 
     const validation = invoiceSchema.safeParse(body);
@@ -77,9 +83,35 @@ export async function PUT(
     }
 
     const data = validation.data;
-    const existing = await Invoice.findById(id);
-    if (!existing) {
-      return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
+
+    let companySnapshot = existing.companySnapshot;
+    let companyObjId = existing.companyId;
+
+    if (data.companyId && mongoose.Types.ObjectId.isValid(data.companyId)) {
+      const company = await Company.findById(data.companyId);
+      if (company) {
+        companyObjId = company._id;
+        companySnapshot = {
+          name: company.name,
+          address: company.address,
+          phone: company.phone,
+          email: company.email || "",
+          gstin: company.gstin || "",
+          state: company.state || "Tamil Nadu",
+          stateCode: company.stateCode || "33",
+        };
+      }
+    } else if (data.type === "labour_bill" && data.labourCategory === "cash") {
+      companyObjId = null as any;
+      companySnapshot = {
+        name: data.customCustomerName?.trim() || body.companySnapshot?.name || "CASH SALE",
+        address: data.customCustomerAddress?.trim() || body.companySnapshot?.address || "",
+        phone: data.customCustomerPhone?.trim() || body.companySnapshot?.phone || "",
+        email: "",
+        gstin: "",
+        state: "Tamil Nadu",
+        stateCode: "33",
+      };
     }
 
     const subtotal = data.items.reduce((sum, item) => sum + item.quantity * item.rate, 0);
@@ -96,17 +128,24 @@ export async function PUT(
     const roundOff = Math.round((roundedGrandTotal - rawTotal) * 100) / 100;
     const amountInWords = numberToWords(roundedGrandTotal);
 
-    const paidAmount = existing.paidAmount || 0;
+    const isCashLabour = data.type === "labour_bill" && data.labourCategory === "cash";
+    const status = isCashLabour ? "paid" : (data.status || existing.status);
+
+    const paidAmount = status === "paid" ? roundedGrandTotal : existing.paidAmount || 0;
     const balanceAmount = Math.max(0, roundedGrandTotal - paidAmount);
-    const status = balanceAmount === 0 && roundedGrandTotal > 0 ? "paid" : data.status;
 
     const updated = await Invoice.findByIdAndUpdate(
       id,
       {
         type: data.type,
+        labourCategory: data.type === "labour_bill" ? data.labourCategory || "cash" : undefined,
         date: new Date(data.date),
         poNumber: data.poNumber || "",
         poDate: data.poDate ? new Date(data.poDate) : null,
+        quoteNumber: data.quoteNumber || "",
+        quoteDate: data.quoteDate ? new Date(data.quoteDate) : null,
+        companyId: companyObjId ? companyObjId : undefined,
+        companySnapshot,
         items: data.items,
         subtotal,
         cgstPercent,
@@ -117,6 +156,7 @@ export async function PUT(
         grandTotal: roundedGrandTotal,
         amountInWords,
         status,
+        paidAmount,
         balanceAmount,
         notes: data.notes || "",
       },
@@ -145,13 +185,12 @@ export async function DELETE(
       return NextResponse.json({ error: "Invalid invoice ID" }, { status: 400 });
     }
 
-    const invoice = await Invoice.findByIdAndDelete(id);
-    if (!invoice) {
+    const existing = await Invoice.findById(id);
+    if (!existing) {
       return NextResponse.json({ error: "Invoice not found" }, { status: 404 });
     }
 
-    // Delete associated payments
-    await Payment.deleteMany({ invoiceId: id });
+    await Invoice.findByIdAndDelete(id);
 
     return NextResponse.json({ message: "Invoice deleted successfully" });
   } catch (error) {

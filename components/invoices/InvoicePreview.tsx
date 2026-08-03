@@ -199,9 +199,9 @@ export function InvoicePreview({
               <p className="text-xs text-slate-600 font-serif mt-0.5 tracking-wide">
                 Ph: {company.phone}
               </p>
-              <p className="text-xs font-semibold text-[#0F172A] font-serif mt-0.5 tracking-wide">
+              {/* <p className="text-xs font-semibold text-[#0F172A] font-serif mt-0.5 tracking-wide">
                 GSTIN: {company.gstin} | State: {company.state} ({company.stateCode})
-              </p>
+              </p> */}
             </div>
 
           ) : (

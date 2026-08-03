@@ -32,12 +32,13 @@ export default function CompanyDetailPage({
     now.getMonth() >= 3 ? now.getFullYear() : now.getFullYear() - 1;
   const [startDate, setStartDate] = useState(`${fyStart}-04-01`);
   const [endDate, setEndDate] = useState(`${fyStart + 1}-03-31`);
+  const [typeFilter, setTypeFilter] = useState<string>("");
 
   const fetchStatement = async () => {
     setLoading(true);
     try {
       const res = await fetch(
-        `/api/companies/${id}/statement?startDate=${startDate}&endDate=${endDate}`,
+        `/api/companies/${id}/statement?startDate=${startDate}&endDate=${endDate}&type=${typeFilter}`,
       );
       const data = await res.json();
       if (!res.ok)
@@ -52,11 +53,11 @@ export default function CompanyDetailPage({
 
   useEffect(() => {
     fetchStatement();
-  }, [id, startDate, endDate]);
+  }, [id, startDate, endDate, typeFilter]);
 
   const handlePrintStatement = () => {
     window.open(
-      `/companies/${id}/statement/print?startDate=${startDate}&endDate=${endDate}`,
+      `/companies/${id}/statement/print?startDate=${startDate}&endDate=${endDate}&type=${typeFilter}`,
       "_blank",
     );
   };
@@ -179,10 +180,10 @@ export default function CompanyDetailPage({
       </div>
 
       {/* Date Range Picker Bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs flex flex-wrap items-center justify-between text-xs">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-blue-600" />
-          <h3 className="font-serif font-bold text-sm text-[#0F172A]">
+          <h3 className="font-serif font-semibold uppercase text-[#0F172A]">
             Statement Filter Period:
           </h3>
         </div>
@@ -210,7 +211,11 @@ export default function CompanyDetailPage({
 
           <div className="flex items-center gap-1">
             <select
-              value={startDate.startsWith(`${fyStart}`) ? fyStart : startDate.substring(0, 4)}
+              value={
+                startDate.startsWith(`${fyStart}`)
+                  ? fyStart
+                  : startDate.substring(0, 4)
+              }
               onChange={(e) => {
                 const year = parseInt(e.target.value, 10);
                 if (!isNaN(year)) {
@@ -221,7 +226,7 @@ export default function CompanyDetailPage({
               className="px-3 py-1.5 border border-blue-200 rounded-lg bg-blue-50/80 hover:bg-blue-100/90 text-blue-800 font-bold text-xs focus:ring-2 focus:ring-blue-500 outline-none transition-all cursor-pointer shadow-2xs"
             >
               <option value={fyStart}>
-                FY {fyStart}-{fyStart + 1} (Current)
+                FY {fyStart}-{fyStart + 1}
               </option>
               <option value={fyStart - 1}>
                 FY {fyStart - 1}-{fyStart}
@@ -235,6 +240,19 @@ export default function CompanyDetailPage({
               <option value={fyStart - 4}>
                 FY {fyStart - 4}-{fyStart - 3}
               </option>
+            </select>
+          </div>
+
+          <div className="flex items-center gap-1.5 pl-2 border-slate-200">
+            <span className="text-slate-500 font-medium">Statement Type:</span>
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className="px-3 py-1.5 border border-rose-300 rounded-lg bg-rose-50/80 hover:bg-rose-100/90 text-[#BE123C] font-bold text-xs focus:ring-2 focus:ring-rose-500 outline-none transition-all cursor-pointer shadow-2xs"
+            >
+              <option value="">ALL BILLS (Tax + Labour)</option>
+              <option value="tax_invoice">TAX INVOICES ONLY</option>
+              <option value="labour_bill">LABOUR BILLS ONLY</option>
             </select>
           </div>
         </div>

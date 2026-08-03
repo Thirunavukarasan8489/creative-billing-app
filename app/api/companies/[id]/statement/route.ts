@@ -37,6 +37,7 @@ export async function GET(
     const { searchParams } = new URL(req.url);
     const startDateParam = searchParams.get("startDate");
     const endDateParam = searchParams.get("endDate");
+    const typeParam = searchParams.get("type");
 
     // Default financial year bounds if not specified
     const now = new Date();
@@ -52,12 +53,18 @@ export async function GET(
     let press = await PressProfile.findOne().lean();
     if (!press) press = DEFAULT_PRESS as any;
 
-    // Fetch all invoices for company
-    const invoices = await Invoice.find({
+    const invoiceQuery: any = {
       companyId: id,
       date: { $gte: startDate, $lte: endDate },
       status: { $ne: "cancelled" },
-    })
+    };
+
+    if (typeParam && (typeParam === "tax_invoice" || typeParam === "labour_bill")) {
+      invoiceQuery.type = typeParam;
+    }
+
+    // Fetch all invoices for company
+    const invoices = await Invoice.find(invoiceQuery)
       .sort({ date: 1, createdAt: 1 })
       .lean();
 

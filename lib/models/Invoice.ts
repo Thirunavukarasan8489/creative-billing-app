@@ -20,6 +20,7 @@ export interface IInvoiceCompanySnapshot {
 
 export interface IInvoice extends Document {
   type: "tax_invoice" | "labour_bill";
+  labourCategory?: "cash" | "credit";
   number: string;
   financialYear: string;
   sequenceNumber: number;
@@ -28,7 +29,7 @@ export interface IInvoice extends Document {
   poDate?: Date;
   quoteNumber?: string;
   quoteDate?: Date;
-  companyId: mongoose.Types.ObjectId;
+  companyId?: mongoose.Types.ObjectId;
   companySnapshot: IInvoiceCompanySnapshot;
   items: IInvoiceItem[];
   subtotal: number;
@@ -56,9 +57,9 @@ const InvoiceItemSchema = new Schema({
 });
 
 const CompanySnapshotSchema = new Schema({
-  name: { type: String, required: true },
-  address: { type: String, required: true },
-  phone: { type: String, required: true },
+  name: { type: String, required: true, default: "Cash Sale" },
+  address: { type: String, default: "" },
+  phone: { type: String, default: "" },
   email: { type: String, default: "" },
   gstin: { type: String, default: "" },
   state: { type: String, default: "Tamil Nadu" },
@@ -72,6 +73,11 @@ const InvoiceSchema: Schema = new Schema(
       enum: ["tax_invoice", "labour_bill"],
       required: true,
     },
+    labourCategory: {
+      type: String,
+      enum: ["cash", "credit"],
+      default: "cash",
+    },
     number: { type: String, required: true, unique: true, trim: true },
     financialYear: { type: String, required: true, trim: true },
     sequenceNumber: { type: Number, required: true },
@@ -80,7 +86,7 @@ const InvoiceSchema: Schema = new Schema(
     poDate: { type: Date, default: null },
     quoteNumber: { type: String, trim: true, default: "" },
     quoteDate: { type: Date, default: null },
-    companyId: { type: Schema.Types.ObjectId, ref: "Company", required: true },
+    companyId: { type: Schema.Types.ObjectId, ref: "Company", required: false, default: null },
     companySnapshot: { type: CompanySnapshotSchema, required: true },
     items: { type: [InvoiceItemSchema], required: true },
     subtotal: { type: Number, required: true, default: 0 },
@@ -104,6 +110,11 @@ const InvoiceSchema: Schema = new Schema(
 );
 
 InvoiceSchema.index({ type: 1, financialYear: 1, sequenceNumber: 1 }, { unique: true });
+
+// Clear cached model in development or when schema changes to prevent Mongoose stale schema validation errors
+if (mongoose.models.Invoice) {
+  delete mongoose.models.Invoice;
+}
 
 const Invoice: Model<IInvoice> =
   mongoose.models.Invoice || mongoose.model<IInvoice>("Invoice", InvoiceSchema);

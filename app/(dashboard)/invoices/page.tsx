@@ -32,8 +32,9 @@ export default function InvoicesPage() {
 
       const res = await fetch(`/api/invoices?${params.toString()}`);
       const data = await res.json();
-      if (res.ok && data.invoices) {
-        setInvoices(data.invoices);
+      if (res.ok) {
+        const list = Array.isArray(data) ? data : (data.invoices || []);
+        setInvoices(list);
       }
     } catch (err) {
       console.error("Failed to load invoices:", err);

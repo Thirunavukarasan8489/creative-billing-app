@@ -33,8 +33,11 @@ export function CompanyForm({
 
   const isEditing = Boolean(initialValues?._id);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.SyntheticEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setLoading(true);
     setError(null);
 
@@ -74,6 +77,14 @@ export function CompanyForm({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && e.target instanceof HTMLInputElement) {
+      e.preventDefault();
+      e.stopPropagation();
+      handleSubmit();
+    }
+  };
+
   const handleGstinChange = (val: string) => {
     const uppercaseVal = val.toUpperCase();
     const isGst = uppercaseVal.trim().length > 0;
@@ -85,7 +96,7 @@ export function CompanyForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-4">
       {error && (
         <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
@@ -102,6 +113,7 @@ export function CompanyForm({
           required
           value={formData.name}
           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          onKeyDown={handleKeyDown}
           placeholder="e.g. Sri Garments Pvt Ltd"
           className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white text-[#0F172A]"
         />
@@ -119,6 +131,7 @@ export function CompanyForm({
             type="text"
             value={formData.gstin || ""}
             onChange={(e) => handleGstinChange(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="e.g. 33DDIPG2441F1Z0"
             maxLength={15}
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-blue-500 outline-none bg-white text-[#0F172A] uppercase"
@@ -136,6 +149,7 @@ export function CompanyForm({
             onChange={(e) =>
               setFormData({ ...formData, phone: e.target.value })
             }
+            onKeyDown={handleKeyDown}
             placeholder="e.g. 9842100000"
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white text-[#0F172A]"
           />
@@ -169,6 +183,7 @@ export function CompanyForm({
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
             }
+            onKeyDown={handleKeyDown}
             placeholder="billing@company.com"
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white text-[#0F172A]"
           />
@@ -184,6 +199,7 @@ export function CompanyForm({
             onChange={(e) =>
               setFormData({ ...formData, state: e.target.value })
             }
+            onKeyDown={handleKeyDown}
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white text-[#0F172A]"
           />
         </div>
@@ -198,6 +214,7 @@ export function CompanyForm({
             onChange={(e) =>
               setFormData({ ...formData, stateCode: e.target.value })
             }
+            onKeyDown={handleKeyDown}
             className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 outline-none bg-white text-[#0F172A]"
           />
         </div>
@@ -231,7 +248,8 @@ export function CompanyForm({
           </button>
         )}
         <button
-          type="submit"
+          type="button"
+          onClick={(e) => handleSubmit(e)}
           disabled={loading}
           className="px-5 py-2 text-sm font-semibold text-white bg-[#0F172A] hover:bg-slate-800 rounded-lg shadow-sm transition-all disabled:opacity-50 flex items-center gap-2"
         >
@@ -245,6 +263,6 @@ export function CompanyForm({
           )}
         </button>
       </div>
-    </form>
+    </div>
   );
 }

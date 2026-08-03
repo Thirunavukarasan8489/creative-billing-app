@@ -22,7 +22,7 @@ export default function EditInvoicePage({
       const res = await fetch(`/api/invoices/${id}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to load invoice");
-      setInvoice(data.invoice);
+      setInvoice(data.invoice || data);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -75,7 +75,7 @@ export default function EditInvoicePage({
       </div>
 
       {/* Edit Form with initialValues */}
-      <InvoiceForm initialValues={invoice} />
+      <InvoiceForm initialValues={invoice} isEditing={true} />
     </div>
   );
 }

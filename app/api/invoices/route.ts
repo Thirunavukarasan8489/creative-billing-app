@@ -1,39 +1,55 @@
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { dbConnect } from "@/lib/db";
 import Invoice from "@/lib/models/Invoice";
 import Company from "@/lib/models/Company";
 import { invoiceSchema } from "@/lib/validation/invoice";
-import { getNextInvoiceNumber, getFinancialYear } from "./next-number/route";
 import { numberToWords } from "@/lib/numberToWords";
+
+function getFinancialYear(dateStr: string | Date): string {
+  const d = new Date(dateStr);
+  const month = d.getMonth() + 1; // 1-12
+  const year = d.getFullYear();
+  const startYear = month >= 4 ? year : year - 1;
+  const endYearShort = String(startYear + 1).slice(-2);
+  const startYearShort = String(startYear).slice(-2);
+  return `${startYearShort}-${endYearShort}`;
+}
+
+async function getNextInvoiceNumber(
+  type: "tax_invoice" | "labour_bill",
+  dateStr: string | Date
+): Promise<{ number: string; financialYear: string; sequenceNumber: number }> {
+  const financialYear = getFinancialYear(dateStr);
+  const prefix = type === "tax_invoice" ? "TI" : "LB";
+
+  const count = await Invoice.countDocuments({
+    type,
+    financialYear,
+  });
+
+  const sequenceNumber = count + 1;
+  const seqStr = String(sequenceNumber).padStart(4, "0");
+  const number = `${prefix}/${financialYear}/${seqStr}`;
+
+  return { number, financialYear, sequenceNumber };
+}
 
 export async function GET(req: NextRequest) {
   try {
     await dbConnect();
     const { searchParams } = new URL(req.url);
-    const search = searchParams.get("search") || "";
     const type = searchParams.get("type");
     const status = searchParams.get("status");
     const companyId = searchParams.get("companyId");
-    const startDate = searchParams.get("startDate");
-    const endDate = searchParams.get("endDate");
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "20", 10);
-    const skip = (page - 1) * limit;
+    const search = searchParams.get("search");
 
-    const query: Record<string, unknown> = {};
+    const query: any = {};
 
     if (type) query.type = type;
     if (status) query.status = status;
-    if (companyId) query.companyId = companyId;
-
-    if (startDate || endDate) {
-      query.date = {};
-      if (startDate) (query.date as Record<string, unknown>).$gte = new Date(startDate);
-      if (endDate) {
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
-        (query.date as Record<string, unknown>).$lte = end;
-      }
+    if (companyId && mongoose.Types.ObjectId.isValid(companyId)) {
+      query.companyId = companyId;
     }
 
     if (search) {
@@ -44,22 +60,11 @@ export async function GET(req: NextRequest) {
       ];
     }
 
-    const total = await Invoice.countDocuments(query);
     const invoices = await Invoice.find(query)
       .sort({ date: -1, createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .populate("companyId", "name phone gstin");
+      .lean();
 
-    return NextResponse.json({
-      invoices,
-      pagination: {
-        total,
-        page,
-        limit,
-        pages: Math.ceil(total / limit),
-      },
-    });
+    return NextResponse.json({ invoices, total: invoices.length });
   } catch (error) {
     console.error("Error fetching invoices:", error);
     return NextResponse.json(
@@ -84,21 +89,36 @@ export async function POST(req: NextRequest) {
 
     const data = validation.data;
 
-    // Fetch company to form historic snapshot
-    const company = await Company.findById(data.companyId);
-    if (!company) {
-      return NextResponse.json({ error: "Company not found" }, { status: 400 });
+    let companySnapshot: any;
+    let companyObjId: any = null;
+
+    if (data.companyId && mongoose.Types.ObjectId.isValid(data.companyId)) {
+      const company = await Company.findById(data.companyId);
+      if (company) {
+        companyObjId = company._id;
+        companySnapshot = {
+          name: company.name,
+          address: company.address,
+          phone: company.phone,
+          email: company.email || "",
+          gstin: company.gstin || "",
+          state: company.state || "Tamil Nadu",
+          stateCode: company.stateCode || "33",
+        };
+      }
     }
 
-    const companySnapshot = {
-      name: company.name,
-      address: company.address,
-      phone: company.phone,
-      email: company.email || "",
-      gstin: company.gstin || "",
-      state: company.state || "Tamil Nadu",
-      stateCode: company.stateCode || "33",
-    };
+    if (!companySnapshot) {
+      companySnapshot = {
+        name: data.customCustomerName?.trim() || body.companySnapshot?.name || "CASH SALE",
+        address: data.customCustomerAddress?.trim() || body.companySnapshot?.address || "",
+        phone: data.customCustomerPhone?.trim() || body.companySnapshot?.phone || "",
+        email: "",
+        gstin: "",
+        state: "Tamil Nadu",
+        stateCode: "33",
+      };
+    }
 
     // Calculate/Verify Math
     const subtotal = data.items.reduce((sum, item) => sum + (item.quantity * item.rate), 0);
@@ -126,7 +146,6 @@ export async function POST(req: NextRequest) {
       financialYear = nextData.financialYear;
       sequenceNumber = nextData.sequenceNumber;
     } else {
-      // Extract sequence if custom number provided
       const existingCount = await Invoice.countDocuments({
         type: data.type,
         financialYear,
@@ -134,15 +153,21 @@ export async function POST(req: NextRequest) {
       sequenceNumber = existingCount + 1;
     }
 
+    const isCashLabour = data.type === "labour_bill" && data.labourCategory === "cash";
+    const status = isCashLabour ? "paid" : (data.status || "draft");
+
     const invoice = await Invoice.create({
       type: data.type,
+      labourCategory: data.type === "labour_bill" ? data.labourCategory || "cash" : undefined,
       number: invoiceNumber,
       financialYear,
       sequenceNumber,
       date: new Date(data.date),
       poNumber: data.poNumber || "",
       poDate: data.poDate ? new Date(data.poDate) : null,
-      companyId: company._id,
+      quoteNumber: data.quoteNumber || "",
+      quoteDate: data.quoteDate ? new Date(data.quoteDate) : null,
+      companyId: companyObjId ? companyObjId : undefined,
       companySnapshot,
       items: data.items,
       subtotal,
@@ -153,9 +178,9 @@ export async function POST(req: NextRequest) {
       roundOff,
       grandTotal: roundedGrandTotal,
       amountInWords,
-      status: data.status || "draft",
-      paidAmount: data.status === "paid" ? roundedGrandTotal : 0,
-      balanceAmount: data.status === "paid" ? 0 : roundedGrandTotal,
+      status,
+      paidAmount: status === "paid" ? roundedGrandTotal : 0,
+      balanceAmount: status === "paid" ? 0 : roundedGrandTotal,
       notes: data.notes || "",
     });
 

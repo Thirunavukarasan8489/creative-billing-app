@@ -37,6 +37,7 @@ export async function GET(
     const { searchParams } = new URL(req.url);
     const startDateParam = searchParams.get("startDate");
     const endDateParam = searchParams.get("endDate");
+    const typeParam = searchParams.get("type");
 
     const now = new Date();
     const currentYear = now.getFullYear();
@@ -50,12 +51,18 @@ export async function GET(
     const dbPress = await PressProfile.findOne().lean();
     const press = (dbPress || DEFAULT_PRESS) as typeof DEFAULT_PRESS;
 
-    // Fetch invoices & payments
-    const invoices = await Invoice.find({
+    const invoiceQuery: any = {
       companyId: id,
       date: { $gte: startDate, $lte: endDate },
       status: { $ne: "cancelled" },
-    })
+    };
+
+    if (typeParam && (typeParam === "tax_invoice" || typeParam === "labour_bill")) {
+      invoiceQuery.type = typeParam;
+    }
+
+    // Fetch invoices & payments
+    const invoices = await Invoice.find(invoiceQuery)
       .sort({ date: 1, createdAt: 1 })
       .lean();
 
@@ -220,7 +227,7 @@ export async function GET(
   <table class="statement-table">
     <thead>
       <tr>
-        <th colSpan="10" style="text-align: center;">ACCOUNT STATEMENT - ${formatDateStr(startDate)} TO ${formatDateStr(endDate)}</th>
+        <th colSpan="10" style="text-align: center;">${typeParam === "tax_invoice" ? "TAX INVOICE ACCOUNT STATEMENT" : typeParam === "labour_bill" ? "LABOUR BILL ACCOUNT STATEMENT" : "ACCOUNT STATEMENT"} - ${formatDateStr(startDate)} TO ${formatDateStr(endDate)}</th>
       </tr>
       <tr>
         <th style="width: 10%;">Date</th>

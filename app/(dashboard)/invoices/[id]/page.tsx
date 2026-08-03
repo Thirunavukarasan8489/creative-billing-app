@@ -38,7 +38,7 @@ export default function InvoiceDetailPage({
       const res = await fetch(`/api/invoices/${id}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to load invoice");
-      setInvoice(data.invoice);
+      setInvoice(data.invoice || data);
       setPayments(data.payments || []);
     } catch (err: any) {
       setError(err.message);

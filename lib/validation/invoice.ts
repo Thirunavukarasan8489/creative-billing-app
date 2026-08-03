@@ -10,7 +10,8 @@ export const invoiceItemSchema = z.object({
 
 export const invoiceSchema = z.object({
   type: z.enum(["tax_invoice", "labour_bill"]),
-  number: z.string().optional(), // If omitted, API will generate next number
+  labourCategory: z.enum(["cash", "credit"]).optional().default("cash"),
+  number: z.string().optional(),
   date: z.string().or(z.date()),
   poNumber: z.string().optional().nullable(),
   poDate: z.string().or(z.date()).optional().nullable(),
@@ -27,7 +28,10 @@ export const invoiceSchema = z.object({
       }
       return String(val);
     })
-    .pipe(z.string().min(1, "Company selection is required")),
+    .optional(),
+  customCustomerName: z.string().optional(),
+  customCustomerAddress: z.string().optional(),
+  customCustomerPhone: z.string().optional(),
   items: z.array(invoiceItemSchema).min(1, "At least one item is required"),
   subtotal: z.coerce.number().min(0),
   cgstPercent: z.coerce.number().min(0).default(0),
