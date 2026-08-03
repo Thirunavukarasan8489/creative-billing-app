@@ -173,10 +173,20 @@ All routes verified active and functional:
 - **[app/(dashboard)/reports/page.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/%28dashboard%29/reports/page.tsx)**: Added Statement Type filter dropdown (`ALL BILLS`, `TAX INVOICES ONLY`, `LABOUR BILLS ONLY`) for Monthly Sales Statement and Financial Year Statement.
 - **[app/api/reports/monthly-sales/route.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/api/reports/monthly-sales/route.ts)** & **[app/(dashboard)/reports/monthly-sales/print/route.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/%28dashboard%29/reports/monthly-sales/print/route.ts)**: API & print routes filter invoices by `type` parameter and generate dynamic statement titles (`TAX INVOICE SALES BILL [MONTH] [YEAR]` / `LABOUR BILL SALES BILL [MONTH] [YEAR]`).
 
+### 6. Executive Overview Dashboard & Interactive Stacked Recharts
+- **[app/(dashboard)/page.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/%28dashboard%29/page.tsx)** & **[components/dashboard/DashboardCharts.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/components/dashboard/DashboardCharts.tsx)**: Redesigned Overview page with executive dark hero banner, KPI stat cards, collection rate progress indicator, fast counter shortcuts, and interactive stacked Recharts bar chart with time filter pills (`7D`, `1M`, `3M`, `6M`, `1Y`) and summary stat cards.
+
+### 7. Sticky Table Headers, Layout Scroll Containers & Financial Year Dropdown
+- **[app/(dashboard)/layout.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/%28dashboard%29/layout.tsx)**, **[app/(dashboard)/invoices/page.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/%28dashboard%29/invoices/page.tsx)**, **[app/(dashboard)/quotations/page.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/%28dashboard%29/quotations/page.tsx)**, & **[app/(dashboard)/companies/page.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/%28dashboard%29/companies/page.tsx)**: Fixed layout scroll boundaries to enable `position: sticky` on headers and sidebars. Added sticky headers (`sticky top-0 z-10`) and max-height scroll containers to all ledger tables.
+- **[app/(dashboard)/companies/[id]/page.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/%28dashboard%29/companies/%5Bid%5D/page.tsx)**: Converted static FY buttons into a Financial Year select dropdown (`FY 2026-2027 (Current)`, `FY 2025-2026`, `FY 2024-2025`, etc.).
+
+### 8. Print Page Break Fix on Printable Account Statements
+- **[app/(dashboard)/companies/[id]/statement/print/route.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/%28dashboard%29/companies/%5Bid%5D/statement/print/route.ts)**: Added `break-inside: avoid; page-break-inside: avoid;` rules to `.bank-box` and table rows (`tr`), preventing Bank Details box from splitting across printable pages.
+
 ---
 
 ## Verification & Build Status
 
 - TypeScript compilation and Next.js route validation verified via `npm run build`.
 - All 37 routes active and verified without errors.
-- All core requirements met: authentication, edge route protection, company-first workflow, overridable bill types, rate quotation 1-click conversion modal, optional PO & Quote fields, crisp black-bordered PDF & preview table layouts, separate Tax vs Labour monthly sales bill statements, financial year statements, and client account ledgers.
+- All core requirements met: authentication, edge route protection, company-first workflow, overridable bill types, rate quotation 1-click conversion modal, optional PO & Quote fields, crisp black-bordered PDF & preview table layouts, separate Tax vs Labour monthly sales bill statements, financial year statements, client account ledgers, interactive stacked Recharts analytics, sticky table headers, FY select dropdown, and print page break protection.

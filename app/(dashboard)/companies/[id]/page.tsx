@@ -208,27 +208,34 @@ export default function CompanyDetailPage({
             />
           </div>
 
-          <div className="flex gap-1.5">
-            <button
-              onClick={() => {
-                const y = new Date().getFullYear();
-                setStartDate(`${y - 1}-04-01`);
-                setEndDate(`${y}-03-31`);
+          <div className="flex items-center gap-1">
+            <select
+              value={startDate.startsWith(`${fyStart}`) ? fyStart : startDate.substring(0, 4)}
+              onChange={(e) => {
+                const year = parseInt(e.target.value, 10);
+                if (!isNaN(year)) {
+                  setStartDate(`${year}-04-01`);
+                  setEndDate(`${year + 1}-03-31`);
+                }
               }}
-              className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-[11px]"
+              className="px-3 py-1.5 border border-blue-200 rounded-lg bg-blue-50/80 hover:bg-blue-100/90 text-blue-800 font-bold text-xs focus:ring-2 focus:ring-blue-500 outline-none transition-all cursor-pointer shadow-2xs"
             >
-              FY {fyStart - 1}-{fyStart}
-            </button>
-            <button
-              onClick={() => {
-                const y = new Date().getFullYear();
-                setStartDate(`${y}-04-01`);
-                setEndDate(`${y + 1}-03-31`);
-              }}
-              className="px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold rounded-lg text-[11px]"
-            >
-              FY {fyStart}-{fyStart + 1}
-            </button>
+              <option value={fyStart}>
+                FY {fyStart}-{fyStart + 1} (Current)
+              </option>
+              <option value={fyStart - 1}>
+                FY {fyStart - 1}-{fyStart}
+              </option>
+              <option value={fyStart - 2}>
+                FY {fyStart - 2}-{fyStart - 1}
+              </option>
+              <option value={fyStart - 3}>
+                FY {fyStart - 3}-{fyStart - 2}
+              </option>
+              <option value={fyStart - 4}>
+                FY {fyStart - 4}-{fyStart - 3}
+              </option>
+            </select>
           </div>
         </div>
       </div>

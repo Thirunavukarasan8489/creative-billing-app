@@ -172,17 +172,21 @@ export async function GET(
       font-family: 'ParkAvenue';
       src: url('/fonts/PARKANA_.TTF') format('truetype');
     }
-    @page { size: A4 portrait; margin: 10mm; }
+    @page { size: A4 landscape; margin: 10mm; }
     body { font-family: Arial, sans-serif; color: #000; background: #FFF; margin: 0; padding: 10px; font-size: 11px; }
     .header-banner { text-align: center; margin-bottom: 10px; }
     .press-title { font-family: 'ParkAvenue', 'Brush Script MT', cursive, Georgia, serif; font-size: 40px; color: #E11D48; margin: 0; font-weight: normal; line-height: 1.1; }
     .press-details { font-size: 11px; color: #1E3A8A; font-weight: bold; margin: 3px 0; }
     .press-gst { font-size: 13px; font-weight: bold; color: #B91C1C; margin-top: 3px; font-family: monospace; }
     .statement-table { width: 100%; border-collapse: collapse; margin-top: 10px; border: 2px solid #000; }
+    .statement-table thead { display: table-header-group; }
+    .statement-table tr { break-inside: avoid; page-break-inside: avoid; }
     .statement-table th { border: 1px solid #000; padding: 6px 4px; font-size: 10px; font-weight: bold; text-align: center; background: #FFF; text-transform: uppercase; }
-    .bank-box { border: 1px solid #94A3B8; padding: 15px; margin-top: 30px; border-radius: 4px; width: 80%; margin-left: auto; margin-right: auto; text-align: left; }
+    .bank-box { border: 1px solid #94A3B8; padding: 15px; margin-top: 25px; border-radius: 4px; width: 80%; margin-left: auto; margin-right: auto; text-align: left; break-inside: avoid; page-break-inside: avoid; }
     @media print {
       .no-print { display: none; }
+      .bank-box { break-inside: avoid; page-break-inside: avoid; }
+      tr { break-inside: avoid; page-break-inside: avoid; }
     }
   </style>
 </head>
@@ -200,17 +204,23 @@ export async function GET(
     <hr style="border: 1px solid #000; margin-top: 8px;" />
   </div>
 
+  <div style="display:flex; justify-content: space-between;">
+  <div style="text-align: left; font-weight: bold; margin-bottom: 8px; font-size: 12px;">
+    ${company.name.toUpperCase()}
+  </div>
+  <div style="text-align: center; font-weight: bold; margin-bottom: 8px; font-size: 12px;">
+    GSTIN : ${company.gstin || "N/A"}
+  </div>
   <div style="text-align: right; font-weight: bold; margin-bottom: 8px; font-size: 12px;">
     Date : ${formatDateStr(new Date())}
+  </div>
   </div>
 
   <!-- Account Statement Table -->
   <table class="statement-table">
     <thead>
       <tr>
-        <th style="width: 12%; text-align: left; padding-left: 8px;">${company.name.toUpperCase()}</th>
-        <th colSpan="7" style="text-align: center;">ACCOUNT STATEMENT - ${formatDateStr(startDate)} TO ${formatDateStr(endDate)}</th>
-        <th style="width: 25%; text-align: right; padding-right: 8px;">GSTIN : ${company.gstin || "N/A"}</th>
+        <th colSpan="10" style="text-align: center;">ACCOUNT STATEMENT - ${formatDateStr(startDate)} TO ${formatDateStr(endDate)}</th>
       </tr>
       <tr>
         <th style="width: 10%;">Date</th>
@@ -245,11 +255,27 @@ export async function GET(
 
   <!-- Bank Account Details Box (Bottom) -->
   <div class="bank-box">
-    <h2 style="text-align: center; margin: 0 0 10px 0; font-size: 20px; font-weight: bold; color: #0F172A;">${press.name}</h2>
-    <p style="margin: 4px 0; font-size: 12px; font-weight: bold;">NAME OF BANK &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ${press.bankName}</p>
-    <p style="margin: 4px 0; font-size: 12px; font-weight: bold;">NATURE OF ACCOUNT : CURRENT ACCOUNT</p>
-    <p style="margin: 4px 0; font-size: 13px; font-weight: bold; font-family: monospace;">ACCOUNT NO. &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ${press.accountNo}</p>
-    <p style="margin: 4px 0; font-size: 13px; font-weight: bold; font-family: monospace;">IFSC &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: ${press.ifscCode}</p>
+  <h2 style="text-align: center; margin: 0 0 10px 0; font-size: 20px; font-weight: bold; color: #0F172A;">${press.name}</h2>
+  <table style="margin: auto;">
+  <tbody>
+  <tr style="margin: 4px 0; font-size: 12px; font-weight: bold;">
+  <th>NAME OF BANK :</th>
+  <td>${press.bankName}</td>
+  </tr>
+  <tr style="margin: 4px 0; font-size: 12px; font-weight: bold;">
+  <th>NATURE OF ACCOUNT :</th>
+  <td>CURRENT ACCOUNT</td>
+  </tr>
+  <tr style="margin: 4px 0; font-size: 12px; font-weight: bold;">
+  <th>ACCOUNT NO. :</th>
+  <td>${press.accountNo}</td>
+  </tr>
+  <tr style="margin: 4px 0; font-size: 12px; font-weight: bold;">
+  <th>IFSC :</th>
+  <td>${press.ifscCode}</td>
+  </tr>
+  </tbody>
+  </table>
   </div>
 </body>
 </html>

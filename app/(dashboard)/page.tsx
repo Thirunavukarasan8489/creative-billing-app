@@ -45,6 +45,8 @@ async function getDashboardData() {
     });
   }
 
+  const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+
   const [
     totalBilledMonthResult,
     taxInvoiceMonthCount,
@@ -56,7 +58,7 @@ async function getDashboardData() {
     companyCount,
     quotationCount,
     topClientsResult,
-    ...trendResults
+    chartInvoicesRaw,
   ] = await Promise.all([
     // Total Billed this month
     Invoice.aggregate([
@@ -112,44 +114,12 @@ async function getDashboardData() {
       { $sort: { totalBilled: -1 } },
       { $limit: 5 },
     ]),
-    // 6-month monthly trend promises
-    ...monthsTrendList.flatMap((m) => [
-      Invoice.aggregate([
-        {
-          $match: {
-            date: { $gte: m.start, $lte: m.end },
-            type: "tax_invoice",
-            status: { $ne: "cancelled" },
-          },
-        },
-        { $group: { _id: null, total: { $sum: "$grandTotal" } } },
-      ]),
-      Invoice.aggregate([
-        {
-          $match: {
-            date: { $gte: m.start, $lte: m.end },
-            type: "labour_bill",
-            status: { $ne: "cancelled" },
-          },
-        },
-        { $group: { _id: null, total: { $sum: "$grandTotal" } } },
-      ]),
-    ]),
+    // Lightweight invoice records for chart filtering
+    Invoice.find(
+      { status: { $ne: "cancelled" }, date: { $gte: oneYearAgo } },
+      { date: 1, type: 1, grandTotal: 1 }
+    ).lean(),
   ]);
-
-  const monthlyTrend = monthsTrendList.map((m, idx) => {
-    const taxRes = trendResults[idx * 2];
-    const labourRes = trendResults[idx * 2 + 1];
-    const taxAmount = taxRes?.[0]?.total || 0;
-    const labourAmount = labourRes?.[0]?.total || 0;
-
-    return {
-      monthLabel: m.monthLabel,
-      taxAmount,
-      labourAmount,
-      totalAmount: taxAmount + labourAmount,
-    };
-  });
 
   const topClients = topClientsResult.map((c: any) => ({
     name: c._id || "Direct Client",
@@ -178,8 +148,8 @@ async function getDashboardData() {
     recentInvoices: JSON.parse(JSON.stringify(recentInvoices)),
     companyCount,
     quotationCount,
-    monthlyTrend,
     topClients,
+    chartInvoices: JSON.parse(JSON.stringify(chartInvoicesRaw)),
   };
 }
 
@@ -203,12 +173,12 @@ export default async function DashboardPage() {
         <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="space-y-3 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E11D48] text-white text-[11px] font-bold uppercase tracking-wider shadow-sm">
+              {/* <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#E11D48] text-white text-[11px] font-bold uppercase tracking-wider shadow-sm">
                 <Sparkles className="w-3.5 h-3.5" />
                 Creative Line Graphics
-              </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 text-[11px] font-mono border border-slate-700">
-                <ShieldCheck className="w-3 h-3 text-emerald-400" />
+              </span> */}
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#E11D48] text-white text-[11px] font-mono border border-slate-700">
+                <Clock className="w-3 h-3 text-white" />
                 {currentDateStr}
               </span>
             </div>
@@ -342,84 +312,9 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      {/* Quick Counter Action Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Link
-          href="/invoices/new?type=tax_invoice"
-          className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-500/50 shadow-2xs hover:shadow-md transition-all flex items-center justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-blue-50 group-hover:bg-blue-600 text-blue-600 group-hover:text-white flex items-center justify-center transition-colors">
-              <Zap className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-bold text-xs text-[#0F172A] group-hover:text-blue-600 transition-colors">
-                Issue Tax Invoice
-              </h3>
-              <p className="text-[10px] text-slate-500">GST Companies (CGST/SGST)</p>
-            </div>
-          </div>
-          <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 transition-colors" />
-        </Link>
-
-        <Link
-          href="/invoices/new?type=labour_bill"
-          className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-rose-500/50 shadow-2xs hover:shadow-md transition-all flex items-center justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-rose-50 group-hover:bg-[#E11D48] text-[#E11D48] group-hover:text-white flex items-center justify-center transition-colors">
-              <FileText className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-bold text-xs text-[#0F172A] group-hover:text-[#E11D48] transition-colors">
-                Issue Labour Bill
-              </h3>
-              <p className="text-[10px] text-slate-500">Fast non-GST printing bill</p>
-            </div>
-          </div>
-          <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-[#E11D48] transition-colors" />
-        </Link>
-
-        <Link
-          href="/quotations"
-          className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-teal-500/50 shadow-2xs hover:shadow-md transition-all flex items-center justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-teal-50 group-hover:bg-teal-600 text-teal-600 group-hover:text-white flex items-center justify-center transition-colors">
-              <FileSpreadsheet className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-bold text-xs text-[#0F172A] group-hover:text-teal-600 transition-colors">
-                Rate Quotations
-              </h3>
-              <p className="text-[10px] text-slate-500">1-Click Invoice Converter</p>
-            </div>
-          </div>
-          <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-teal-600 transition-colors" />
-        </Link>
-
-        <Link
-          href="/companies"
-          className="group bg-white p-4 rounded-xl border border-slate-200 hover:border-indigo-500/50 shadow-2xs hover:shadow-md transition-all flex items-center justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white flex items-center justify-center transition-colors">
-              <Building2 className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="font-bold text-xs text-[#0F172A] group-hover:text-indigo-600 transition-colors">
-                Companies Directory
-              </h3>
-              <p className="text-[10px] text-slate-500">Client account ledgers</p>
-            </div>
-          </div>
-          <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 transition-colors" />
-        </Link>
-      </div>
-
       {/* Interactive Visual Charts & Analytics */}
       <DashboardCharts
-        monthlyTrend={data.monthlyTrend}
+        chartInvoices={data.chartInvoices}
         totalPaid={data.totalPaid}
         totalOutstanding={data.totalOutstanding}
         topClients={data.topClients}
