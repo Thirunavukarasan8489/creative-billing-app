@@ -37,9 +37,9 @@ export function Sidebar() {
   const navLinks = [
     { href: "/", label: "Overview", icon: LayoutDashboard },
     { href: "/invoices", label: "Invoices", icon: FileText },
+    { href: "/companies", label: "Companies & Statements", icon: Building2 },
     { href: "/quotations", label: "Rate Quotations", icon: FileSpreadsheet },
-    { href: "/companies", label: "Client Ledgers & Statements", icon: Building2 },
-    { href: "/reports", label: "GST & Tax Reports", icon: PieChart },
+    { href: "/reports", label: "Reports", icon: PieChart },
     { href: "/settings", label: "Press Settings", icon: Settings },
   ];
 
@@ -74,9 +74,8 @@ export function Sidebar() {
 
       {/* Sidebar Container */}
       <aside
-        className={`fixed lg:sticky top-0 left-0 z-50 lg:z-30 h-screen w-64 bg-[#0F172A] text-slate-200 border-r border-slate-800 flex flex-col justify-between transition-transform duration-200 ease-in-out ${
-          isOpenMobile ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
+        className={`fixed lg:sticky top-0 left-0 z-50 lg:z-30 h-screen w-64 bg-[#0F172A] text-slate-200 border-r border-slate-800 flex flex-col justify-between transition-transform duration-200 ease-in-out ${isOpenMobile ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+          }`}
       >
         <div className="p-5 space-y-6 flex-1 overflow-y-auto">
           {/* Brand Header */}
@@ -126,11 +125,10 @@ export function Sidebar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsOpenMobile(false)}
-                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-                    isActive
-                      ? "bg-blue-600 text-white shadow-sm font-bold"
-                      : "text-slate-400 hover:text-white hover:bg-slate-800/80"
-                  }`}
+                  className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${isActive
+                    ? "bg-blue-600 text-white shadow-sm font-bold"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800/80"
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <Icon className={`w-4 h-4 ${isActive ? "text-white" : "text-slate-400"}`} />
