@@ -14,12 +14,25 @@ import {
   Settings,
   CheckCircle2,
   FileSpreadsheet,
+  LogOut,
+  User,
 } from "lucide-react";
 
 export function Sidebar() {
   const pathname = usePathname();
   // Sidebar default is CLOSED on mobile (< lg), always OPEN on desktop (lg:)
   const [isOpenMobile, setIsOpenMobile] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (e) {
+      console.error("Logout error:", e);
+    }
+    window.location.href = "/login";
+  };
 
   const navLinks = [
     { href: "/", label: "Overview", icon: LayoutDashboard },
@@ -132,15 +145,29 @@ export function Sidebar() {
           </nav>
         </div>
 
-        {/* Sidebar Footer Info */}
-        <div className="p-4 border-t border-slate-800/80 bg-slate-950/50 space-y-2">
+        {/* Sidebar Footer Info & Logout */}
+        <div className="p-4 border-t border-slate-800/80 bg-slate-950/50 space-y-2.5">
           <div className="p-2.5 bg-slate-900/80 rounded-lg border border-slate-800 text-[11px] text-slate-400">
-            <p className="font-semibold text-slate-200">Creative Line Graphics</p>
-            <p className="text-[10px] text-slate-400 font-mono">Tiruppur • Tamil Nadu</p>
+            <div className="flex items-center justify-between font-semibold text-slate-200">
+              <span className="truncate">creativetpr@gmail.com</span>
+              <span className="bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[9px] font-bold px-1.5 py-0.2 rounded">
+                Admin
+              </span>
+            </div>
+            <p className="text-[10px] text-slate-400 font-mono mt-0.5">Tiruppur • Tamil Nadu</p>
             <p className="text-[9px] text-emerald-400 mt-1 flex items-center gap-1 font-mono">
-              <CheckCircle2 className="w-3 h-3 text-emerald-400" /> GST & Labour Ready
+              <CheckCircle2 className="w-3 h-3 text-emerald-400" /> Protected Session
             </p>
           </div>
+
+          <button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="w-full py-2 px-3 bg-slate-900 hover:bg-rose-950/60 hover:border-rose-800/60 border border-slate-800 text-slate-300 hover:text-rose-300 text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-2 group cursor-pointer disabled:opacity-50"
+          >
+            <LogOut className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+            <span>{isLoggingOut ? "Logging out..." : "Sign Out"}</span>
+          </button>
         </div>
       </aside>
     </>
