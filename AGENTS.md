@@ -154,18 +154,29 @@ All routes verified active and functional:
 
 ## Completed Works & Implementation Log
 
-### 1. Right-Aligned Header Details & Whitespace Optimization
-- **[app/(dashboard)/invoices/[id]/pdf/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/pdf/route.ts)** & **[components/invoices/InvoicePreview.tsx](file:///d:/projects/creative-billing-app/components/invoices/InvoicePreview.tsx)**: Centered `TAX INVOICE` / `LABOUR BILL` title, right-aligned `BILL NO`, `DATE`, `P.O. NO`, and `P.O. DATE`, and optimized `BILLED TO` box layout to eliminate unused right whitespace.
+### 1. User Authentication & Next.js 16 Edge Route Protection
+- **[lib/models/User.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/lib/models/User.ts)**, **[lib/auth.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/lib/auth.ts)**, & **[app/api/auth/login/route.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/api/auth/login/route.ts)**: Configured MongoDB user authentication with bcrypt password hashing for `creativetpr@gmail.com`.
+- **[lib/session.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/lib/session.ts)** & **[proxy.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/proxy.ts)**: Next.js 16 Edge runtime proxy middleware protecting all app routes with `jose` JWT cookies.
+- **[app/login/page.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/login/page.tsx)**: Brand login page with `<Suspense>` wrapper.
 
-### 2. B&W Print Layout Redesign
-- **[app/(dashboard)/invoices/[id]/pdf/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/pdf/route.ts)** & **[components/invoices/InvoicePreview.tsx](file:///d:/projects/creative-billing-app/components/invoices/InvoicePreview.tsx)**: Removed solid dark background fills, moved Press GSTIN under phone details on left, and added crisp black borders (`border: 1px solid #000`) around all table cells.
+### 2. Quotation-to-Bill Conversion Modal & Auto-Sequencing
+- **[components/quotations/ConvertModal.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/components/quotations/ConvertModal.tsx)** & **[app/api/quotations/[id]/convert/route.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/api/quotations/%5Bid%5D/convert/route.ts)**: Added modal dialog popup on Quotations ledger & detail views to convert rate quotations into Tax Invoices or Labour Bills with live GST tax math and auto-sequence bill numbering.
 
-### 3. Optional Purchase Order Fields (`poNumber` & `poDate`)
-- **[lib/models/Invoice.ts](file:///d:/projects/creative-billing-app/lib/models/Invoice.ts)** & **[lib/validation/invoice.ts](file:///d:/projects/creative-billing-app/lib/validation/invoice.ts)**: Added optional `poNumber` and `poDate` fields.
+### 3. Optional Quote Fields (`quoteNumber` & `quoteDate`)
+- **[lib/models/Invoice.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/lib/models/Invoice.ts)** & **[lib/validation/invoice.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/lib/validation/invoice.ts)**: Added optional `quoteNumber` and `quoteDate` fields.
+- **[components/invoices/InvoiceForm.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/components/invoices/InvoiceForm.tsx)**, **[components/invoices/InvoicePreview.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/components/invoices/InvoicePreview.tsx)**, & **[app/(dashboard)/invoices/[id]/pdf/route.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/%28dashboard%29/invoices/%5Bid%5D/pdf/route.ts)**: Input fields, live preview, and PDF stream support for quote metadata.
+
+### 4. Crisp Bordered Table Layouts (Header Metadata & Bank Account Details)
+- **[components/invoices/InvoicePreview.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/components/invoices/InvoicePreview.tsx)** & **[app/(dashboard)/invoices/[id]/pdf/route.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/%28dashboard%29/invoices/%5Bid%5D/pdf/route.ts)**: Styled bill metadata block (BILL NO, DATE, QUOTE NO, PO NO) and Bank Account Details (Bank Name, Account No, IFSC Code, Branch) into structured HTML tables with crisp `border: 1px solid #000` cells.
+
+### 5. Separate Tax Invoice vs Labour Bill Monthly Sales Statements
+- **[app/(dashboard)/reports/page.tsx](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/%28dashboard%29/reports/page.tsx)**: Added Statement Type filter dropdown (`ALL BILLS`, `TAX INVOICES ONLY`, `LABOUR BILLS ONLY`) for Monthly Sales Statement and Financial Year Statement.
+- **[app/api/reports/monthly-sales/route.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/api/reports/monthly-sales/route.ts)** & **[app/(dashboard)/reports/monthly-sales/print/route.ts](file:///f:/Thiru/frontend/Personal/creative-billing-app/app/%28dashboard%29/reports/monthly-sales/print/route.ts)**: API & print routes filter invoices by `type` parameter and generate dynamic statement titles (`TAX INVOICE SALES BILL [MONTH] [YEAR]` / `LABOUR BILL SALES BILL [MONTH] [YEAR]`).
 
 ---
 
 ## Verification & Build Status
 
 - TypeScript compilation and Next.js route validation verified via `npm run build`.
-- All routes and components adhere to the non-negotiables: mobile-responsive counter billing with persistent left sidebar, overridable bill types, GST field scoping, physical bill replica styling, dynamic press settings, full invoice editing capability with optional PO fields, B&W print layout redesign, paper-replica company account statements, rate quotations with 1-click invoice conversion, monthly sales bill statement ledgers, financial year statement exports, and invoice cancellation/deletion workflows.
+- All 37 routes active and verified without errors.
+- All core requirements met: authentication, edge route protection, company-first workflow, overridable bill types, rate quotation 1-click conversion modal, optional PO & Quote fields, crisp black-bordered PDF & preview table layouts, separate Tax vs Labour monthly sales bill statements, financial year statements, and client account ledgers.

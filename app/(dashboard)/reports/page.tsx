@@ -38,6 +38,7 @@ export default function ReportsPage() {
     now.getMonth() + 1
   );
   const [selectedYear, setSelectedYear] = useState<number>(now.getFullYear());
+  const [monthlyBillType, setMonthlyBillType] = useState<"all" | "tax_invoice" | "labour_bill">("all");
   const [monthlyData, setMonthlyData] = useState<any | null>(null);
   const [loadingMonthly, setLoadingMonthly] = useState<boolean>(true);
 
@@ -46,6 +47,7 @@ export default function ReportsPage() {
   const [selectedFY, setSelectedFY] = useState<string>(defaultFY);
   const [customStart, setCustomStart] = useState<string>("");
   const [customEnd, setCustomEnd] = useState<string>("");
+  const [annualBillType, setAnnualBillType] = useState<"all" | "tax_invoice" | "labour_bill">("all");
   const [annualData, setAnnualData] = useState<any | null>(null);
   const [loadingAnnual, setLoadingAnnual] = useState<boolean>(true);
 
@@ -60,7 +62,7 @@ export default function ReportsPage() {
     setLoadingMonthly(true);
     try {
       const res = await fetch(
-        `/api/reports/monthly-sales?month=${selectedMonth}&year=${selectedYear}`
+        `/api/reports/monthly-sales?month=${selectedMonth}&year=${selectedYear}&type=${monthlyBillType}`
       );
       const data = await res.json();
       if (res.ok) {
@@ -83,6 +85,9 @@ export default function ReportsPage() {
         if (customEnd) params.set("endDate", customEnd);
       } else {
         params.set("fy", selectedFY);
+      }
+      if (annualBillType !== "all") {
+        params.set("type", annualBillType);
       }
 
       const res = await fetch(`/api/reports/annual-statement?${params.toString()}`);
@@ -119,11 +124,11 @@ export default function ReportsPage() {
 
   useEffect(() => {
     fetchMonthlyStatement();
-  }, [selectedMonth, selectedYear]);
+  }, [selectedMonth, selectedYear, monthlyBillType]);
 
   useEffect(() => {
     fetchAnnualStatement();
-  }, [selectedFY, customStart, customEnd]);
+  }, [selectedFY, customStart, customEnd, annualBillType]);
 
   useEffect(() => {
     fetchGeneralReport();
@@ -131,7 +136,7 @@ export default function ReportsPage() {
 
   const handleDownloadMonthly = () => {
     window.open(
-      `/reports/monthly-sales/print?month=${selectedMonth}&year=${selectedYear}&autoPrint=true`,
+      `/reports/monthly-sales/print?month=${selectedMonth}&year=${selectedYear}&type=${monthlyBillType}&autoPrint=true`,
       "_blank"
     );
   };
@@ -143,6 +148,9 @@ export default function ReportsPage() {
       if (customEnd) params.set("endDate", customEnd);
     } else {
       params.set("fy", selectedFY);
+    }
+    if (annualBillType !== "all") {
+      params.set("type", annualBillType);
     }
     params.set("autoPrint", "true");
     window.open(`/reports/annual-statement/print?${params.toString()}`, "_blank");
@@ -277,6 +285,19 @@ export default function ReportsPage() {
                   <option value={2027}>2027</option>
                 </select>
               </div>
+
+              <div className="flex items-center gap-2 border-l border-slate-200 pl-3">
+                <label className="text-slate-500 font-semibold">Statement Type:</label>
+                <select
+                  value={monthlyBillType}
+                  onChange={(e) => setMonthlyBillType(e.target.value as any)}
+                  className="px-3 py-1.5 border border-slate-300 rounded-lg font-bold bg-white text-[#0F172A] focus:ring-2 focus:ring-rose-500 outline-none"
+                >
+                  <option value="all">ALL BILLS (Tax + Labour)</option>
+                  <option value="tax_invoice">TAX INVOICES ONLY</option>
+                  <option value="labour_bill">LABOUR BILLS ONLY</option>
+                </select>
+              </div>
             </div>
 
             <button
@@ -307,11 +328,11 @@ export default function ReportsPage() {
 
                 {/* Sub-Header Title & Date */}
                 <div className="flex justify-between items-center border-t border-b-2 border-slate-900 py-1.5 my-3 text-xs sm:text-sm font-bold">
-                  <div className="w-1/3"></div>
-                  <div className="w-1/3 text-center text-[#BE123C] tracking-wide uppercase">
-                    SALES BILL {monthlyData.monthLabel} {monthlyData.year}
+                  <div className="w-1/4"></div>
+                  <div className="w-2/4 text-center text-[#BE123C] tracking-wide uppercase font-extrabold">
+                    {monthlyData.title || `SALES BILL ${monthlyData.monthLabel} ${monthlyData.year}`}
                   </div>
-                  <div className="w-1/3 text-right text-[#BE123C] font-mono">
+                  <div className="w-1/4 text-right text-[#BE123C] font-mono">
                     {new Date().toLocaleDateString("en-GB").replace(/\//g, " - ")}
                   </div>
                 </div>
@@ -489,6 +510,19 @@ export default function ReportsPage() {
                   <option value="2026-2027">A.Y. 2026 - 2027 (01/04/26 to 31/03/27)</option>
                   <option value="2027-2028">A.Y. 2027 - 2028 (01/04/27 to 31/03/28)</option>
                 </select>
+
+                <div className="flex items-center gap-2 border-l border-slate-200 pl-3">
+                  <label className="text-slate-500 font-semibold">Statement Type:</label>
+                  <select
+                    value={annualBillType}
+                    onChange={(e) => setAnnualBillType(e.target.value as any)}
+                    className="px-3 py-1.5 border border-slate-300 rounded-lg font-bold bg-white text-[#0F172A] focus:ring-2 focus:ring-rose-500 outline-none"
+                  >
+                    <option value="all">ALL BILLS (Tax + Labour)</option>
+                    <option value="tax_invoice">TAX INVOICES ONLY</option>
+                    <option value="labour_bill">LABOUR BILLS ONLY</option>
+                  </select>
+                </div>
               </div>
 
               <button

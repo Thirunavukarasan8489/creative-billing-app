@@ -45,6 +45,7 @@ export async function GET(req: NextRequest) {
     const now = new Date();
     const monthParam = searchParams.get("month"); // 1 - 12
     const yearParam = searchParams.get("year"); // YYYY
+    const typeParam = searchParams.get("type"); // "tax_invoice" | "labour_bill" | "all"
 
     const month = monthParam ? parseInt(monthParam, 10) : now.getMonth() + 1;
     const year = yearParam ? parseInt(yearParam, 10) : now.getFullYear();
@@ -55,11 +56,17 @@ export async function GET(req: NextRequest) {
     let press = await PressProfile.findOne().lean();
     if (!press) press = DEFAULT_PRESS as any;
 
-    // Fetch active non-cancelled invoices in that month
-    const invoices = await Invoice.find({
+    const query: any = {
       date: { $gte: startDate, $lte: endDate },
       status: { $ne: "cancelled" },
-    })
+    };
+
+    if (typeParam === "tax_invoice" || typeParam === "labour_bill") {
+      query.type = typeParam;
+    }
+
+    // Fetch active non-cancelled invoices in that month
+    const invoices = await Invoice.find(query)
       .populate("companyId")
       .sort({ date: 1, number: 1 })
       .lean();
@@ -98,11 +105,19 @@ export async function GET(req: NextRequest) {
 
     const monthLabel = MONTH_NAMES[month - 1] || "JUNE";
 
+    let statementTitle = `SALES BILL ${monthLabel} ${year}`;
+    if (typeParam === "tax_invoice") {
+      statementTitle = `TAX INVOICE SALES BILL ${monthLabel} ${year}`;
+    } else if (typeParam === "labour_bill") {
+      statementTitle = `LABOUR BILL SALES BILL ${monthLabel} ${year}`;
+    }
+
     return NextResponse.json({
       month,
       year,
       monthLabel,
-      title: `SALES BILL ${monthLabel} ${year}`,
+      type: typeParam || "all",
+      title: statementTitle,
       press,
       startDate,
       endDate,

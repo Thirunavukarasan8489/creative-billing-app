@@ -29,6 +29,7 @@ export async function GET(req: NextRequest) {
     const fyParam = searchParams.get("fy"); // e.g. "2026-2027"
     const startDateParam = searchParams.get("startDate");
     const endDateParam = searchParams.get("endDate");
+    const typeParam = searchParams.get("type"); // "tax_invoice" | "labour_bill" | "all"
 
     let startDate: Date;
     let endDate: Date;
@@ -57,13 +58,25 @@ export async function GET(req: NextRequest) {
       periodLabel = `ASSESSMENT YEAR ${currentYear}-${currentYear + 1}`;
     }
 
+    if (typeParam === "tax_invoice") {
+      periodLabel = `TAX INVOICE ${periodLabel}`;
+    } else if (typeParam === "labour_bill") {
+      periodLabel = `LABOUR BILL ${periodLabel}`;
+    }
+
     let press = await PressProfile.findOne().lean();
     if (!press) press = DEFAULT_PRESS as any;
 
-    const invoices = await Invoice.find({
+    const query: any = {
       date: { $gte: startDate, $lte: endDate },
       status: { $ne: "cancelled" },
-    })
+    };
+
+    if (typeParam === "tax_invoice" || typeParam === "labour_bill") {
+      query.type = typeParam;
+    }
+
+    const invoices = await Invoice.find(query)
       .populate("companyId")
       .sort({ date: 1, number: 1 })
       .lean();

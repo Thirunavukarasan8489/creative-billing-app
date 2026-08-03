@@ -42,6 +42,7 @@ export async function GET(req: NextRequest) {
     const now = new Date();
     const monthParam = searchParams.get("month");
     const yearParam = searchParams.get("year");
+    const typeParam = searchParams.get("type"); // "tax_invoice" | "labour_bill" | "all"
     const autoPrint = searchParams.get("autoPrint") !== "false";
 
     const month = monthParam ? parseInt(monthParam, 10) : now.getMonth() + 1;
@@ -53,10 +54,16 @@ export async function GET(req: NextRequest) {
     let press = await PressProfile.findOne().lean();
     if (!press) press = DEFAULT_PRESS as any;
 
-    const invoices = await Invoice.find({
+    const query: any = {
       date: { $gte: startDate, $lte: endDate },
       status: { $ne: "cancelled" },
-    })
+    };
+
+    if (typeParam === "tax_invoice" || typeParam === "labour_bill") {
+      query.type = typeParam;
+    }
+
+    const invoices = await Invoice.find(query)
       .populate("companyId")
       .sort({ date: 1, number: 1 })
       .lean();
@@ -98,6 +105,13 @@ export async function GET(req: NextRequest) {
     const monthLabel = MONTH_NAMES[month - 1] || "JUNE";
     const reportDateStr = now.toLocaleDateString("en-GB").replace(/\//g, " - ");
 
+    let statementTitle = `SALES BILL ${monthLabel} ${year}`;
+    if (typeParam === "tax_invoice") {
+      statementTitle = `TAX INVOICE SALES BILL ${monthLabel} ${year}`;
+    } else if (typeParam === "labour_bill") {
+      statementTitle = `LABOUR BILL SALES BILL ${monthLabel} ${year}`;
+    }
+
     // Create empty table rows to fill out full A4 landscape sheet
     const MIN_ROWS = 15;
     const emptyRowsCount = Math.max(0, MIN_ROWS - rows.length);
@@ -108,7 +122,7 @@ export async function GET(req: NextRequest) {
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>SALES_BILL_${monthLabel}_${year}</title>
+  <title>${statementTitle.replace(/ /g, "_")}</title>
   <style>
     @font-face {
       font-family: 'ParkAvenue';
@@ -239,7 +253,7 @@ export async function GET(req: NextRequest) {
       
       <div class="sub-header">
         <div style="flex: 1;"></div>
-        <div class="title-text" style="flex: 2; text-align: center;">SALES BILL ${monthLabel} ${year}</div>
+        <div class="title-text" style="flex: 2; text-align: center;">${statementTitle}</div>
         <div class="date-text" style="flex: 1; text-align: right;">${reportDateStr}</div>
       </div>
 

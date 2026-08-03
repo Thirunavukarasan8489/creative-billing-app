@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
     const fyParam = searchParams.get("fy"); // e.g. "2026-2027"
     const startDateParam = searchParams.get("startDate");
     const endDateParam = searchParams.get("endDate");
+    const typeParam = searchParams.get("type"); // "tax_invoice" | "labour_bill" | "all"
     const autoPrint = searchParams.get("autoPrint") !== "false";
 
     let startDate: Date;
@@ -59,13 +60,27 @@ export async function GET(req: NextRequest) {
       fileTitle = `ANNUAL_STATEMENT_AY_${currentYear}_${currentYear + 1}`;
     }
 
+    if (typeParam === "tax_invoice") {
+      periodTitle = `TAX INVOICE ${periodTitle}`;
+      fileTitle = `TAX_INVOICE_${fileTitle}`;
+    } else if (typeParam === "labour_bill") {
+      periodTitle = `LABOUR BILL ${periodTitle}`;
+      fileTitle = `LABOUR_BILL_${fileTitle}`;
+    }
+
     let press = await PressProfile.findOne().lean();
     if (!press) press = DEFAULT_PRESS as any;
 
-    const invoices = await Invoice.find({
+    const query: any = {
       date: { $gte: startDate, $lte: endDate },
       status: { $ne: "cancelled" },
-    })
+    };
+
+    if (typeParam === "tax_invoice" || typeParam === "labour_bill") {
+      query.type = typeParam;
+    }
+
+    const invoices = await Invoice.find(query)
       .populate("companyId")
       .sort({ date: 1, number: 1 })
       .lean();

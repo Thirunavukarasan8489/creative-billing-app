@@ -181,7 +181,7 @@ export default function InvoicesPage() {
               <thead className="bg-slate-100 text-[#0F172A] font-bold uppercase tracking-wider border-b border-slate-200">
                 <tr>
                   <th className="p-3">Bill No.</th>
-                  <th className="p-3">Type</th>
+                  <th className="py-3 px-10">Type</th>
                   <th className="p-3">Client Company</th>
                   <th className="p-3">Date</th>
                   <th className="p-3 text-right">Grand Total (₹)</th>
