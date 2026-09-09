@@ -270,10 +270,18 @@ export default function InvoicesPage() {
                       {new Date(inv.date).toLocaleDateString("en-IN")}
                     </td>
                     <td className="p-3 font-mono font-bold text-right text-[#0F172A]">
-                      ₹{inv.grandTotal.toLocaleString("en-IN")}
+                      {inv.status === "cancelled" ? (
+                        <span className="text-slate-400 font-normal select-none" title="Bill Cancelled">—</span>
+                      ) : (
+                        `₹${inv.grandTotal.toLocaleString("en-IN")}`
+                      )}
                     </td>
                     <td className="p-3 font-mono font-bold text-right text-[#E11D48]">
-                      ₹{(inv.balanceAmount || 0).toLocaleString("en-IN")}
+                      {inv.status === "cancelled" ? (
+                        <span className="text-slate-400 font-normal select-none" title="Bill Cancelled">—</span>
+                      ) : (
+                        `₹${(inv.balanceAmount || 0).toLocaleString("en-IN")}`
+                      )}
                     </td>
                     <td className="p-3 text-center">
                       {inv.status === "cancelled" ? (

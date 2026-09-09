@@ -15,6 +15,7 @@ import {
   Zap,
   ArrowUpRight,
   ShieldCheck,
+  Ban,
 } from "lucide-react";
 import { dbConnect } from "@/lib/db";
 import Invoice from "@/lib/models/Invoice";
@@ -396,10 +397,16 @@ export default async function DashboardPage() {
                       {new Date(inv.date).toLocaleDateString("en-GB").replace(/\//g, ".")}
                     </td>
                     <td className="p-3 font-mono font-bold text-right text-[#0F172A]">
-                      ₹{inv.grandTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                      {inv.status === "cancelled" ? (
+                        <span className="text-slate-400 font-normal select-none" title="Bill Cancelled">—</span>
+                      ) : (
+                        `₹${inv.grandTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}`
+                      )}
                     </td>
                     <td className="p-3 font-mono font-bold text-right">
-                      {inv.balanceAmount > 0 ? (
+                      {inv.status === "cancelled" ? (
+                        <span className="text-slate-400 font-normal select-none" title="Bill Cancelled">—</span>
+                      ) : inv.balanceAmount > 0 ? (
                         <span className="text-[#E11D48]">
                           ₹{inv.balanceAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                         </span>
@@ -408,7 +415,11 @@ export default async function DashboardPage() {
                       )}
                     </td>
                     <td className="p-3 text-center">
-                      {inv.status === "paid" || inv.balanceAmount === 0 ? (
+                      {inv.status === "cancelled" ? (
+                        <span className="bg-rose-100 text-rose-800 border border-rose-300 text-[10px] font-bold px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
+                          <Ban className="w-3 h-3 text-rose-600" /> Cancelled
+                        </span>
+                      ) : inv.status === "paid" || inv.balanceAmount === 0 ? (
                         <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
                           <CheckCircle2 className="w-3 h-3" /> Paid
                         </span>

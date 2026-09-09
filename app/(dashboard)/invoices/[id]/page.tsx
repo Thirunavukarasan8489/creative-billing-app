@@ -215,6 +215,19 @@ export default function InvoiceDetailPage({
         </div>
       </div>
 
+      {/* Cancelled Notice Banner */}
+      {isCancelled && (
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center gap-3 text-rose-800 text-xs font-semibold shadow-2xs">
+          <Ban className="w-5 h-5 text-rose-600 shrink-0" />
+          <div>
+            <p className="font-bold text-sm text-rose-900">This Bill Has Been Cancelled</p>
+            <p className="text-rose-700 font-normal mt-0.5">
+              Amounts and dues are voided and excluded from accounting ledgers, GST reports, and company balances.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Payment & Balance Status Banner */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
@@ -222,10 +235,13 @@ export default function InvoiceDetailPage({
             Grand Total Amount
           </span>
           <p className="font-mono text-xl font-bold text-[#0F172A] mt-0.5">
-            ₹
-            {invoice.grandTotal.toLocaleString("en-IN", {
-              minimumFractionDigits: 2,
-            })}
+            {isCancelled ? (
+              <span className="text-slate-400 font-normal select-none" title="Bill Cancelled">—</span>
+            ) : (
+              `₹${invoice.grandTotal.toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+              })}`
+            )}
           </p>
         </div>
 
@@ -234,10 +250,13 @@ export default function InvoiceDetailPage({
             Total Payments Received
           </span>
           <p className="font-mono text-xl font-bold text-emerald-800 mt-0.5">
-            ₹
-            {(invoice.paidAmount || 0).toLocaleString("en-IN", {
-              minimumFractionDigits: 2,
-            })}
+            {isCancelled ? (
+              <span className="text-slate-400 font-normal select-none" title="Bill Cancelled">—</span>
+            ) : (
+              `₹${(invoice.paidAmount || 0).toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+              })}`
+            )}
           </p>
         </div>
 
@@ -246,10 +265,13 @@ export default function InvoiceDetailPage({
             Balance Outstanding
           </span>
           <p className="font-mono text-xl font-bold text-[#E11D48] mt-0.5">
-            ₹
-            {(invoice.balanceAmount || 0).toLocaleString("en-IN", {
-              minimumFractionDigits: 2,
-            })}
+            {isCancelled ? (
+              <span className="text-slate-400 font-normal select-none" title="Bill Cancelled">—</span>
+            ) : (
+              `₹${(invoice.balanceAmount || 0).toLocaleString("en-IN", {
+                minimumFractionDigits: 2,
+              })}`
+            )}
           </p>
         </div>
       </div>

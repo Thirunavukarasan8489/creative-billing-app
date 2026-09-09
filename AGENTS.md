@@ -176,6 +176,11 @@ All routes verified active and functional:
   - Default bill sorting set to **descending** (`desc`) so newest invoices appear first.
   - Interactive **BILL NO.** table header button with visual indicator (`DESC ↓` or `ASC ↑`), subtle icon rotation, hover animations, and instant client-side + server-side sort toggle.
 
+### 4. Cancelled Bill Amounts Masking Across Views
+- **[app/(dashboard)/invoices/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/page.tsx)**: When a bill status is `cancelled`, Grand Total (₹) and Balance Due (₹) display muted em-dashes (`—`) instead of financial amounts, preventing cancelled totals from appearing active.
+- **[app/(dashboard)/invoices/[id]/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/page.tsx)**: Added a top banner warning for cancelled bills and masked Grand Total, Received, and Balance cards with `—`.
+- **[app/(dashboard)/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/page.tsx)**: Mapped cancelled bills in the recent bills overview with `—` totals and a Cancelled badge.
+
 ---
 
 ## Verification & Build Status
