@@ -170,6 +170,12 @@ All routes verified active and functional:
   - Enhanced responsive layout with mobile horizontal scroll hints, responsive paddings, and flexible text wrapping.
 - **[app/api/reports/route.ts](file:///d:/projects/creative-billing-app/app/api/reports/route.ts)**: Ensured cancelled bills are excluded from active GST liability and company ledger calculations.
 
+### 3. Invoices Ledger Sorting (Default Descending & Bill No. Header Toggle)
+- **[app/api/invoices/route.ts](file:///d:/projects/creative-billing-app/app/api/invoices/route.ts)**: Added `sortOrder` parameter support (`desc` default, `asc` supported) with natural sequence number and alphanumeric bill number sorting.
+- **[app/(dashboard)/invoices/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/page.tsx)**:
+  - Default bill sorting set to **descending** (`desc`) so newest invoices appear first.
+  - Interactive **BILL NO.** table header button with visual indicator (`DESC ↓` or `ASC ↑`), subtle icon rotation, hover animations, and instant client-side + server-side sort toggle.
+
 ---
 
 ## Verification & Build Status

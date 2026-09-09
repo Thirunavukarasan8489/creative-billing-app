@@ -81,7 +81,7 @@ export async function GET(req: NextRequest) {
 
     const invoices = await Invoice.find(query)
       .populate("companyId")
-      .sort({ date: 1, number: 1 })
+      .sort({ sequenceNumber: 1, number: 1, date: 1 })
       .lean();
 
     const rows = invoices.map((inv: any) => {
@@ -99,6 +99,7 @@ export async function GET(req: NextRequest) {
 
       return {
         billNo: inv.number,
+        sequenceNumber: inv.sequenceNumber ?? 0,
         date: new Date(inv.date).toLocaleDateString("en-GB").replace(/\//g, "."),
         particulars: companyName,
         gstin,
@@ -111,6 +112,23 @@ export async function GET(req: NextRequest) {
         status: inv.status,
         isCancelled,
       };
+    });
+
+    // Ensure strictly ascending sorting by BILL No.
+    rows.sort((a, b) => {
+      if (
+        typeof a.sequenceNumber === "number" &&
+        typeof b.sequenceNumber === "number" &&
+        a.sequenceNumber !== 0 &&
+        b.sequenceNumber !== 0 &&
+        a.sequenceNumber !== b.sequenceNumber
+      ) {
+        return a.sequenceNumber - b.sequenceNumber;
+      }
+      return (a.billNo || "").localeCompare(b.billNo || "", undefined, {
+        numeric: true,
+        sensitivity: "base",
+      });
     });
 
     const activeRows = rows.filter((r) => !r.isCancelled);

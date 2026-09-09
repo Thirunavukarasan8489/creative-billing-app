@@ -12,6 +12,9 @@ import {
   Pencil,
   Ban,
   Trash2,
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
 } from "lucide-react";
 
 export default function InvoicesPage() {
@@ -19,6 +22,7 @@ export default function InvoicesPage() {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [sortOrder, setSortOrder] = useState<"desc" | "asc">("desc");
   const [loading, setLoading] = useState(true);
 
   const fetchInvoices = async () => {
@@ -28,12 +32,31 @@ export default function InvoicesPage() {
       if (search) params.set("search", search);
       if (typeFilter) params.set("type", typeFilter);
       if (statusFilter) params.set("status", statusFilter);
+      params.set("sortOrder", sortOrder);
       params.set("limit", "100");
 
       const res = await fetch(`/api/invoices?${params.toString()}`);
       const data = await res.json();
       if (res.ok) {
         const list = Array.isArray(data) ? data : (data.invoices || []);
+        list.sort((a: any, b: any) => {
+          if (
+            typeof a.sequenceNumber === "number" &&
+            typeof b.sequenceNumber === "number" &&
+            a.sequenceNumber !== 0 &&
+            b.sequenceNumber !== 0 &&
+            a.sequenceNumber !== b.sequenceNumber
+          ) {
+            return sortOrder === "asc"
+              ? a.sequenceNumber - b.sequenceNumber
+              : b.sequenceNumber - a.sequenceNumber;
+          }
+          const comp = (a.number || "").localeCompare(b.number || "", undefined, {
+            numeric: true,
+            sensitivity: "base",
+          });
+          return sortOrder === "asc" ? comp : -comp;
+        });
         setInvoices(list);
       }
     } catch (err) {
@@ -45,7 +68,7 @@ export default function InvoicesPage() {
 
   useEffect(() => {
     fetchInvoices();
-  }, [search, typeFilter, statusFilter]);
+  }, [search, typeFilter, statusFilter, sortOrder]);
 
   const handleCancelInvoice = async (id: string, number: string) => {
     if (
@@ -181,7 +204,31 @@ export default function InvoicesPage() {
             <table className="w-full text-xs text-left min-w-[720px] border-separate border-spacing-0">
               <thead className="sticky top-0 z-10 bg-slate-100 text-[#0F172A] font-bold uppercase tracking-wider shadow-xs">
                 <tr>
-                  <th className="p-3 bg-slate-100 border-b border-slate-200 sticky top-0 z-10">Bill No.</th>
+                  <th
+                    onClick={() => setSortOrder((prev) => (prev === "desc" ? "asc" : "desc"))}
+                    className="p-3 bg-slate-100 border-b border-slate-200 sticky top-0 z-10 cursor-pointer select-none hover:bg-slate-200/80 transition-colors group"
+                    title={`Sort by Bill No. (Currently: ${sortOrder === "desc" ? "Descending / Newest first" : "Ascending / Oldest first"}) — Click to toggle`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span>Bill No.</span>
+                      <span className="inline-flex items-center justify-center p-0.5 rounded bg-white border border-slate-300 group-hover:border-slate-400 shadow-2xs">
+                        {sortOrder === "desc" ? (
+                          <ArrowDown className="w-3.5 h-3.5 text-[#E11D48]" />
+                        ) : (
+                          <ArrowUp className="w-3.5 h-3.5 text-blue-600" />
+                        )}
+                      </span>
+                      <span
+                        className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded border uppercase tracking-wider ${
+                          sortOrder === "desc"
+                            ? "bg-rose-50 text-rose-700 border-rose-200"
+                            : "bg-blue-50 text-blue-700 border-blue-200"
+                        }`}
+                      >
+                        {sortOrder === "desc" ? "DESC ↓" : "ASC ↑"}
+                      </span>
+                    </div>
+                  </th>
                   <th className="py-3 px-3 bg-slate-100 border-b border-slate-200 sticky top-0 z-10">Type</th>
                   <th className="p-3 bg-slate-100 border-b border-slate-200 sticky top-0 z-10">Client Company</th>
                   <th className="p-3 bg-slate-100 border-b border-slate-200 sticky top-0 z-10">Date</th>

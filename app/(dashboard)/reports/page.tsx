@@ -66,6 +66,23 @@ export default function ReportsPage() {
       );
       const data = await res.json();
       if (res.ok) {
+        if (Array.isArray(data.rows)) {
+          data.rows.sort((a: any, b: any) => {
+            if (
+              typeof a.sequenceNumber === "number" &&
+              typeof b.sequenceNumber === "number" &&
+              a.sequenceNumber !== 0 &&
+              b.sequenceNumber !== 0 &&
+              a.sequenceNumber !== b.sequenceNumber
+            ) {
+              return a.sequenceNumber - b.sequenceNumber;
+            }
+            return (a.billNo || "").localeCompare(b.billNo || "", undefined, {
+              numeric: true,
+              sensitivity: "base",
+            });
+          });
+        }
         setMonthlyData(data);
       }
     } catch (err) {
@@ -93,6 +110,23 @@ export default function ReportsPage() {
       const res = await fetch(`/api/reports/annual-statement?${params.toString()}`);
       const data = await res.json();
       if (res.ok) {
+        if (Array.isArray(data.rows)) {
+          data.rows.sort((a: any, b: any) => {
+            if (
+              typeof a.sequenceNumber === "number" &&
+              typeof b.sequenceNumber === "number" &&
+              a.sequenceNumber !== 0 &&
+              b.sequenceNumber !== 0 &&
+              a.sequenceNumber !== b.sequenceNumber
+            ) {
+              return a.sequenceNumber - b.sequenceNumber;
+            }
+            return (a.billNo || "").localeCompare(b.billNo || "", undefined, {
+              numeric: true,
+              sensitivity: "base",
+            });
+          });
+        }
         setAnnualData(data);
       }
     } catch (err) {

@@ -60,11 +60,33 @@ export async function GET(req: NextRequest) {
       ];
     }
 
+    const sortOrderParam = searchParams.get("sortOrder") === "asc" ? "asc" : "desc";
+    const sortDir = sortOrderParam === "asc" ? 1 : -1;
+
     const invoices = await Invoice.find(query)
-      .sort({ date: -1, createdAt: -1 })
+      .sort({ sequenceNumber: sortDir, number: sortDir, date: sortDir, createdAt: sortDir })
       .lean();
 
-    return NextResponse.json({ invoices, total: invoices.length });
+    invoices.sort((a: any, b: any) => {
+      if (
+        typeof a.sequenceNumber === "number" &&
+        typeof b.sequenceNumber === "number" &&
+        a.sequenceNumber !== 0 &&
+        b.sequenceNumber !== 0 &&
+        a.sequenceNumber !== b.sequenceNumber
+      ) {
+        return sortDir === 1
+          ? a.sequenceNumber - b.sequenceNumber
+          : b.sequenceNumber - a.sequenceNumber;
+      }
+      const comp = (a.number || "").localeCompare(b.number || "", undefined, {
+        numeric: true,
+        sensitivity: "base",
+      });
+      return sortDir === 1 ? comp : -comp;
+    });
+
+    return NextResponse.json({ invoices, total: invoices.length, sortOrder: sortOrderParam });
   } catch (error) {
     console.error("Error fetching invoices:", error);
     return NextResponse.json(
