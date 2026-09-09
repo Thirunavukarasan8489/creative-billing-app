@@ -69,7 +69,6 @@ export async function GET(req: NextRequest) {
 
     const query: any = {
       date: { $gte: startDate, $lte: endDate },
-      status: { $ne: "cancelled" },
     };
 
     if (typeParam === "tax_invoice" || typeParam === "labour_bill") {
@@ -82,6 +81,27 @@ export async function GET(req: NextRequest) {
       .lean();
 
     const rows = invoices.map((inv: any) => {
+      const isCancelled = inv.status === "cancelled";
+
+      if (isCancelled) {
+        return {
+          _id: inv._id,
+          billNo: inv.number,
+          date: inv.date,
+          particulars: "BILL CANCELLED",
+          gstin: "",
+          subtotal: 0,
+          cgstPercent: 0,
+          cgstAmount: 0,
+          sgstPercent: 0,
+          sgstAmount: 0,
+          grandTotal: 0,
+          type: inv.type,
+          status: inv.status,
+          isCancelled: true,
+        };
+      }
+
       const companyName =
         inv.companySnapshot?.name ||
         (typeof inv.companyId === "object" ? inv.companyId?.name : "N/A") ||
@@ -105,13 +125,16 @@ export async function GET(req: NextRequest) {
         sgstAmount: Number(inv.sgstAmount) || 0,
         grandTotal: Number(inv.grandTotal) || 0,
         type: inv.type,
+        status: inv.status,
+        isCancelled: false,
       };
     });
 
-    const totalSubtotal = rows.reduce((sum, r) => sum + r.subtotal, 0);
-    const totalCGST = rows.reduce((sum, r) => sum + r.cgstAmount, 0);
-    const totalSGST = rows.reduce((sum, r) => sum + r.sgstAmount, 0);
-    const grandTotalSum = rows.reduce((sum, r) => sum + r.grandTotal, 0);
+    const activeRows = rows.filter((r) => !r.isCancelled);
+    const totalSubtotal = activeRows.reduce((sum, r) => sum + r.subtotal, 0);
+    const totalCGST = activeRows.reduce((sum, r) => sum + r.cgstAmount, 0);
+    const totalSGST = activeRows.reduce((sum, r) => sum + r.sgstAmount, 0);
+    const grandTotalSum = activeRows.reduce((sum, r) => sum + r.grandTotal, 0);
 
     return NextResponse.json({
       periodLabel,
@@ -126,6 +149,8 @@ export async function GET(req: NextRequest) {
         totalSGST: Math.round(totalSGST * 100) / 100,
         grandTotalSum: Math.round(grandTotalSum * 100) / 100,
         totalBills: rows.length,
+        activeBillsCount: activeRows.length,
+        cancelledBillsCount: rows.length - activeRows.length,
       },
     });
   } catch (error) {

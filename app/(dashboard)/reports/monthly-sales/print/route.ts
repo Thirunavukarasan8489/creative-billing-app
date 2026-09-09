@@ -56,7 +56,6 @@ export async function GET(req: NextRequest) {
 
     const query: any = {
       date: { $gte: startDate, $lte: endDate },
-      status: { $ne: "cancelled" },
     };
 
     if (typeParam === "tax_invoice" || typeParam === "labour_bill") {
@@ -79,6 +78,8 @@ export async function GET(req: NextRequest) {
         (typeof inv.companyId === "object" ? inv.companyId?.gstin : "") ||
         "—";
 
+      const isCancelled = inv.status === "cancelled";
+
       return {
         billNo: inv.number,
         date: new Date(inv.date)
@@ -94,13 +95,17 @@ export async function GET(req: NextRequest) {
           inv.type === "tax_invoice" ? Number(inv.sgstPercent || 9) : 0,
         sgstAmount: Number(inv.sgstAmount) || 0,
         grandTotal: Number(inv.grandTotal) || 0,
+        status: inv.status,
+        isCancelled,
       };
     });
 
-    const totalSubtotal = rows.reduce((sum, r) => sum + r.subtotal, 0);
-    const totalCGST = rows.reduce((sum, r) => sum + r.cgstAmount, 0);
-    const totalSGST = rows.reduce((sum, r) => sum + r.sgstAmount, 0);
-    const grandTotalSum = rows.reduce((sum, r) => sum + r.grandTotal, 0);
+    // Totals calculate only from active bills
+    const activeRows = rows.filter((r) => !r.isCancelled);
+    const totalSubtotal = activeRows.reduce((sum, r) => sum + r.subtotal, 0);
+    const totalCGST = activeRows.reduce((sum, r) => sum + r.cgstAmount, 0);
+    const totalSGST = activeRows.reduce((sum, r) => sum + r.sgstAmount, 0);
+    const grandTotalSum = activeRows.reduce((sum, r) => sum + r.grandTotal, 0);
 
     const monthLabel = MONTH_NAMES[month - 1] || "JUNE";
     const reportDateStr = now.toLocaleDateString("en-GB").replace(/\//g, " - ");
@@ -275,7 +280,17 @@ export async function GET(req: NextRequest) {
         <tbody>
           ${rows
             .map(
-              (r) => `
+              (r) =>
+                r.isCancelled
+                  ? `
+          <tr style="background-color: #FFF1F2;">
+            <td class="col-bill" style="color: #BE123C; font-weight: bold;">${r.billNo}</td>
+            <td colspan="9" style="text-align: center; font-weight: bold; color: #BE123C; letter-spacing: 2px; font-size: 11px;">
+              BILL CANCELLED
+            </td>
+          </tr>
+          `
+                  : `
           <tr>
             <td class="col-bill">${r.billNo}</td>
             <td class="col-date">${r.date}</td>
@@ -292,7 +307,7 @@ export async function GET(req: NextRequest) {
             )
             .join("")}
           <tr class="summary-row">
-            <td colspan="4" class="summary-label">TOTAL</td>
+            <td colspan="4" class="summary-label">TOTAL (${activeRows.length} ACTIVE${rows.length - activeRows.length > 0 ? ` + ${rows.length - activeRows.length} CANCELLED` : ""})</td>
             <td class="summary-val">${totalSubtotal.toFixed(2)}</td>
             <td></td>
             <td class="summary-val">${totalCGST.toFixed(2)}</td>

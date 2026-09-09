@@ -160,6 +160,16 @@ All routes verified active and functional:
 - **[app/(dashboard)/companies/[id]/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/companies/\[id\]/page.tsx)**: Added **Statement Type** filter dropdown (`ALL BILLS (Tax + Labour)`, `TAX INVOICES ONLY`, `LABOUR BILLS ONLY`) in the filter bar with live state update.
 - **[app/(dashboard)/companies/[id]/statement/print/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/companies/\[id\]/statement/print/route.ts)**: Added type parameter filtering and dynamic statement header titles (`TAX INVOICE ACCOUNT STATEMENT` / `LABOUR BILL ACCOUNT STATEMENT` / `ACCOUNT STATEMENT`).
 
+### 2. Cancelled Bill Visibility in Monthly & Annual Sales Statements
+- **[app/api/reports/monthly-sales/route.ts](file:///d:/projects/creative-billing-app/app/api/reports/monthly-sales/route.ts)**: Removed `status: { $ne: 'cancelled' }` filter to return all sequence bills; mapped `isCancelled` & `status`; turnover and tax totals strictly sum active bills (`activeBillsCount` and `cancelledBillsCount` tracked in summary response).
+- **[app/(dashboard)/reports/monthly-sales/print/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/reports/monthly-sales/print/route.ts)**: Rendered cancelled bills with light rose background, `BILL CANCELLED` badge in Particulars, struck-through amounts, and summary label displaying active and cancelled bill counts.
+- **[app/api/reports/annual-statement/route.ts](file:///d:/projects/creative-billing-app/app/api/reports/annual-statement/route.ts)** & **[app/(dashboard)/reports/annual-statement/print/route.ts](file:///d:/projects/creative-billing-app/app/\(dashboard\)/reports/annual-statement/print/route.ts)**: Aligned annual / assessment year statement with cancelled bill tracking.
+- **[app/(dashboard)/reports/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/reports/page.tsx)**:
+  - Added warning notice banner when cancelled bills exist in the statement period.
+  - Rendered `⚠️ BILL CANCELLED` badge, rose highlight row, and strikethrough styling for cancelled bills in both Monthly and Annual interactive paper replica grids.
+  - Enhanced responsive layout with mobile horizontal scroll hints, responsive paddings, and flexible text wrapping.
+- **[app/api/reports/route.ts](file:///d:/projects/creative-billing-app/app/api/reports/route.ts)**: Ensured cancelled bills are excluded from active GST liability and company ledger calculations.
+
 ---
 
 ## Verification & Build Status

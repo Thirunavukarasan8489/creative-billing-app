@@ -12,6 +12,7 @@ export async function GET(req: NextRequest) {
 
     const query: Record<string, unknown> = {
       type: "tax_invoice",
+      status: { $ne: "cancelled" },
     };
 
     if (startDateParam || endDateParam) {
@@ -33,7 +34,10 @@ export async function GET(req: NextRequest) {
     const totalTaxableGrandTotal = taxInvoices.reduce((sum, inv) => sum + inv.grandTotal, 0);
 
     // Also get Labour Bill totals
-    const labourQuery: Record<string, unknown> = { type: "labour_bill" };
+    const labourQuery: Record<string, unknown> = {
+      type: "labour_bill",
+      status: { $ne: "cancelled" },
+    };
     if (query.date) labourQuery.date = query.date;
 
     const labourInvoices = await Invoice.find(labourQuery);
@@ -43,7 +47,10 @@ export async function GET(req: NextRequest) {
     const companies = await Company.find().sort({ name: 1 });
     const companyLedgers = await Promise.all(
       companies.map(async (company) => {
-        const invs = await Invoice.find({ companyId: company._id });
+        const invs = await Invoice.find({
+          companyId: company._id,
+          status: { $ne: "cancelled" },
+        });
         const totalBilled = invs.reduce((sum, inv) => sum + inv.grandTotal, 0);
         const totalPaid = invs.reduce((sum, inv) => sum + (inv.paidAmount || 0), 0);
         const outstanding = totalBilled - totalPaid;

@@ -309,6 +309,21 @@ export default function ReportsPage() {
             </button>
           </div>
 
+          {/* Cancelled Bills Notice Banner */}
+          {monthlyData?.totals?.cancelledBillsCount > 0 && (
+            <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs">
+              <span className="text-base">⚠️</span>
+              <p>
+                <strong>Notice:</strong> This statement includes{" "}
+                <span className="font-bold text-rose-700 underline">
+                  {monthlyData.totals.cancelledBillsCount} Cancelled Bill
+                  {monthlyData.totals.cancelledBillsCount > 1 ? "s" : ""}
+                </span>
+                . Cancelled bills appear in serial order with a warning badge and strikethrough, and their amounts are excluded from all turnover and tax totals.
+              </p>
+            </div>
+          )}
+
           {/* Live Paper Statement Replica */}
           {loadingMonthly ? (
             <div className="p-12 text-center text-xs text-slate-500">
@@ -319,162 +334,193 @@ export default function ReportsPage() {
               Failed to load monthly statement data.
             </div>
           ) : (
-            <div className="bg-white p-4 sm:p-8 rounded-xl border-2 border-slate-900 shadow-lg space-y-4 max-w-5xl mx-auto overflow-x-auto">
-              <div className="border border-slate-900 p-4 sm:p-6 min-w-[700px]">
-                {/* ParkAvenue Heading */}
-                <h2 className="park-avenue text-3xl sm:text-4xl text-center text-[#E11D48]">
-                  Creative Line Graphics
-                </h2>
+            <div className="bg-white p-2 sm:p-6 lg:p-8 rounded-xl border-2 border-slate-900 shadow-lg space-y-3 sm:space-y-4 max-w-5xl mx-auto">
+              <div className="text-[10px] text-slate-500 sm:hidden flex items-center justify-between px-1">
+                <span>👉 Swipe horizontally to view full 10 columns</span>
+                {monthlyData.totals.cancelledBillsCount > 0 && (
+                  <span className="text-rose-600 font-bold">
+                    {monthlyData.totals.cancelledBillsCount} Cancelled
+                  </span>
+                )}
+              </div>
 
-                {/* Sub-Header Title & Date */}
-                <div className="flex justify-between items-center border-t border-b-2 border-slate-900 py-1.5 my-3 text-xs sm:text-sm font-bold">
-                  <div className="w-1/4"></div>
-                  <div className="w-2/4 text-center text-[#BE123C] tracking-wide uppercase font-extrabold">
-                    {monthlyData.title || `SALES BILL ${monthlyData.monthLabel} ${monthlyData.year}`}
-                  </div>
-                  <div className="w-1/4 text-right text-[#BE123C] font-mono">
-                    {new Date().toLocaleDateString("en-GB").replace(/\//g, " - ")}
-                  </div>
-                </div>
+              <div className="border border-slate-900 p-2 sm:p-6 overflow-x-auto">
+                <div className="min-w-[700px]">
+                  {/* ParkAvenue Heading */}
+                  <h2 className="park-avenue text-3xl sm:text-4xl text-center text-[#E11D48]">
+                    Creative Line Graphics
+                  </h2>
 
-                {/* 10-Column Monthly Sales Grid */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs border-collapse border border-slate-900 font-mono">
-                    <thead>
-                      <tr className="bg-slate-50 text-slate-900 font-bold uppercase text-[10px] border-b border-slate-900">
-                        <th className="border border-slate-900 p-1.5 text-center w-14">
-                          BILL No.
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-center w-20">
-                          Date
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-left">
-                          Particulars
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-center w-36">
-                          GST NO.
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-right w-20">
-                          TOTAL
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-center w-8">
-                          %
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-right w-20">
-                          CGST
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-center w-8">
-                          %
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-right w-20">
-                          SGST
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-right w-24">
-                          Amount
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-900">
-                      {monthlyData.rows.length === 0 ? (
-                        <tr>
-                          <td
-                            colSpan={10}
-                            className="p-8 text-center text-slate-400 font-sans text-xs italic"
-                          >
-                            No bills issued in {monthlyData.monthLabel}{" "}
-                            {monthlyData.year}
-                          </td>
+                  {/* Sub-Header Title & Date */}
+                  <div className="flex justify-between items-center border-t border-b-2 border-slate-900 py-1.5 my-3 text-xs sm:text-sm font-bold">
+                    <div className="w-1/4"></div>
+                    <div className="w-2/4 text-center text-[#BE123C] tracking-wide uppercase font-extrabold">
+                      {monthlyData.title || `SALES BILL ${monthlyData.monthLabel} ${monthlyData.year}`}
+                    </div>
+                    <div className="w-1/4 text-right text-[#BE123C] font-mono">
+                      {new Date().toLocaleDateString("en-GB").replace(/\//g, " - ")}
+                    </div>
+                  </div>
+
+                  {/* 10-Column Monthly Sales Grid */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs border-collapse border border-slate-900 font-mono">
+                      <thead>
+                        <tr className="bg-slate-50 text-slate-900 font-bold uppercase text-[10px] border-b border-slate-900">
+                          <th className="border border-slate-900 p-1.5 text-center w-14">
+                            BILL No.
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-center w-20">
+                            Date
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-left">
+                            Particulars
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-center w-36">
+                            GST NO.
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-right w-20">
+                            TOTAL
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-center w-8">
+                            %
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-right w-20">
+                            CGST
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-center w-8">
+                            %
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-right w-20">
+                            SGST
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-right w-24">
+                            Amount
+                          </th>
                         </tr>
-                      ) : (
-                        monthlyData.rows.map((r: any) => (
-                          <tr key={r._id} className="hover:bg-slate-50">
-                            <td className="border border-slate-900 p-1.5 text-center font-bold text-slate-900">
-                              {r.billNo}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-center text-slate-700">
-                              {new Date(r.date)
-                                .toLocaleDateString("en-GB")
-                                .replace(/\//g, ".")}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 font-sans font-semibold text-slate-800">
-                              {r.particulars}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-center text-slate-600 text-[10px]">
-                              {r.gstin}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-right text-slate-800">
-                              {r.subtotal > 0
-                                ? r.subtotal.toLocaleString("en-IN", {
-                                    minimumFractionDigits: 2,
-                                  })
-                                : ""}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-center text-slate-600">
-                              {r.cgstPercent > 0 ? r.cgstPercent : ""}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-right text-slate-800">
-                              {r.cgstAmount > 0
-                                ? r.cgstAmount.toLocaleString("en-IN", {
-                                    minimumFractionDigits: 2,
-                                  })
-                                : ""}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-center text-slate-600">
-                              {r.sgstPercent > 0 ? r.sgstPercent : ""}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-right text-slate-800">
-                              {r.sgstAmount > 0
-                                ? r.sgstAmount.toLocaleString("en-IN", {
-                                    minimumFractionDigits: 2,
-                                  })
-                                : ""}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-right font-bold text-slate-900">
-                              {r.grandTotal.toLocaleString("en-IN", {
-                                minimumFractionDigits: 2,
-                              })}
+                      </thead>
+                      <tbody className="divide-y divide-slate-900">
+                        {monthlyData.rows.length === 0 ? (
+                          <tr>
+                            <td
+                              colSpan={10}
+                              className="p-8 text-center text-slate-400 font-sans text-xs italic"
+                            >
+                              No bills issued in {monthlyData.monthLabel}{" "}
+                              {monthlyData.year}
                             </td>
                           </tr>
-                        ))
-                      )}
+                        ) : (
+                          monthlyData.rows.map((r: any) =>
+                            r.isCancelled ? (
+                              <tr
+                                key={r._id}
+                                className="bg-rose-50/70 hover:bg-rose-100/60"
+                              >
+                                <td className="border border-slate-900 p-1.5 text-center font-bold text-rose-700 font-mono">
+                                  {r.billNo}
+                                </td>
+                                <td
+                                  colSpan={9}
+                                  className="border border-slate-900 p-1.5 text-center font-extrabold text-rose-600 tracking-widest uppercase font-sans text-xs bg-rose-50/40"
+                                >
+                                  <span className="inline-flex items-center gap-1.5 font-extrabold">
+                                    ⚠️ BILL CANCELLED
+                                  </span>
+                                </td>
+                              </tr>
+                            ) : (
+                              <tr key={r._id} className="hover:bg-slate-50">
+                                <td className="border border-slate-900 p-1.5 text-center font-bold text-slate-900">
+                                  {r.billNo}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-center text-slate-700">
+                                  {new Date(r.date)
+                                    .toLocaleDateString("en-GB")
+                                    .replace(/\//g, ".")}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 font-sans font-semibold text-slate-800">
+                                  {r.particulars}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-center text-slate-600 text-[10px]">
+                                  {r.gstin}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-right text-slate-800">
+                                  {r.subtotal > 0
+                                    ? r.subtotal.toLocaleString("en-IN", {
+                                        minimumFractionDigits: 2,
+                                      })
+                                    : ""}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-center text-slate-600">
+                                  {r.cgstPercent > 0 ? r.cgstPercent : ""}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-right text-slate-800">
+                                  {r.cgstAmount > 0
+                                    ? r.cgstAmount.toLocaleString("en-IN", {
+                                        minimumFractionDigits: 2,
+                                      })
+                                    : ""}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-center text-slate-600">
+                                  {r.sgstPercent > 0 ? r.sgstPercent : ""}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-right text-slate-800">
+                                  {r.sgstAmount > 0
+                                    ? r.sgstAmount.toLocaleString("en-IN", {
+                                        minimumFractionDigits: 2,
+                                      })
+                                    : ""}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-right font-bold text-slate-900">
+                                  {r.grandTotal.toLocaleString("en-IN", {
+                                    minimumFractionDigits: 2,
+                                  })}
+                                </td>
+                              </tr>
+                            )
+                          )
+                        )}
 
-                      {/* Summary Totals Row */}
-                      <tr className="bg-rose-50/50 font-bold border-t-2 border-slate-900 text-xs">
-                        <td
-                          colSpan={4}
-                          className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold uppercase font-sans"
-                        >
-                          TOTAL
-                        </td>
-                        <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
-                          {monthlyData.totals.totalSubtotal.toLocaleString(
-                            "en-IN",
-                            { minimumFractionDigits: 2 }
-                          )}
-                        </td>
-                        <td className="border border-slate-900 p-2"></td>
-                        <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
-                          {monthlyData.totals.totalCGST.toLocaleString(
-                            "en-IN",
-                            { minimumFractionDigits: 2 }
-                          )}
-                        </td>
-                        <td className="border border-slate-900 p-2"></td>
-                        <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
-                          {monthlyData.totals.totalSGST.toLocaleString(
-                            "en-IN",
-                            { minimumFractionDigits: 2 }
-                          )}
-                        </td>
-                        <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold text-sm">
-                          {monthlyData.totals.grandTotalSum.toLocaleString(
-                            "en-IN",
-                            { minimumFractionDigits: 2 }
-                          )}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                        {/* Summary Totals Row */}
+                        <tr className="bg-rose-50/50 font-bold border-t-2 border-slate-900 text-xs">
+                          <td
+                            colSpan={4}
+                            className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold uppercase font-sans"
+                          >
+                            TOTAL ({monthlyData.totals.activeBillsCount ?? monthlyData.totals.totalBills} ACTIVE
+                            {monthlyData.totals.cancelledBillsCount > 0 ? ` + ${monthlyData.totals.cancelledBillsCount} CANCELLED` : ""})
+                          </td>
+                          <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
+                            {monthlyData.totals.totalSubtotal.toLocaleString(
+                              "en-IN",
+                              { minimumFractionDigits: 2 }
+                            )}
+                          </td>
+                          <td className="border border-slate-900 p-2"></td>
+                          <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
+                            {monthlyData.totals.totalCGST.toLocaleString(
+                              "en-IN",
+                              { minimumFractionDigits: 2 }
+                            )}
+                          </td>
+                          <td className="border border-slate-900 p-2"></td>
+                          <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
+                            {monthlyData.totals.totalSGST.toLocaleString(
+                              "en-IN",
+                              { minimumFractionDigits: 2 }
+                            )}
+                          </td>
+                          <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold text-sm">
+                            {monthlyData.totals.grandTotalSum.toLocaleString(
+                              "en-IN",
+                              { minimumFractionDigits: 2 }
+                            )}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
@@ -571,6 +617,21 @@ export default function ReportsPage() {
             </div>
           </div>
 
+          {/* Cancelled Bills Notice Banner */}
+          {annualData?.totals?.cancelledBillsCount > 0 && (
+            <div className="flex items-center gap-2 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs">
+              <span className="text-base">⚠️</span>
+              <p>
+                <strong>Notice:</strong> This annual statement includes{" "}
+                <span className="font-bold text-rose-700 underline">
+                  {annualData.totals.cancelledBillsCount} Cancelled Bill
+                  {annualData.totals.cancelledBillsCount > 1 ? "s" : ""}
+                </span>
+                . Cancelled bills appear in serial order with a warning badge and strikethrough, and their amounts are excluded from all turnover and tax totals.
+              </p>
+            </div>
+          )}
+
           {/* Live Paper Annual Statement Replica */}
           {loadingAnnual ? (
             <div className="p-12 text-center text-xs text-slate-500">
@@ -581,161 +642,192 @@ export default function ReportsPage() {
               Failed to load annual statement data.
             </div>
           ) : (
-            <div className="bg-white p-4 sm:p-8 rounded-xl border-2 border-slate-900 shadow-lg space-y-4 max-w-5xl mx-auto overflow-x-auto">
-              <div className="border border-slate-900 p-4 sm:p-6 min-w-[700px]">
-                {/* ParkAvenue Heading */}
-                <h2 className="park-avenue text-3xl sm:text-4xl text-center text-[#E11D48]">
-                  Creative Line Graphics
-                </h2>
+            <div className="bg-white p-2 sm:p-6 lg:p-8 rounded-xl border-2 border-slate-900 shadow-lg space-y-3 sm:space-y-4 max-w-5xl mx-auto">
+              <div className="text-[10px] text-slate-500 sm:hidden flex items-center justify-between px-1">
+                <span>👉 Swipe horizontally to view full 10 columns</span>
+                {annualData.totals.cancelledBillsCount > 0 && (
+                  <span className="text-rose-600 font-bold">
+                    {annualData.totals.cancelledBillsCount} Cancelled
+                  </span>
+                )}
+              </div>
 
-                {/* Sub-Header Title & Period */}
-                <div className="flex justify-between items-center border-t border-b-2 border-slate-900 py-1.5 my-3 text-xs sm:text-sm font-bold">
-                  <div className="w-1/4"></div>
-                  <div className="w-2/4 text-center text-[#BE123C] tracking-wide uppercase">
-                    SALES STATEMENT — {annualData.periodLabel}
-                  </div>
-                  <div className="w-1/4 text-right text-[#BE123C] font-mono">
-                    {new Date().toLocaleDateString("en-GB").replace(/\//g, " - ")}
-                  </div>
-                </div>
+              <div className="border border-slate-900 p-2 sm:p-6 overflow-x-auto">
+                <div className="min-w-[700px]">
+                  {/* ParkAvenue Heading */}
+                  <h2 className="park-avenue text-3xl sm:text-4xl text-center text-[#E11D48]">
+                    Creative Line Graphics
+                  </h2>
 
-                {/* 10-Column Annual Sales Grid */}
-                <div className="overflow-x-auto">
-                  <table className="w-full text-xs border-collapse border border-slate-900 font-mono">
-                    <thead>
-                      <tr className="bg-slate-50 text-slate-900 font-bold uppercase text-[10px] border-b border-slate-900">
-                        <th className="border border-slate-900 p-1.5 text-center w-14">
-                          BILL No.
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-center w-20">
-                          Date
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-left">
-                          Particulars
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-center w-36">
-                          GST NO.
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-right w-20">
-                          TOTAL
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-center w-8">
-                          %
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-right w-20">
-                          CGST
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-center w-8">
-                          %
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-right w-20">
-                          SGST
-                        </th>
-                        <th className="border border-slate-900 p-1.5 text-right w-24">
-                          Amount
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-900">
-                      {annualData.rows.length === 0 ? (
-                        <tr>
-                          <td
-                            colSpan={10}
-                            className="p-8 text-center text-slate-400 font-sans text-xs italic"
-                          >
-                            No bills found for {annualData.periodLabel}
-                          </td>
+                  {/* Sub-Header Title & Period */}
+                  <div className="flex justify-between items-center border-t border-b-2 border-slate-900 py-1.5 my-3 text-xs sm:text-sm font-bold">
+                    <div className="w-1/4"></div>
+                    <div className="w-2/4 text-center text-[#BE123C] tracking-wide uppercase">
+                      SALES STATEMENT — {annualData.periodLabel}
+                    </div>
+                    <div className="w-1/4 text-right text-[#BE123C] font-mono">
+                      {new Date().toLocaleDateString("en-GB").replace(/\//g, " - ")}
+                    </div>
+                  </div>
+
+                  {/* 10-Column Annual Sales Grid */}
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs border-collapse border border-slate-900 font-mono">
+                      <thead>
+                        <tr className="bg-slate-50 text-slate-900 font-bold uppercase text-[10px] border-b border-slate-900">
+                          <th className="border border-slate-900 p-1.5 text-center w-14">
+                            BILL No.
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-center w-20">
+                            Date
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-left">
+                            Particulars
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-center w-36">
+                            GST NO.
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-right w-20">
+                            TOTAL
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-center w-8">
+                            %
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-right w-20">
+                            CGST
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-center w-8">
+                            %
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-right w-20">
+                            SGST
+                          </th>
+                          <th className="border border-slate-900 p-1.5 text-right w-24">
+                            Amount
+                          </th>
                         </tr>
-                      ) : (
-                        annualData.rows.map((r: any) => (
-                          <tr key={r._id} className="hover:bg-slate-50">
-                            <td className="border border-slate-900 p-1.5 text-center font-bold text-slate-900">
-                              {r.billNo}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-center text-slate-700">
-                              {new Date(r.date)
-                                .toLocaleDateString("en-GB")
-                                .replace(/\//g, ".")}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 font-sans font-semibold text-slate-800">
-                              {r.particulars}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-center text-slate-600 text-[10px]">
-                              {r.gstin}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-right text-slate-800">
-                              {r.subtotal > 0
-                                ? r.subtotal.toLocaleString("en-IN", {
-                                    minimumFractionDigits: 2,
-                                  })
-                                : ""}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-center text-slate-600">
-                              {r.cgstPercent > 0 ? r.cgstPercent : ""}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-right text-slate-800">
-                              {r.cgstAmount > 0
-                                ? r.cgstAmount.toLocaleString("en-IN", {
-                                    minimumFractionDigits: 2,
-                                  })
-                                : ""}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-center text-slate-600">
-                              {r.sgstPercent > 0 ? r.sgstPercent : ""}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-right text-slate-800">
-                              {r.sgstAmount > 0
-                                ? r.sgstAmount.toLocaleString("en-IN", {
-                                    minimumFractionDigits: 2,
-                                  })
-                                : ""}
-                            </td>
-                            <td className="border border-slate-900 p-1.5 text-right font-bold text-slate-900">
-                              {r.grandTotal.toLocaleString("en-IN", {
-                                minimumFractionDigits: 2,
-                              })}
+                      </thead>
+                      <tbody className="divide-y divide-slate-900">
+                        {annualData.rows.length === 0 ? (
+                          <tr>
+                            <td
+                              colSpan={10}
+                              className="p-8 text-center text-slate-400 font-sans text-xs italic"
+                            >
+                              No bills found for {annualData.periodLabel}
                             </td>
                           </tr>
-                        ))
-                      )}
+                        ) : (
+                          annualData.rows.map((r: any) =>
+                            r.isCancelled ? (
+                              <tr
+                                key={r._id}
+                                className="bg-rose-50/70 hover:bg-rose-100/60"
+                              >
+                                <td className="border border-slate-900 p-1.5 text-center font-bold text-rose-700 font-mono">
+                                  {r.billNo}
+                                </td>
+                                <td
+                                  colSpan={9}
+                                  className="border border-slate-900 p-1.5 text-center font-extrabold text-rose-600 tracking-widest uppercase font-sans text-xs bg-rose-50/40"
+                                >
+                                  <span className="inline-flex items-center gap-1.5 font-extrabold">
+                                    ⚠️ BILL CANCELLED
+                                  </span>
+                                </td>
+                              </tr>
+                            ) : (
+                              <tr key={r._id} className="hover:bg-slate-50">
+                                <td className="border border-slate-900 p-1.5 text-center font-bold text-slate-900">
+                                  {r.billNo}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-center text-slate-700">
+                                  {new Date(r.date)
+                                    .toLocaleDateString("en-GB")
+                                    .replace(/\//g, ".")}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 font-sans font-semibold text-slate-800">
+                                  {r.particulars}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-center text-slate-600 text-[10px]">
+                                  {r.gstin}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-right text-slate-800">
+                                  {r.subtotal > 0
+                                    ? r.subtotal.toLocaleString("en-IN", {
+                                        minimumFractionDigits: 2,
+                                      })
+                                    : ""}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-center text-slate-600">
+                                  {r.cgstPercent > 0 ? r.cgstPercent : ""}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-right text-slate-800">
+                                  {r.cgstAmount > 0
+                                    ? r.cgstAmount.toLocaleString("en-IN", {
+                                        minimumFractionDigits: 2,
+                                      })
+                                    : ""}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-center text-slate-600">
+                                  {r.sgstPercent > 0 ? r.sgstPercent : ""}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-right text-slate-800">
+                                  {r.sgstAmount > 0
+                                    ? r.sgstAmount.toLocaleString("en-IN", {
+                                        minimumFractionDigits: 2,
+                                      })
+                                    : ""}
+                                </td>
+                                <td className="border border-slate-900 p-1.5 text-right font-bold text-slate-900">
+                                  {r.grandTotal.toLocaleString("en-IN", {
+                                    minimumFractionDigits: 2,
+                                  })}
+                                </td>
+                              </tr>
+                            )
+                          )
+                        )}
 
-                      {/* Summary Totals Row */}
-                      <tr className="bg-rose-50/50 font-bold border-t-2 border-slate-900 text-xs">
-                        <td
-                          colSpan={4}
-                          className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold uppercase font-sans"
-                        >
-                          TOTAL ({annualData.totals.totalBills} BILLS)
-                        </td>
-                        <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
-                          {annualData.totals.totalSubtotal.toLocaleString(
-                            "en-IN",
-                            { minimumFractionDigits: 2 }
-                          )}
-                        </td>
-                        <td className="border border-slate-900 p-2"></td>
-                        <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
-                          {annualData.totals.totalCGST.toLocaleString(
-                            "en-IN",
-                            { minimumFractionDigits: 2 }
-                          )}
-                        </td>
-                        <td className="border border-slate-900 p-2"></td>
-                        <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
-                          {annualData.totals.totalSGST.toLocaleString(
-                            "en-IN",
-                            { minimumFractionDigits: 2 }
-                          )}
-                        </td>
-                        <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold text-sm">
-                          {annualData.totals.grandTotalSum.toLocaleString(
-                            "en-IN",
-                            { minimumFractionDigits: 2 }
-                          )}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
+                        {/* Summary Totals Row */}
+                        <tr className="bg-rose-50/50 font-bold border-t-2 border-slate-900 text-xs">
+                          <td
+                            colSpan={4}
+                            className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold uppercase font-sans"
+                          >
+                            TOTAL ({annualData.totals.activeBillsCount ?? annualData.totals.totalBills} ACTIVE
+                            {annualData.totals.cancelledBillsCount > 0 ? ` + ${annualData.totals.cancelledBillsCount} CANCELLED` : ""})
+                          </td>
+                          <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
+                            {annualData.totals.totalSubtotal.toLocaleString(
+                              "en-IN",
+                              { minimumFractionDigits: 2 }
+                            )}
+                          </td>
+                          <td className="border border-slate-900 p-2"></td>
+                          <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
+                            {annualData.totals.totalCGST.toLocaleString(
+                              "en-IN",
+                              { minimumFractionDigits: 2 }
+                            )}
+                          </td>
+                          <td className="border border-slate-900 p-2"></td>
+                          <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold">
+                            {annualData.totals.totalSGST.toLocaleString(
+                              "en-IN",
+                              { minimumFractionDigits: 2 }
+                            )}
+                          </td>
+                          <td className="border border-slate-900 p-2 text-right text-[#BE123C] font-extrabold text-sm">
+                            {annualData.totals.grandTotalSum.toLocaleString(
+                              "en-IN",
+                              { minimumFractionDigits: 2 }
+                            )}
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
