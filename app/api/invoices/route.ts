@@ -47,7 +47,12 @@ export async function GET(req: NextRequest) {
     const query: any = {};
 
     if (type) query.type = type;
-    if (status) query.status = status;
+    if (status === "unpaid") {
+      query.status = { $nin: ["paid", "cancelled"] };
+      query.balanceAmount = { $gt: 0 };
+    } else if (status) {
+      query.status = status;
+    }
     if (companyId && mongoose.Types.ObjectId.isValid(companyId)) {
       query.companyId = companyId;
     }

@@ -2,6 +2,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export interface IPayment extends Document {
   invoiceId: mongoose.Types.ObjectId;
+  companyId?: mongoose.Types.ObjectId;
   amountPaid: number;
   date: Date;
   mode: "cash" | "upi" | "bank_transfer" | "cheque";
@@ -14,6 +15,7 @@ export interface IPayment extends Document {
 const PaymentSchema: Schema = new Schema(
   {
     invoiceId: { type: Schema.Types.ObjectId, ref: "Invoice", required: true },
+    companyId: { type: Schema.Types.ObjectId, ref: "Company" },
     amountPaid: { type: Number, required: true, min: 0.01 },
     date: { type: Date, required: true, default: Date.now },
     mode: {
@@ -24,8 +26,16 @@ const PaymentSchema: Schema = new Schema(
     referenceNo: { type: String, trim: true, default: "" },
     notes: { type: String, trim: true, default: "" },
   },
-  { timestamps: true }
+  { timestamps: true, strictPopulate: false }
 );
+
+// If model was cached in Next.js runtime before companyId was added, bust the cache
+if (
+  mongoose.models.Payment &&
+  !mongoose.models.Payment.schema.path("companyId")
+) {
+  delete (mongoose.models as any).Payment;
+}
 
 const Payment: Model<IPayment> =
   mongoose.models.Payment || mongoose.model<IPayment>("Payment", PaymentSchema);

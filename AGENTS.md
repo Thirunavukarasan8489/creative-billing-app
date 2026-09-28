@@ -61,6 +61,8 @@ app/
           page.tsx              # Interactive invoice editor with Cash/Credit modes (/invoices/[id]/edit)
         pdf/
           route.ts              # Printable HTML/PDF letterhead stream (/invoices/[id]/pdf) with B&W print layout
+    payments/
+      page.tsx                  # Full Payment Hub (/payments): Month-wise settlement, multi-bill select, FIFO auto-allocate, & receipts log
     quotations/
       page.tsx                  # Rate quotations ledger & 1-click invoice converter (/quotations)
       new/page.tsx              # Create new rate quotation (/quotations/new)
@@ -138,6 +140,7 @@ All routes verified active and functional:
 | `/invoices/[id]` | `app/(dashboard)/invoices/[id]/page.tsx` | **Verified**: Invoice details with optional PO fields, Edit, Payment modal, & Cancel/Delete actions |
 | `/invoices/[id]/edit` | `app/(dashboard)/invoices/[id]/edit/page.tsx` | **Verified**: Invoice editing with Cash/Credit Labour Bill modes |
 | `/invoices/[id]/pdf` | `app/(dashboard)/invoices/[id]/pdf/route.ts` | **Verified**: Printable HTML/PDF stream with B&W print layout |
+| `/payments` | `app/(dashboard)/payments/page.tsx` | **Verified**: Payment Entry Hub with Month-wise settlement, multi-bill select, FIFO lump sum & receipts log |
 | `/quotations` | `app/(dashboard)/quotations/page.tsx` | **Verified**: Rate Quotation ledger with 1-click invoice converter |
 | `/quotations/new` | `app/(dashboard)/quotations/new/page.tsx` | **Verified**: Create rate quotation with live preview |
 | `/quotations/[id]` | `app/(dashboard)/quotations/[id]/page.tsx` | **Verified**: Quotation detail view, Edit & Convert buttons |
@@ -181,9 +184,21 @@ All routes verified active and functional:
 - **[app/(dashboard)/invoices/[id]/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/invoices/\[id\]/page.tsx)**: Added a top banner warning for cancelled bills and masked Grand Total, Received, and Balance cards with `—`.
 - **[app/(dashboard)/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/page.tsx)**: Mapped cancelled bills in the recent bills overview with `—` totals and a Cancelled badge.
 
+### 5. Record Payment Hub (/payments)
+- **[components/layout/Sidebar.tsx](file:///d:/projects/creative-billing-app/components/layout/Sidebar.tsx)**: Added persistent `Record Payment` navigation link with `CreditCard` icon.
+- **[app/api/payments/route.ts](file:///d:/projects/creative-billing-app/app/api/payments/route.ts)**: GET payments history with populate & KPI stats; POST batch or single bill settlement with automatic invoice balance calculation.
+- **[app/api/payments/[id]/route.ts](file:///d:/projects/creative-billing-app/app/api/payments/\[id\]/route.ts)**: DELETE payment route that restores invoice `paidAmount`, `balanceAmount`, and `status`.
+- **[app/(dashboard)/payments/page.tsx](file:///d:/projects/creative-billing-app/app/\(dashboard\)/payments/page.tsx)**:
+  - Interactive Company Selector with live search and outstanding dues indicators.
+  - **Month-Wise Settlement Concept**: Groups company's unpaid bills by Month with one-click *"Settle Month"* or expandable single bill selection.
+  - **Multi-Bill Checkbox Selection**: Select any combination of bills with custom amount allocation per bill.
+  - **Auto-FIFO Lump Sum**: Enter total payment received to automatically clear oldest unpaid bills first with live breakdown.
+  - Universal transaction form (Date, Mode: Bank/UPI/Cash/Cheque, Ref No, Notes).
+  - Receipts log with search, mode filter, bill links, and payment deletion.
+
 ---
 
 ## Verification & Build Status
 
 - TypeScript compilation and Next.js route validation verified via `npm run build`.
-- All 23 routes active and verified without errors.
+- All 24 routes active and verified without errors.

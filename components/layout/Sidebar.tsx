@@ -16,6 +16,7 @@ import {
   FileSpreadsheet,
   LogOut,
   User,
+  CreditCard,
 } from "lucide-react";
 
 export function Sidebar() {
@@ -37,6 +38,7 @@ export function Sidebar() {
   const navLinks = [
     { href: "/", label: "Overview", icon: LayoutDashboard },
     { href: "/invoices", label: "Invoices", icon: FileText },
+    { href: "/payments", label: "Record Payment", icon: CreditCard },
     { href: "/companies", label: "Companies & Statements", icon: Building2 },
     { href: "/quotations", label: "Rate Quotations", icon: FileSpreadsheet },
     { href: "/reports", label: "Reports", icon: PieChart },

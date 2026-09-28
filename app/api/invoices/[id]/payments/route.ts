@@ -28,6 +28,7 @@ export async function POST(
 
     const payment = await Payment.create({
       invoiceId: id,
+      companyId: invoice.companyId || undefined,
       amountPaid,
       date: date ? new Date(date) : new Date(),
       mode: mode || "bank_transfer",
